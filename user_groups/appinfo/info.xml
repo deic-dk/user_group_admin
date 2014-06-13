@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<info>
+      <id>user_groups</id>
+      <name>DeIC: user group management</name>
+      <description>Allowing users to create and manage groups</description>
+      <version>0.1</version>
+      <licence>AGPL</licence>
+      <author>Christian Brinch</author>
+      <require>6</require>
+</info>
