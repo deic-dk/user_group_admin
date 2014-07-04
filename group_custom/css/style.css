@@ -1,0 +1,81 @@
+#leftcontent li {
+	position: relative;
+	top: 5em;
+	white-space: normal ;
+}
+
+#leftcontent li img {	
+	padding-right: 5px;
+	vertical-align: middle;
+}
+
+#leftcontent li .group-actions {
+	float: right;
+}
+
+#create_group , #import_group {
+	float: left;
+}
+
+#mkgroup {
+	width: 95% ;	
+}
+
+#rightcontent {
+	box-sizing: border-box;
+	position: absolute;
+	top: 5em;
+	left: 20em;
+	right: 0;
+	bottom: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+	margin: 5px 10px ;
+}
+
+#rightcontent .title-group{
+	font-weight: bold ;
+}
+
+#rightcontent .title-group img{
+	padding-right: 10px;
+}
+
+.group.members li {
+	padding: 0.5em ;
+}
+
+.group.members li img {
+	padding-right: 5px;
+}
+
+.group.members li .member-actions {
+	float: right;
+}
+
+.group.members li .member-actions img{
+	vertical-align: middle;
+	padding-right: 1em
+}
+
+.group.members li .member-actions img:hover {
+    opacity: 1;
+}
+
+#block-members {
+	padding: .5em 1em;
+	margin: 1em;
+	background: #F8F8F8;
+	color: #555;
+	text-shadow: white 0 1px 0;
+	-moz-border-radius: .5em;
+	-webkit-border-radius: .5em;
+	border-radius: .5em;
+}
+
+#block-members .title {
+	margin-top: -1.2em ;
+}
+
+#import_group_form { width: 0; height: 0; }
+#import_group_file { -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; filter:alpha(opacity=0); opacity:0; z-index:1001; width:0; height:0;}
