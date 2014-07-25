@@ -5,3 +5,6 @@ user_group_admin
 In ownCloud, in order to create and manage a given group, you need to have group administrator rights to this groups and such rights can only be assigned manually by an administrator.
 
 This app allows any user to create (a limited number of) groups - for which he/she automatically becomes group administrator.
+
+This is a modified version of the group_custom app version 0.4:
+http://apps.owncloud.com/content/show.php/Group+Custom?content=156032
