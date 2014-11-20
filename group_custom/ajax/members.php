@@ -34,7 +34,7 @@ if (isset($_GET['search'])) {
     $offset = 0;
     while ($count < 4 && count($users) == $limit) {
         $limit = 4 - $count;
-        $users = OC_User::getUsers($_GET['search'], $limit, $offset);
+        $users = OC_User::getDisplayNames($_GET['search'], $limit, $offset);
         $offset += $limit;
         foreach ($users as $user) {
             if ((!isset($_GET['itemShares']) || !is_array($_GET['itemShares'][OCP\Share::SHARE_TYPE_USER]) || !in_array($user, $_GET['itemShares'][OCP\Share::SHARE_TYPE_USER])) && $user != OC_User::getUser()) {

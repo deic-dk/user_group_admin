@@ -1,81 +1,73 @@
-#leftcontent li {
-	position: relative;
-	top: 5em;
-	white-space: normal ;
+#group_left {
+  float: left;
+  width: 500px;
+  overflow: hidden;
 }
 
-#leftcontent li img {	
-	padding-right: 5px;
-	vertical-align: middle;
+#owngroups {
+  width: 200px;
+  float: left;
+  padding: 2px;
 }
 
-#leftcontent li .group-actions {
-	float: right;
+#create_group {
+  color: #ddd;
+  text-align: center;
+  font-size: x-large;
+  font-weight: bold;
 }
 
-#create_group , #import_group {
-	float: left;
+#othergroups {
+  float: left;
+  padding: 2px;
 }
 
-#mkgroup {
-	width: 95% ;	
+
+#group_right {
+  margin-top: 60px;
+  width: 200px;
+  overflow: hidden;
 }
 
-#rightcontent {
-	box-sizing: border-box;
-	position: absolute;
-	top: 5em;
-	left: 20em;
-	right: 0;
-	bottom: 0;
-	overflow-x: hidden;
-	overflow-y: auto;
-	margin: 5px 10px ;
+#titlebar {
+  font-family: 'Open Sans', sans-serif;
+  text-align: center;
+  height: 42px;
+  border: 2px solid #ddd;
+  font-weight: bold;
+  background: #eee;
+  vertical-align: middle;
+  display: table-cell;
+  width:200px;
 }
 
-#rightcontent .title-group{
-	font-weight: bold ;
+#group_left li {
+  height: 33px; 
+  line-height: 33px;
+  padding: 5px 0 0 15px;
 }
 
-#rightcontent .title-group img{
-	padding-right: 10px;
+#group_left li:hover {
+  background: #eee;
 }
 
-.group.members li {
-	padding: 0.5em ;
+a.action {
+  float: right;
+  padding-right: 5px;
 }
 
-.group.members li img {
-	padding-right: 5px;
+#group_buttons {
+  display: none;
 }
 
-.group.members li .member-actions {
-	float: right;
+#group_custom_holder {
+  display:none;
 }
 
-.group.members li .member-actions img{
-	vertical-align: middle;
-	padding-right: 1em
+#newgroup {
+  width: 80%;
+  border: none;
+  padding: 5px;
+  margin-left:20px;
 }
 
-.group.members li .member-actions img:hover {
-    opacity: 1;
-}
-
-#block-members {
-	padding: .5em 1em;
-	margin: 1em;
-	background: #F8F8F8;
-	color: #555;
-	text-shadow: white 0 1px 0;
-	-moz-border-radius: .5em;
-	-webkit-border-radius: .5em;
-	border-radius: .5em;
-}
-
-#block-members .title {
-	margin-top: -1.2em ;
-}
-
-#import_group_form { width: 0; height: 0; }
-#import_group_file { -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; filter:alpha(opacity=0); opacity:0; z-index:1001; width:0; height:0;}
