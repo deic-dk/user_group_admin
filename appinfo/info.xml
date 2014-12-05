@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<info>
+	<id>group_custom</id>
+	<name>Group Custom</name>
+	<description>Create and Manage Custom Groups</description>
+	<version>0.4</version>
+	<licence>AGPL (Icon taken from picol.org , Creative Commons-License BY-SA. )</licence>
+	<author>Jorge Rafael Garcia Ramos </author>
+	<require>4.93</require>
+</info>
