@@ -1,10 +1,9 @@
-user_group_admin
-================
-### ownCloud app allowing users to manage groups
+Group Custom 
+============
 
-In ownCloud, in order to create and manage a given group, you need to have group administrator rights to this groups and such rights can only be assigned manually by an administrator.
+Group custom is an Owncloud app that allows users to manage groups
+Written by Christian Brinch, DeIC, 2014. 
+It is based on Group custom written by Jorge Rafael Garcia Ramos,
+http://apps.owncloud.com/content/show.php?content=156032
 
-This app allows any user to create (a limited number of) groups - for which he/she automatically becomes group administrator.
 
-This is a modified version of the group_custom app version 0.4:
-http://apps.owncloud.com/content/show.php/Group+Custom?content=156032
