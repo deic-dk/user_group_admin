@@ -22,7 +22,7 @@
  */
 
 OCP\JSON::checkLoggedIn();
-OCP\JSON::checkAppEnabled('group_custom');
+OCP\JSON::checkAppEnabled('user_groupadmin');
 OCP\JSON::callCheck();
 
 $l = OC_L10N::get('group_custom');
@@ -33,7 +33,7 @@ if ( isset($_POST['group']) ) {
 
     if ($result) {
 
-        $tmpl = new OCP\Template("group_custom", "part.group");
+        $tmpl = new OCP\Template("user_groupadmin", "part.group");
         $tmpl->assign( 'groups' , OC_Group_Custom_Local::getGroups() , true );
         $page = $tmpl->fetchPage();
 

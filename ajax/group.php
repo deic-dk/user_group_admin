@@ -22,12 +22,12 @@
  */
 
 OCP\JSON::checkLoggedIn();
-OCP\JSON::checkAppEnabled('group_custom');
+OCP\JSON::checkAppEnabled('user_groupadmin');
 OCP\JSON::callCheck();
 
 if ( isset($_GET['group']) ) {
 
-    $tmpl = new OCP\Template("group_custom", "part.member");
+    $tmpl = new OCP\Template("user_groupadmin", "part.member");
     $tmpl->assign( 'group' , $_GET['group'] , false );
     $tmpl->assign( 'members' ,  OC_Group_Custom_Local::usersInGroup( $_GET['group'] )  , false );
     $page = $tmpl->fetchPage();

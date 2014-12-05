@@ -22,7 +22,7 @@
  */
 
 OCP\User::checkLoggedIn();
-OCP\App::checkAppEnabled('group_custom');
+OCP\App::checkAppEnabled('user_groupadmin');
 
 $group = isset($_GET['group']) ? $_GET['group'] : null;
 

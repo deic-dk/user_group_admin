@@ -22,10 +22,10 @@
  */
 
 OCP\User::checkLoggedIn();
-OCP\App::checkAppEnabled('group_custom');
+OCP\App::checkAppEnabled('user_groupadmin');
 
-OCP\App::setActiveNavigationEntry( 'group_custom_index' );
+OCP\App::setActiveNavigationEntry( 'user_groupadmin' );
 
-$tmpl = new OCP\Template('group_custom', 'groups', 'user');
+$tmpl = new OCP\Template('user_groupadmin', 'groups', 'user');
 $tmpl->assign( 'groups' , OC_Group_Custom_Local::getGroups() , true );
 $tmpl->printPage();

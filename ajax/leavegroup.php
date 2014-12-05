@@ -22,7 +22,7 @@
  */
 
 OCP\JSON::checkLoggedIn();
-OCP\JSON::checkAppEnabled('group_custom');
+OCP\JSON::checkAppEnabled('user_groupadmin');
 OCP\JSON::callCheck();
 
 $l = OC_L10N::get('group_custom');

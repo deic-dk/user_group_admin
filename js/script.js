@@ -11,7 +11,7 @@ OC.GroupCustom = {
 
         OC.GroupCustom.groupSelected = group ;
 
-        $.post(OC.filePath('group_custom', 'ajax', 'addgroup.php'), { group : group } , function ( jsondata ){
+        $.post(OC.filePath('user_groupadmin', 'ajax', 'addgroup.php'), { group : group } , function ( jsondata ){
             if(jsondata.status == 'success' ) {
 
                 $('#.roup_left').html(jsondata.data.page)
@@ -24,7 +24,7 @@ OC.GroupCustom = {
     } ,
 
     doExport:function( group ) {
-            document.location.href = OC.linkTo('group_custom', 'ajax/export.php') + '?group=' + group;
+            document.location.href = OC.linkTo('user_groupadmin', 'ajax/export.php') + '?group=' + group;
     },
 
     initDropDown : function() {
@@ -35,7 +35,7 @@ OC.GroupCustom = {
         $('#mkgroup').autocomplete({
             minLength : 2,
             source : function(search, response) {
-                $.get(OC.filePath('group_custom', 'ajax', 'members.php'), {
+                $.get(OC.filePath('user_groupadmin', 'ajax', 'members.php'), {
                     fetch : 'getShareWith',
                     search : search.term,
                     itemShares : [OC.GroupCustom.groupMember[OC.Share.SHARE_TYPE_USER], OC.GroupCustom.groupMember[OC.Share.SHARE_TYPE_GROUP]]
@@ -51,7 +51,7 @@ OC.GroupCustom = {
           select : function(event, selected) {
 
             var member = selected.item.value.shareWith;
-            $.post(OC.filePath('group_custom', 'ajax', 'addmember.php'), { member : member , group : OC.GroupCustom.groupSelected } , function ( jsondata ){
+            $.post(OC.filePath('user_groupadmin', 'ajax', 'addmember.php'), { member : member , group : OC.GroupCustom.groupSelected } , function ( jsondata ){
               if(jsondata.status == 'success' ) {
                 $('#mkgroup').val('');
                 OC.GroupCustom.groupMember[OC.Share.SHARE_TYPE_USER].push(member);
@@ -80,7 +80,7 @@ $(document).ready(function() {
   $('#newgroup').on('focusout', function() {  
     if( $('#newgroup').val() != "") { 
       // make the following an ajax call
-      $.post(OC.filePath('group_custom', 'ajax', 'addgroup.php'), { group : $('#newgroup').val() } , function ( jsondata ){
+      $.post(OC.filePath('user_groupadmin', 'ajax', 'addgroup.php'), { group : $('#newgroup').val() } , function ( jsondata ){
         if(jsondata.status == 'success' ) {
 
           $('#own').html(jsondata.data.page)
@@ -109,7 +109,7 @@ $(document).ready(function() {
   $('.group_left ul li').live('click', function() {  
     OC.GroupCustom.groupSelected = $(this).data('group') ;
 
-    $.getJSON(OC.filePath('group_custom', 'ajax', 'group.php'),{ group: OC.GroupCustom.groupSelected },function(jsondata) {
+    $.getJSON(OC.filePath('user_groupadmin', 'ajax', 'group.php'),{ group: OC.GroupCustom.groupSelected },function(jsondata) {
       if(jsondata.status == 'success') {
         $('#group_right').html(jsondata.data.page)
         OC.GroupCustom.initDropDown() ;
@@ -131,7 +131,7 @@ $(document).ready(function() {
     var container = $(this).parents('li').first();
     var member    = container.data('member');
 
-    $.post(OC.filePath('group_custom', 'ajax', 'delmember.php'), { member : member , group : OC.GroupCustom.groupSelected } , function ( jsondata ){
+    $.post(OC.filePath('user_groupadmin', 'ajax', 'delmember.php'), { member : member , group : OC.GroupCustom.groupSelected } , function ( jsondata ){
       if(jsondata.status == 'success' ) {
         container.remove();
         var index = OC.GroupCustom.groupMember[OC.Share.SHARE_TYPE_USER].indexOf(member);
@@ -152,7 +152,7 @@ $(document).ready(function() {
     var group     = container.data('group');
     event.stopPropagation();
 
-    $.post(OC.filePath('group_custom', 'ajax', 'delgroup.php'), { group : group } , function ( jsondata ){
+    $.post(OC.filePath('user_groupadmin', 'ajax', 'delgroup.php'), { group : group } , function ( jsondata ){
       if(jsondata.status == 'success' ) {
         container.remove();
         $('#group_right').html('');
@@ -173,7 +173,7 @@ $(document).ready(function() {
     var group     = container.data('group');
     event.stopPropagation();
 
-    $.post(OC.filePath('group_custom', 'ajax', 'leavegroup.php'), { group : group } , function ( jsondata ){
+    $.post(OC.filePath('user_groupadmin', 'ajax', 'leavegroup.php'), { group : group } , function ( jsondata ){
       if(jsondata.status == 'success' ) {
         container.remove();
         $('#group_right').html('');

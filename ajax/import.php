@@ -22,7 +22,7 @@
  */
 
 OCP\User::checkLoggedIn();
-OCP\App::checkAppEnabled('group_custom');
+OCP\App::checkAppEnabled('user_groupadmin');
 
 if (isset($_FILES['import_group_file'])) {
 
