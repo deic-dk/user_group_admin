@@ -1,9 +1,10 @@
 <?php
 
 /**
- * ownCloud - group_custom
+ * ownCloud - user_group_admin
  *
  * @author Jorge Rafael García Ramos
+ * @author Christian Brinck
  * @copyright 2012 Jorge Rafael García Ramos <kadukeitor@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
@@ -21,7 +22,7 @@
  *
  */
 
-class OC_Group_Custom_Hooks
+class OC_User_Group_Admin_Hooks
 {
 
     public static function post_deleteUser( $parameters )
@@ -29,13 +30,13 @@ class OC_Group_Custom_Hooks
         $uid = $parameters['uid'] ;
 
         // Delete the group
-        $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*groups_custom` WHERE `owner` = ?" );
+        $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin` WHERE `owner` = ?" );
         $stmt->execute( array($uid) );
 
         // Delete the group-user relation
-        $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*group_user_custom` WHERE `uid` = ?" );
+        $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin` WHERE `uid` = ?" );
         $stmt->execute( array($uid) );
-        $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*group_user_custom` WHERE `owner` = ?" );
+        $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin` WHERE `owner` = ?" );
         $stmt->execute( array($uid) );
 
         return true ;

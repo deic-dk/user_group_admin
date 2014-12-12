@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ownCloud - group_custom
+ * ownCloud - user_group_admin
  *
  * @author Jorge Rafael García Ramos
  * @copyright 2012 Jorge Rafael García Ramos <kadukeitor@gmail.com>
@@ -22,10 +22,10 @@
  */
 
 OCP\User::checkLoggedIn();
-OCP\App::checkAppEnabled('user_groupadmin');
+OCP\App::checkAppEnabled('user_group_admin');
 
-OCP\App::setActiveNavigationEntry( 'user_groupadmin' );
+OCP\App::setActiveNavigationEntry( 'user_group_admin' );
 
-$tmpl = new OCP\Template('user_groupadmin', 'groups', 'user');
-$tmpl->assign( 'groups' , OC_Group_Custom_Local::getGroups() , true );
+$tmpl = new OCP\Template('user_group_admin', 'groups', 'user');
+$tmpl->assign( 'groups' , OC_User_Group_Admin_Util::getGroups() , true );
 $tmpl->printPage();

@@ -2,14 +2,14 @@
 
 
 <?php
-if (OC_Group_Custom_Local::inGroup(OC_User::getUser() , $_['group'] ) ){
+if (OC_User_Group_Admin_Util::inGroup(OC_User::getUser() , $_['group'] ) ){
 ?> 
   
   <div id="block-members">
     <div class="title"><strong><?php echo $l->t('Owner')  ; ?></strong></div>
     <ul class="group members">
     <?php
-      $stmt = OC_DB::prepare( "SELECT `owner` FROM `*PREFIX*groups_custom` WHERE `gid` = ?" ); 
+      $stmt = OC_DB::prepare( "SELECT `owner` FROM `*PREFIX*user_group_admin` WHERE `gid` = ?" ); 
       $result = $stmt->execute( array('Test group'));
       $owners = array();                                                                                                           
       while ($row = $result->fetchRow()) {                                                                                         
@@ -43,7 +43,7 @@ if (OC_Group_Custom_Local::inGroup(OC_User::getUser() , $_['group'] ) ){
                 if ( OC_Group_Virtual::groupExists( $_['group'] ) ){
                     $members = OC_Group_Virtual::usersInGroup( $_['group'] ) ;
                     foreach ($members as $member) {
-                        echo "<li data-member=$member><img src=" . OCP\Util::imagePath( 'group_custom', 'user.png' ) . ">$member</li>" ;
+                        echo "<li data-member=$member><img src=" . OCP\Util::imagePath( 'user_group_admin', 'user.png' ) . ">$member</li>" ;
                     }
                 }
             }
@@ -80,7 +80,7 @@ if (OC_Group_Custom_Local::inGroup(OC_User::getUser() , $_['group'] ) ){
                 if ( OC_Group_Virtual::groupExists( $_['group'] ) ){
                     $members = OC_Group_Virtual::usersInGroup( $_['group'] ) ;
                     foreach ($members as $member) {
-                        echo "<li data-member=$member><img src=" . OCP\Util::imagePath( 'group_custom', 'user.png' ) . ">$member</li>" ;
+                        echo "<li data-member=$member><img src=" . OCP\Util::imagePath( 'user_group_admin', 'user.png' ) . ">$member</li>" ;
                     }
                 }
             }

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <info>
-	<id>user_groupadmin</id>
-	<name>user_groupadmin</name>
-	<description>Create and Manage Custom Groups</description>
+	<id>user_group_admin</id>
+	<name>User Group Admin</name>
+	<description>Enable users to create and manage groups</description>
 	<version>0.4</version>
 	<licence>AGPL </licence>
 	<author>Jorge Rafael Garcia Ramos </author>

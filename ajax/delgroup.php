@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ownCloud - group_custom
+ * ownCloud - user_group_admin
  *
  * @author Jorge Rafael García Ramos
  * @copyright 2012 Jorge Rafael García Ramos <kadukeitor@gmail.com>
@@ -22,14 +22,14 @@
  */
 
 OCP\JSON::checkLoggedIn();
-OCP\JSON::checkAppEnabled('user_groupadmin');
+OCP\JSON::checkAppEnabled('user_group_admin');
 OCP\JSON::callCheck();
 
-$l = OC_L10N::get('group_custom');
+$l = OC_L10N::get('user_group_admin');
 
 if ( isset($_POST['group']) ) {
 
-    $result = OC_Group_Custom_Local::deleteGroup( $_POST['group'] ) ;
+    $result = OC_User_Group_Admin_Util::deleteGroup( $_POST['group'] ) ;
 
     if ($result) {
 

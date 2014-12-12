@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ownCloud - group_custom
+ * ownCloud - user_group_admin
  *
  * @author Jorge Rafael García Ramos
  * @copyright 2012 Jorge Rafael García Ramos <kadukeitor@gmail.com>
@@ -22,20 +22,20 @@
  */
 
 OCP\JSON::checkLoggedIn();
-OCP\JSON::checkAppEnabled('user_groupadmin');
+OCP\JSON::checkAppEnabled('user_group_admin');
 OCP\JSON::callCheck();
 
-$l = OC_L10N::get('group_custom');
+$l = OC_L10N::get('user_group_admin');
 
 if ( isset($_POST['member']) and isset($_POST['group']) ) {
 
-    $result = OC_Group_Custom_Local::addToGroup( $_POST['member'] , $_POST['group'] ) ;
+    $result = OC_User_Group_Admin_Util::addToGroup( $_POST['member'] , $_POST['group'] ) ;
 
     if ($result) {
 
-        $tmpl = new OCP\Template("user_groupadmin", "part.member");
+        $tmpl = new OCP\Template("user_group_admin", "part.member");
         $tmpl->assign( 'group' , $_POST['group'] , false );
-        $tmpl->assign( 'members' , OC_Group_Custom_Local::usersInGroup( $_POST['group'] ) , false );
+        $tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $_POST['group'] ) , false );
         $page = $tmpl->fetchPage();
 
         OCP\JSON::success(array('data' => array('page'=>$page)));

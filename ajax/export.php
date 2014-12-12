@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ownCloud - group_custom
+ * ownCloud - user_group_admin
  *
  * @author Jorge Rafael García Ramos
  * @copyright 2012 Jorge Rafael García Ramos <kadukeitor@gmail.com>
@@ -22,7 +22,7 @@
  */
 
 OCP\User::checkLoggedIn();
-OCP\App::checkAppEnabled('user_groupadmin');
+OCP\App::checkAppEnabled('user_group_admin');
 
 $group = isset($_GET['group']) ? $_GET['group'] : null;
 
@@ -31,7 +31,7 @@ if ( isset($group) ) {
     header('Content-Type: application/octet-stream');
     header('Content-Disposition: inline; filename=' . str_replace(' ', '_', $group) . '.ocg');
 
-    $members = OC_Group_Custom_Local::usersInGroup( $group ) ;
+    $members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
     $data    = array_merge( array($group) , $members ) ;
 
     echo serialize($data) ;

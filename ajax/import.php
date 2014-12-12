@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ownCloud - group_custom
+ * ownCloud - user_group_admin
  *
  * @author Jorge Rafael García Ramos
  * @copyright 2012 Jorge Rafael García Ramos <kadukeitor@gmail.com>
@@ -22,7 +22,7 @@
  */
 
 OCP\User::checkLoggedIn();
-OCP\App::checkAppEnabled('user_groupadmin');
+OCP\App::checkAppEnabled('user_group_admin');
 
 if (isset($_FILES['import_group_file'])) {
 
@@ -36,17 +36,17 @@ if (isset($_FILES['import_group_file'])) {
         $group  = $members[0] ;
         array_shift($members);
 
-        $result = OC_Group_Custom_Local::createGroup( $group ) ;
+        $result = OC_User_Group_Admin_Util::createGroup( $group ) ;
         if ( $result ) {
             foreach ( $members as $member ) {
                 if ( OCP\User::userExists( $member ) and OCP\User::getUser() != $member ){
-                    OC_Group_Custom_Local::addToGroup( $member , $group ) ;
+                    OC_User_Group_Admin_Util::addToGroup( $member , $group ) ;
                 }
             }
         }
 
     }
 
-    header( 'Location: ' . OCP\Util::linkToAbsolute( 'group_custom' , 'index.php' ) ) ;
+    header( 'Location: ' . OCP\Util::linkToAbsolute( 'user_group_admin' , 'index.php' ) ) ;
 
 }

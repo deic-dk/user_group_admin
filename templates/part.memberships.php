@@ -1,7 +1,7 @@
 <?php
 
 
-    $groups = OC_Group_Custom_Local::getUserGroups(OC_User::getUser());
+    $groups = OC_User_Group_Admin_Util::getUserGroups(OC_User::getUser());
 
 
         foreach ($groups as $group) {
@@ -15,7 +15,7 @@
         // patch //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if ( OCP\App::isEnabled('group_virtual') and OC_Group::inGroup(OC_User::getUser(),'admin') ){
             foreach ( \OC_Group_Virtual::getGroups() as $group) {
-                echo "<li data-group=\"$group\" ><img src=" . OCP\Util::imagePath( 'group_custom', 'group.png' ) . ">$group</li>" ;
+                echo "<li data-group=\"$group\" ><img src=" . OCP\Util::imagePath( 'user_group_admin', 'group.png' ) . ">$group</li>" ;
             }
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

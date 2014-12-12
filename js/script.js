@@ -1,4 +1,4 @@
-OC.GroupCustom = {
+OC.UserGroupAdmin = {
 
     groupSelected : '' ,
     groupMember : [] ,
@@ -9,9 +9,9 @@ OC.GroupCustom = {
 
         $('#new_group_dialog').dialog('destroy').remove();
 
-        OC.GroupCustom.groupSelected = group ;
+        OC.UserGroupAdmin.groupSelected = group ;
 
-        $.post(OC.filePath('user_groupadmin', 'ajax', 'addgroup.php'), { group : group } , function ( jsondata ){
+        $.post(OC.filePath('user_group_admin', 'ajax', 'addgroup.php'), { group : group } , function ( jsondata ){
             if(jsondata.status == 'success' ) {
 
                 $('#.roup_left').html(jsondata.data.page)
@@ -24,21 +24,21 @@ OC.GroupCustom = {
     } ,
 
     doExport:function( group ) {
-            document.location.href = OC.linkTo('user_groupadmin', 'ajax/export.php') + '?group=' + group;
+            document.location.href = OC.linkTo('user_group_admin', 'ajax/export.php') + '?group=' + group;
     },
 
     initDropDown : function() {
 
-        OC.GroupCustom.groupMember[OC.Share.SHARE_TYPE_USER]  = [];
-        OC.GroupCustom.groupMember[OC.Share.SHARE_TYPE_GROUP] = [];
+        OC.UserGroupAdmin.groupMember[OC.Share.SHARE_TYPE_USER]  = [];
+        OC.UserGroupAdmin.groupMember[OC.Share.SHARE_TYPE_GROUP] = [];
 
         $('#mkgroup').autocomplete({
             minLength : 2,
             source : function(search, response) {
-                $.get(OC.filePath('user_groupadmin', 'ajax', 'members.php'), {
+                $.get(OC.filePath('user_group_admin', 'ajax', 'members.php'), {
                     fetch : 'getShareWith',
                     search : search.term,
-                    itemShares : [OC.GroupCustom.groupMember[OC.Share.SHARE_TYPE_USER], OC.GroupCustom.groupMember[OC.Share.SHARE_TYPE_GROUP]]
+                    itemShares : [OC.UserGroupAdmin.groupMember[OC.Share.SHARE_TYPE_USER], OC.UserGroupAdmin.groupMember[OC.Share.SHARE_TYPE_GROUP]]
                 }, function(result) {
                     if(result.status == 'success' && result.data.length > 0) {
                         response(result.data);
@@ -51,12 +51,12 @@ OC.GroupCustom = {
           select : function(event, selected) {
 
             var member = selected.item.value.shareWith;
-            $.post(OC.filePath('user_groupadmin', 'ajax', 'addmember.php'), { member : member , group : OC.GroupCustom.groupSelected } , function ( jsondata ){
+            $.post(OC.filePath('user_group_admin', 'ajax', 'addmember.php'), { member : member , group : OC.UserGroupAdmin.groupSelected } , function ( jsondata ){
               if(jsondata.status == 'success' ) {
                 $('#mkgroup').val('');
-                OC.GroupCustom.groupMember[OC.Share.SHARE_TYPE_USER].push(member);
+                OC.UserGroupAdmin.groupMember[OC.Share.SHARE_TYPE_USER].push(member);
                 $('#group_right').html(jsondata.data.page);
-                OC.GroupCustom.initDropDown() ;
+                OC.UserGroupAdmin.initDropDown() ;
               }else{
                 OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
               }           
@@ -73,26 +73,26 @@ $(document).ready(function() {
 
 
   $('#create_group').click(function() {
-    $('#group_custom_holder').show();
+    $('#user_group_admin_holder').show();
     $('#newgroup').focus();
   });
 
   $('#newgroup').on('focusout', function() {  
     if( $('#newgroup').val() != "") { 
       // make the following an ajax call
-      $.post(OC.filePath('user_groupadmin', 'ajax', 'addgroup.php'), { group : $('#newgroup').val() } , function ( jsondata ){
+      $.post(OC.filePath('user_group_admin', 'ajax', 'addgroup.php'), { group : $('#newgroup').val() } , function ( jsondata ){
         if(jsondata.status == 'success' ) {
 
           $('#own').html(jsondata.data.page)
         $('#newgroup').val("");
-      $('#group_custom_holder').hide();
+      $('#user_group_admin_holder').hide();
 
         }else{
           OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
         }           
       });
     } else {
-      $('#group_custom_holder').hide();
+      $('#user_group_admin_holder').hide();
     }
   });     
 
@@ -107,14 +107,14 @@ $(document).ready(function() {
 
 
   $('.group_left ul li').live('click', function() {  
-    OC.GroupCustom.groupSelected = $(this).data('group') ;
+    OC.UserGroupAdmin.groupSelected = $(this).data('group') ;
 
-    $.getJSON(OC.filePath('user_groupadmin', 'ajax', 'group.php'),{ group: OC.GroupCustom.groupSelected },function(jsondata) {
+    $.getJSON(OC.filePath('user_group_admin', 'ajax', 'group.php'),{ group: OC.UserGroupAdmin.groupSelected },function(jsondata) {
       if(jsondata.status == 'success') {
         $('#group_right').html(jsondata.data.page)
-        OC.GroupCustom.initDropDown() ;
+        OC.UserGroupAdmin.initDropDown() ;
         for (var i = 0 ; i <= jsondata.data.members.length - 1 ; i++ ) {
-          OC.GroupCustom.groupMember[ OC.Share.SHARE_TYPE_USER ].push( jsondata.data.members[i] ) ;
+          OC.UserGroupAdmin.groupMember[ OC.Share.SHARE_TYPE_USER ].push( jsondata.data.members[i] ) ;
         };
       }
     }) ;
@@ -131,11 +131,11 @@ $(document).ready(function() {
     var container = $(this).parents('li').first();
     var member    = container.data('member');
 
-    $.post(OC.filePath('user_groupadmin', 'ajax', 'delmember.php'), { member : member , group : OC.GroupCustom.groupSelected } , function ( jsondata ){
+    $.post(OC.filePath('user_group_admin', 'ajax', 'delmember.php'), { member : member , group : OC.UserGroupAdmin.groupSelected } , function ( jsondata ){
       if(jsondata.status == 'success' ) {
         container.remove();
-        var index = OC.GroupCustom.groupMember[OC.Share.SHARE_TYPE_USER].indexOf(member);
-        OC.GroupCustom.groupMember[OC.Share.SHARE_TYPE_USER].splice(index, 1);
+        var index = OC.UserGroupAdmin.groupMember[OC.Share.SHARE_TYPE_USER].indexOf(member);
+        OC.UserGroupAdmin.groupMember[OC.Share.SHARE_TYPE_USER].splice(index, 1);
       }else{
         OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
       }           
@@ -152,7 +152,7 @@ $(document).ready(function() {
     var group     = container.data('group');
     event.stopPropagation();
 
-    $.post(OC.filePath('user_groupadmin', 'ajax', 'delgroup.php'), { group : group } , function ( jsondata ){
+    $.post(OC.filePath('user_group_admin', 'ajax', 'delgroup.php'), { group : group } , function ( jsondata ){
       if(jsondata.status == 'success' ) {
         container.remove();
         $('#group_right').html('');
@@ -173,7 +173,7 @@ $(document).ready(function() {
     var group     = container.data('group');
     event.stopPropagation();
 
-    $.post(OC.filePath('user_groupadmin', 'ajax', 'leavegroup.php'), { group : group } , function ( jsondata ){
+    $.post(OC.filePath('user_group_admin', 'ajax', 'leavegroup.php'), { group : group } , function ( jsondata ){
       if(jsondata.status == 'success' ) {
         container.remove();
         $('#group_right').html('');
@@ -193,7 +193,7 @@ $(document).ready(function() {
     var container = $(this).parents('li').first();
     var group     = container.data('group');
 
-    OC.GroupCustom.doExport( group ) ;
+    OC.UserGroupAdmin.doExport( group ) ;
     return false;
 
   });

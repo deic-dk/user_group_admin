@@ -1,6 +1,6 @@
-<div id="group_custom_main">
+<div id="user_group_admin_main">
 
-<table id="group_custom_table">
+<table id="user_group_admin_table">
 <thead>
 <tr>
 <td id="own_head">My groups</td>                                                                                                   
@@ -16,7 +16,7 @@
        <?php echo $this->inc('part.group'); ?>
      </ul>
      <ul>
-       <li id="group_custom_holder"><i class="fa fa-users"></i><input class="groupinput" id="newgroup" placeholder="New group" val=""></li>
+       <li id="user_group_admin_holder"><i class="fa fa-users"></i><input class="groupinput" id="newgroup" placeholder="New group" val=""></li>
      </ul>
    </div>
    <ul>  
@@ -41,7 +41,7 @@
 
 <div id="group_buttons">
     <div class="title-group"><i class="fa fa-cloud-upload"></i>Import group from text file</div>
-    <form  id="import_group_form" class="file_upload_form" action="<?php echo OCP\Util::linkTo('group_custom', 'ajax/import.php'); ?>" method="post" enctype="multipart/form-data">
+    <form  id="import_group_form" class="file_upload_form" action="<?php echo OCP\Util::linkTo('user_group_admin', 'ajax/import.php'); ?>" method="post" enctype="multipart/form-data">
         <input id="import_group_file" type="file" name="import_group_file" /> 
     </form>
 </div>

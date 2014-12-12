@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ownCloud - group_custom
+ * ownCloud - user_group_admin
  *
  * @author Jorge Rafael García Ramos
  * @copyright 2012 Jorge Rafael García Ramos <kadukeitor@gmail.com>
@@ -22,19 +22,19 @@
  */
 
 OCP\JSON::checkLoggedIn();
-OCP\JSON::checkAppEnabled('user_groupadmin');
+OCP\JSON::checkAppEnabled('user_group_admin');
 OCP\JSON::callCheck();
 
-$l = OC_L10N::get('group_custom');
+$l = OC_L10N::get('user_group_admin');
 
 if ( isset($_POST['group']) ) {
 
-    $result = OC_Group_Custom_Local::createGroup( $_POST['group'] ) ;
+    $result = OC_User_Group_Admin_Util::createGroup( $_POST['group'] ) ;
 
     if ($result) {
 
-        $tmpl = new OCP\Template("user_groupadmin", "part.group");
-        $tmpl->assign( 'groups' , OC_Group_Custom_Local::getGroups() , true );
+        $tmpl = new OCP\Template("user_group_admin", "part.group");
+        $tmpl->assign( 'groups' , OC_User_Group_Admin_Util::getGroups() , true );
         $page = $tmpl->fetchPage();
 
         OCP\JSON::success(array('data' => array('page'=>$page)));
