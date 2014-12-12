@@ -140,11 +140,9 @@ class OC_User_Group_Admin_Util
      */
     public static function getUserGroups( $uid )
     {
-        // No magic!
-        // $stmt = OC_DB::prepare( "SELECT `gid` FROM `*PREFIX*user_group_admin` WHERE `uid` = ? AND `owner` = ?" );
-        // $result = $stmt->execute( array( $uid , OCP\USER::getUser() ));
-        $stmt = OC_DB::prepare( "SELECT `gid` FROM `*PREFIX*user_group_admin` WHERE `uid` = ?" );
-        $result = $stmt->execute( array( $uid ));
+    	$dispname = OC_User::getDisplayName($uid);
+    	$stmt = OC_DB::prepare( "SELECT `gid` FROM `*PREFIX*user_group_admin` WHERE `uid` = ? OR `uid` = ? " );
+        $result = $stmt->execute( array( $uid, $dispname ));
 
         $groups = array();
         while ( $row = $result->fetchRow()) {
