@@ -9,7 +9,31 @@
 
 	<table>
 
-		<name>*dbprefix*user_group_admin</name>
+		<name>*dbprefix*user_group_admin_groups</name>
+
+		<declaration>
+
+			<field>
+				<name>gid</name>
+				<type>text</type>
+				<notnull>true</notnull>
+				<length>64</length>
+			</field>s
+
+			<field>
+				<name>owner</name>
+				<type>text</type>
+				<notnull>true</notnull>
+				<length>64</length>
+			</field>
+
+		</declaration>
+
+	</table>
+	
+	<table>
+
+		<name>*dbprefix*user_group_admin_group_user</name>
 
 		<declaration>
 

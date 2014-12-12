@@ -30,13 +30,13 @@ class OC_User_Group_Admin_Hooks
         $uid = $parameters['uid'] ;
 
         // Delete the group
-        $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin` WHERE `owner` = ?" );
+        $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin_groups` WHERE `owner` = ?" );
         $stmt->execute( array($uid) );
 
         // Delete the group-user relation
-        $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin` WHERE `uid` = ?" );
+        $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ?" );
         $stmt->execute( array($uid) );
-        $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin` WHERE `owner` = ?" );
+        $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `owner` = ?" );
         $stmt->execute( array($uid) );
 
         return true ;
