@@ -9,7 +9,7 @@ if (OC_User_Group_Admin_Util::inGroup(OC_User::getUser() , $_['group'] ) ){
     <div class="title"><strong><?php echo $l->t('Owner')  ; ?></strong></div>
     <ul class="group members">
     <?php
-      $stmt = OC_DB::prepare( "SELECT `owner` FROM `*PREFIX*user_group_admin` WHERE `gid` = ?" ); 
+      $stmt = OC_DB::prepare( "SELECT `owner` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?" ); 
       $result = $stmt->execute( array($_['group']));
       $owners = array();                                                                                                           
       while ($row = $result->fetchRow()) {                                                                                         
