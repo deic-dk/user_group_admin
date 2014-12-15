@@ -84,8 +84,9 @@ class OC_User_Group_Admin_Util
      */
     public static function inGroup( $uid, $gid )
     {
-        $stmt = OC_DB::prepare( "SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ?" );
-        $result = $stmt->execute( array( $gid, $uid ));
+    	$dispname = OC_User::getDisplayName($uid);
+    	$stmt = OC_DB::prepare( "SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND (`uid` = ? OR `uid` = ?)" );
+        $result = $stmt->execute( array( $gid, $uid, $dispname ));
 
         return $result->fetchRow() ? true : false ;
     }
