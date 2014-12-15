@@ -33,14 +33,19 @@ if ( isset($_POST['group']) ) {
   switch ($_POST['action']) {
     case "addgroup":
       $result = OC_User_Group_Admin_Util::createGroup( $_POST['group'] ) ;
+      break;
     case "addmember":
       if ( isset($_POST['member'])) $result = OC_User_Group_Admin_Util::addToGroup( $_POST['member'] , $_POST['group'] );
+      break;
     case "leavegroup":
       $result = OC_User_Group_Admin_Util::removeFromGroup( OCP\User::getUser() , $_POST['group'] ) ;
+      break;
     case "delgroup":
       $result = OC_User_Group_Admin_Util::deleteGroup( $_POST['group'] ) ;
+      break;
     case "delmember":
       if ( isset($_POST['member'])) $result = OC_User_Group_Admin_Util::removeFromGroup( $_POST['member'] , $_POST['group'] ) ;
+      break;
   }
   		
   if ($result) {
@@ -48,10 +53,12 @@ if ( isset($_POST['group']) ) {
       case "addgroup":
         $tmpl = new OCP\Template("user_group_admin", "part.group");
         $tmpl->assign( 'groups' , OC_User_Group_Admin_Util::getGroups() , true );
+  	    break;
   	  case "addmember":  
         $tmpl = new OCP\Template("user_group_admin", "part.member");
         $tmpl->assign( 'group' , $_POST['group'] , false );
         $tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $_POST['group'] ) , false );
+  	    break;
   	  default:
   	    OCP\JSON::success();
     }     
