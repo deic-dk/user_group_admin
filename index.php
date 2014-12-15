@@ -1,7 +1,10 @@
 <?php
 
-/**
+/*
  * ownCloud - user_group_admin
+ *
+ * @author Christian Brinch
+ * @copyright 2014 Christian Brinch, DeIC, <christian.brinch@deic.dk>
  *
  * @author Jorge Rafael García Ramos
  * @copyright 2012 Jorge Rafael García Ramos <kadukeitor@gmail.com>

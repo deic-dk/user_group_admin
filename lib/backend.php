@@ -1,10 +1,12 @@
 <?php
 
-/**
+/*
  * ownCloud - user_group_admin
  *
+ * @author Christian Brinch
+ * @copyright 2014 Christian Brinch, DeIC, <christian.brinch@deic.dk>
+ *
  * @author Jorge Rafael García Ramos
- * @author Christian Brinck
  * @copyright 2012 Jorge Rafael García Ramos <kadukeitor@gmail.com>
  *
  * This library is free software; you can redistribute it and/or

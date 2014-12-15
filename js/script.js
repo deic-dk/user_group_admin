@@ -11,7 +11,7 @@ OC.UserGroupAdmin = {
 
         OC.UserGroupAdmin.groupSelected = group ;
 
-        $.post(OC.filePath('user_group_admin', 'ajax', 'addgroup.php'), { group : group } , function ( jsondata ){
+        $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : group , action : "addgroup"} , function ( jsondata ){
             if(jsondata.status == 'success' ) {
 
                 $('#.roup_left').html(jsondata.data.page)
@@ -51,7 +51,7 @@ OC.UserGroupAdmin = {
           select : function(event, selected) {
 
             var member = selected.item.value.shareWith;
-            $.post(OC.filePath('user_group_admin', 'ajax', 'addmember.php'), { member : member , group : OC.UserGroupAdmin.groupSelected } , function ( jsondata ){
+            $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { member : member , group : OC.UserGroupAdmin.groupSelected , action : "addmember"} , function ( jsondata ){
               if(jsondata.status == 'success' ) {
                 $('#mkgroup').val('');
                 OC.UserGroupAdmin.groupMember[OC.Share.SHARE_TYPE_USER].push(member);
@@ -131,7 +131,7 @@ $(document).ready(function() {
     var container = $(this).parents('li').first();
     var member    = container.data('member');
 
-    $.post(OC.filePath('user_group_admin', 'ajax', 'delmember.php'), { member : member , group : OC.UserGroupAdmin.groupSelected } , function ( jsondata ){
+    $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { member : member , group : OC.UserGroupAdmin.groupSelected , action : "delmember"} , function ( jsondata ){
       if(jsondata.status == 'success' ) {
         container.remove();
         var index = OC.UserGroupAdmin.groupMember[OC.Share.SHARE_TYPE_USER].indexOf(member);
@@ -152,7 +152,7 @@ $(document).ready(function() {
     var group     = container.data('group');
     event.stopPropagation();
 
-    $.post(OC.filePath('user_group_admin', 'ajax', 'delgroup.php'), { group : group } , function ( jsondata ){
+    $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : group , action : "delgroup"} , function ( jsondata ){
       if(jsondata.status == 'success' ) {
         container.remove();
         $('#group_right').html('');
@@ -173,7 +173,7 @@ $(document).ready(function() {
     var group     = container.data('group');
     event.stopPropagation();
 
-    $.post(OC.filePath('user_group_admin', 'ajax', 'leavegroup.php'), { group : group } , function ( jsondata ){
+    $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : group , action : "leavegroup"} , function ( jsondata ){
       if(jsondata.status == 'success' ) {
         container.remove();
         $('#group_right').html('');
