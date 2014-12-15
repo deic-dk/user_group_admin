@@ -80,7 +80,7 @@ $(document).ready(function() {
   $('#newgroup').on('focusout', function() {  
     if( $('#newgroup').val() != "") { 
       // make the following an ajax call
-      $.post(OC.filePath('user_group_admin', 'ajax', 'addgroup.php'), { group : $('#newgroup').val() } , function ( jsondata ){
+      $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : $('#newgroup').val(), action: "addgroup" } , function ( jsondata ){
         if(jsondata.status == 'success' ) {
 
           $('#own').html(jsondata.data.page)
