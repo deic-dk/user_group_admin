@@ -27,6 +27,8 @@
 class OC_User_Group_Admin_Util
 {
 
+		private static $HIDDEN_GROUP_OWNER = 'hidden_group_owner';
+
     /**
      * @brief Try to create a new group
      * @param  string $gid The name of the group to create
@@ -54,6 +56,25 @@ class OC_User_Group_Admin_Util
 
     }
 
+    public static function createHiddenGroup( $gid )
+    {
+        
+        // Check for existence
+        $stmt = OC_DB::prepare( "SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?" );
+        $result = $stmt->execute( array( $gid ));
+        if ( $result->fetchRow() ) { return false; }
+        $stmt = OC_DB::prepare( "SELECT `gid` FROM `*PREFIX*groups` WHERE `gid` = ?" );
+        $result = $stmt->execute( array( $gid ));
+        if ( $result->fetchRow() ) { return false; }
+
+        // Add group and exit
+        $stmt = OC_DB::prepare( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` ) VALUES( ? , ? )" );
+        $result = $stmt->execute( array( $gid , OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER ));
+
+        return $result ? true : false;
+
+    }
+    
     /**
      * @brief delete a group
      * @param  string $gid gid of the group to delete
@@ -84,10 +105,10 @@ class OC_User_Group_Admin_Util
      */
     public static function inGroup( $uid, $gid )
     {
-    	$stmt = OC_DB::prepare( "SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ?" );
-      $result = $stmt->execute( array( $gid, $uid ));
+    	$stmt = OC_DB::prepare( "SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? " );
+        $result = $stmt->execute( array( $gid, $uid ));
 
-      return $result->fetchRow() ? true : false ;
+        return $result->fetchRow() ? true : false ;
     }
 
     /**
@@ -103,7 +124,12 @@ class OC_User_Group_Admin_Util
         // No duplicate entries!
         if ( ! OC_User_Group_Admin_Util::inGroup( $uid, $gid ) ) {
             $stmt = OC_DB::prepare( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `owner` ) VALUES( ?, ?, ? )" );
-            $stmt->execute( array( $gid, $uid, OCP\USER::getUser() ));
+            if(OC_User_Group_Admin_Util::hiddenGroupExists($gid)){
+							$stmt->execute( array( $gid, $uid, OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER ));
+            }
+            else{
+							$stmt->execute( array( $gid, $uid, OCP\USER::getUser() ));
+            }
 
             return true;
         } else {
@@ -137,8 +163,8 @@ class OC_User_Group_Admin_Util
      */
     public static function getUserGroups( $uid )
     {
-    	$stmt = OC_DB::prepare( "SELECT `gid` FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ?" );
-        $result = $stmt->execute( array( $uid ));
+    	$stmt = OC_DB::prepare( "SELECT `gid` FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `owner` != ?" );
+        $result = $stmt->execute( array( $uid, OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER ));
 
         $groups = array();
         while ( $row = $result->fetchRow()) {
@@ -169,11 +195,22 @@ class OC_User_Group_Admin_Util
         return $groups;
     }
 
+    public static function hiddenGroupExists($gid)
+    {
+        $query = OC_DB::prepare('SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ? AND `owner` = ?' );
+        $result = $query->execute(array($gid,OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER))->fetchOne();
+        if ($result) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * check if a group exists
      * @param  string $gid
      * @return bool
-     */
+     */    
     public static function groupExists($gid)
     {
         $query = OC_DB::prepare('SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ? AND `owner` = ?' );
@@ -195,8 +232,8 @@ class OC_User_Group_Admin_Util
      */
     public static function usersInGroup($gid, $search = '', $limit = null, $offset = null)
     {
-         $stmt = OC_DB::prepare('SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` LIKE ?', $limit, $offset);
-         $result = $stmt->execute(array($gid, $search.'%'));
+        $stmt = OC_DB::prepare('SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` LIKE ? AND `owner` != ?', $limit, $offset);
+        $result = $stmt->execute(array($gid, $search.'%', OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER));
         $users = array();
         while ($row = $result->fetchRow()) {
             $users[] = $row['uid'];

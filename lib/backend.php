@@ -27,6 +27,8 @@
 class OC_User_Group_Admin_Backend extends OC_Group_Backend
 {
 
+		private static $HIDDEN_GROUP_OWNER = 'hidden_group_owner';
+
     /**
      * @brief is user in group?
      * @param  string $uid uid of the user
@@ -77,11 +79,14 @@ class OC_User_Group_Admin_Backend extends OC_Group_Backend
      */
     public function getGroups($search = '', $limit = null, $offset = null)
     {
-        $stmt = OC_DB::prepare('SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` LIKE ? AND `owner` = ?', $limit, $offset);
-        $result = $stmt->execute(array($search.'%',OCP\USER::getUser()));
+        $stmt = OC_DB::prepare('SELECT `gid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` LIKE ? AND (`owner` = ? OR `uid` = ? AND `owner` != ?)  GROUP BY `gid`', $limit, $offset);
+        $user = OCP\USER::getUser();
+        $result = $stmt->execute(array($search.'%', $user, $user, self::$HIDDEN_GROUP_OWNER));
         $groups = array();
         while ($row = $result->fetchRow()) {
-            $groups[] = $row['gid'];
+					if(!in_array($row['gid'], $groups)){
+						$groups[] = $row['gid'];
+					}
         }
 
         return $groups;
