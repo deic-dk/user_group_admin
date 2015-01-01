@@ -68,7 +68,7 @@ if (OC_User_Group_Admin_Util::inGroup(OC_User::getUser() , $_['group'] ) ){
             
             $members = $_['members'] ;
             foreach ($members as $member) {
-                echo "<li data-member=$member><i class=\"fa fa-user\"></i>$member
+                echo "<li data-member=$member title=\"".OC_User::getDisplayName($member)."\"><i class=\"fa fa-user\"></i>$member
                 <span class=\"member-actions\">
                     <a href=# class='action remove member' original-title=" . $l->t('Remove') . "><i class=\"fa fa-times\"></i></a>
                 </span>
