@@ -8,18 +8,18 @@ http://apps.owncloud.com/content/show.php?content=156032
 
 Information on the groups defined by users is kept in the two tables:
 
-user_group_admin_groups, user_group_admin_group_user,
+"user_group_admin_groups", "user_group_admin_group_user",
 
 corresponding to the two tables files_sharing uses for the purpose:
 
-groups, group_user
+"groups", "group_user"
 
 Compared to the files_sharing tables, the user_group_admin tables add one
 column, `owner`, to keep track of who created and owns a given group. As of
 now, only the owner is allowed to manage the groups he has created.
 
 The information in the tables is integrated with the ownCloud sharing mechanism
-by means of calls to OC_Group::useBackend() and OCP\Util::connectHook().
+by means of calls to `OC_Group::useBackend()` and `OCP\Util::connectHook()`.
 
 Our extensions introduce a special owner, 'hidden_group_owner', whose groups
 are hidden from the ownCloud sharing mechamisn, i.e. members can only be added
