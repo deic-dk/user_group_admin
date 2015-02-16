@@ -8,7 +8,7 @@
             echo "<li data-group=\"$group\"><i class=\"fa fa-users\"></i>".$group."
                 <span class=\"group-actions\">
                     <a href=# class='action export group' original-title=" . $l->t('Export') . "><i class=\"fa fa-cloud-download\"></i></a>
-                    <a href=# class='action remove group' original-title=" . $l->t('Remove') . "><i class=\"fa fa-times\"></i></a>
+                    <a href=# class='action leave group' original-title=" . $l->t('Remove') . "><i class=\"fa fa-times\"></i></a>
                 </span></li>" ;
         }
 
