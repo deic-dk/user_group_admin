@@ -67,10 +67,13 @@ OC.UserGroupAdmin = {
         });
 
     }
+
+
+
 };
 
-$(document).ready(function() {
 
+$(document).ready(function() {
 
   $('#create_group').click(function() {
     $('#user_group_admin_holder').show();
@@ -167,15 +170,18 @@ $(document).ready(function() {
 
   // Function added by Christian Brinch
 
-  $('.group-actions > .leave.group').live('click', function( event ) {   
+  $('.group-actions > .leave.group').live('click', function(event) {
+  //  window.alert('hello');   
     var container = $(this).parents('li').first();
-
     var group     = container.data('group');
     event.stopPropagation();
-
     $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : group , action : "leavegroup"} , function ( jsondata ){
       if(jsondata.status == 'success' ) {
+       // window.alert($("data-user").val());
         container.remove();
+//	var index = OC.UserGroupAdmin.groupMember[OC.Share.SHARE_TYPE_USER].indexOf(group);
+  //      OC.UserGroupAdmin.groupMember[OC.Share.SHARE_TYPE_USER].splice(index, 1);
+
         $('#group_right').html('');
       }else{
         OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
@@ -185,6 +191,9 @@ $(document).ready(function() {
     $('.tipsy').remove();
 
   });
+
+
+
 
   $('.group-actions > .export.group').live('click', function( event ) {   
 

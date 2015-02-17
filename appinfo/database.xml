@@ -57,7 +57,19 @@
 				<notnull>true</notnull>
 				<length>64</length>
 			</field>
-
+			
+			<field>
+				<name>verified</name>
+				<type>boolean</type>
+				<notnull>true</notnull>
+			</field>
+			
+			<field>
+				<name>accept</name>
+				<type>text</type>
+				<notnull>true</notnull>
+				<length>128</length>
+			</field>
 		</declaration>
 
 	</table>

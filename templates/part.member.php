@@ -48,7 +48,6 @@ if (OC_User_Group_Admin_Util::inGroup(OC_User::getUser() , $_['group'] ) ){
                 }
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
         ?>
 
     </ul>
@@ -56,7 +55,6 @@ if (OC_User_Group_Admin_Util::inGroup(OC_User::getUser() , $_['group'] ) ){
 
   
 <?php
-
 } else { ?>
 
 
@@ -65,13 +63,23 @@ if (OC_User_Group_Admin_Util::inGroup(OC_User::getUser() , $_['group'] ) ){
     <ul class="group members">
 
         <?php
-            
-            $members = $_['members'] ;
+		$members = $_['members'] ;
+	    $members = $_['members'] ;
             foreach ($members as $member) {
-                echo "<li data-member=$member title=\"".OC_User::getDisplayName($member)."\"><i class=\"fa fa-user\"></i>$member
+		$groupmembers = OC_User_Group_Admin_Util::searchUser($_['group'], $member, '1');
+		if(!$groupmembers){
+                         $status = 'Pending...';
+                } else {
+                         $status = '';
+                }
+		$name = OC_User::getDisplayName($member);
+                 
+                echo "<li data-member=$member title=\"".OC_User::getDisplayName($member)."\"><i class=\"fa fa-user\"></i>$name 
+		<li>($member)</li> 
                 <span class=\"member-actions\">
                     <a href=# class='action remove member' original-title=" . $l->t('Remove') . "><i class=\"fa fa-times\"></i></a>
                 </span>
+		<li><i>$status</i></li>
                 </li>" ;
             }
         
@@ -85,7 +93,6 @@ if (OC_User_Group_Admin_Util::inGroup(OC_User::getUser() , $_['group'] ) ){
                 }
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
         ?>
 
       <li id="mkgroup_li"><i class="fa fa-user"></i><input class="groupinput" id="mkgroup" placeholder="Add member" val=""></li>
@@ -95,4 +102,3 @@ if (OC_User_Group_Admin_Util::inGroup(OC_User::getUser() , $_['group'] ) ){
 </div>
 
 <?php } ?>
-

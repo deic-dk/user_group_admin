@@ -2,14 +2,28 @@
 
 
     $groups = OC_User_Group_Admin_Util::getUserGroups(OC_User::getUser());
-
+   //ioanna
 
         foreach ($groups as $group) {
+
             echo "<li data-group=\"$group\"><i class=\"fa fa-users\"></i>".$group."
                 <span class=\"group-actions\">
                     <a href=# class='action export group' original-title=" . $l->t('Export') . "><i class=\"fa fa-cloud-download\"></i></a>
-                    <a href=# class='action remove group' original-title=" . $l->t('Remove') . "><i class=\"fa fa-times\"></i></a>
-                </span></li>" ;
+                    <a href=# class='action leave group' original-title=" . $l->t('Remove') . "><i class=\"fa fa-times\"></i></a>
+                </span></li>";
+		if (isset($_GET['code']) && $group != 'dtu.dk') {
+       			echo "<script type='text/javascript'>
+				var r = window.confirm(\"You have been invited to the following group:  $group\");
+				if (r == true) {
+
+}
+
+ 
+
+			</script>";
+			$result=OC_User_Group_Admin_Util::acceptInvitation($_GET['code']);
+
+		}
         }
 
         // patch //////////////////////////////////////////////////////////////////////////////////////////////////////////////

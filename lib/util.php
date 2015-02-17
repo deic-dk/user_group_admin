@@ -1,5 +1,5 @@
 <?php
-
+require '/usr/local/www/owncloud/3rdparty/phpmailer/phpmailer/PHPMailerAutoload.php';
 /*
  * ownCloud - user_group_admin
  *
@@ -51,6 +51,9 @@ class OC_User_Group_Admin_Util
         // Add group and exit
         $stmt = OC_DB::prepare( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` ) VALUES( ? , ? )" );
         $result = $stmt->execute( array( $gid , OCP\USER::getUser() ));
+        
+
+
 
         return $result ? true : false;
 
@@ -71,6 +74,10 @@ class OC_User_Group_Admin_Util
         $stmt = OC_DB::prepare( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` ) VALUES( ? , ? )" );
         $result = $stmt->execute( array( $gid , OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER ));
 
+
+
+
+
         return $result ? true : false;
 
     }
@@ -87,7 +94,6 @@ class OC_User_Group_Admin_Util
         // Delete the group
         $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ? AND `owner` = ?" );
         $stmt->execute( array( $gid , OCP\USER::getUser() ));
-
         // Delete the group-user relation
         $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `owner` = ?" );
         $stmt->execute( array( $gid , OCP\USER::getUser() ));
@@ -119,16 +125,18 @@ class OC_User_Group_Admin_Util
      *
      * Adds a user to a group.
      */
-    public static function addToGroup( $uid, $gid )
+    public static function addToGroup( $uid, $gid, $owner )
     {
         // No duplicate entries!
         if ( ! OC_User_Group_Admin_Util::inGroup( $uid, $gid ) ) {
-            $stmt = OC_DB::prepare( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `owner` ) VALUES( ?, ?, ? )" );
+            $accept= md5($uid.time());
+            $stmt = OC_DB::prepare( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `owner`, `verified`, `accept` ) VALUES( ?, ?, ?, ?, ? )" );
             if(OC_User_Group_Admin_Util::hiddenGroupExists($gid)){
-							$stmt->execute( array( $gid, $uid, OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER ));
+							$stmt->execute( array( $gid, $uid, OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER, '0', $accept ));
             }
             else{
-							$stmt->execute( array( $gid, $uid, OCP\USER::getUser() ));
+							$stmt->execute( array( $gid, $uid, OCP\USER::getUser(), '0', $accept ));
+						        OC_User_Group_Admin_Util::sendVerification( $uid, $accept, $gid, OCP\USER::getDisplayName() );
             }
 
             return true;
@@ -136,6 +144,49 @@ class OC_User_Group_Admin_Util
             return false;
         }
     }
+	//ioanna
+
+    public static function sendVerification($uid, $accept, $gid, $owner) 
+    {
+	
+    	$to = $uid;
+	
+	$subject = 'Group Invitation to Data DeiC';
+        $message = 'You have been added to the group "'.$gid.'" by '.$owner.'. Click here to accept the invitation:
+		https://test.data.deic.dk/index.php/apps/user_group_admin?code='.$accept.'
+		 Click here to decline the invitation:';
+       
+        $headers = 'From: cloud@data.deic.dk' . "\r\n" .
+        'Reply-To: cloud@data.deic.dk' . "\r\n" .
+        'X-Mailer: PHP/' . phpversion();
+         mail($to, $subject, $message, $headers, "-r ".$to);
+
+
+}
+
+//ioanna
+
+	public static function acceptInvitation($code) {
+		 $query = OC_DB::prepare("UPDATE `*PREFIX*user_group_admin_group_user` SET `verified` = true WHERE `accept` = ?");                                           
+	 	 $result = $query->execute( array( $code ));            
+   		 return $result;
+        }
+//ioanna
+
+	public static function declineInvitation($code) {
+		$query = OC_DB::prepare("UPDATE `*PREFIX*user_group_admin_group_user` SET `verified` = false WHERE `accept` = ?");
+                 $result = $query->execute( array( $code ));
+                 return $result;
+	}
+//ioanna
+	 public static function searchUser($gid, $uid, $verified )
+         {
+         	$stmt = OC_DB::prepare( "SELECT `verified` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ? "  );
+        	$result = $stmt->execute( array($gid, $uid,  $verified ));
+
+        	return $result->fetchRow() ? true : false ;
+  
+          }
 
     /**
      * @brief Removes a user from a group
@@ -152,6 +203,15 @@ class OC_User_Group_Admin_Util
 
         return true;
     }
+
+//ioanna
+	public static function removeSelf( $uid, $gid)
+	{
+	$stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `gid` = ?" );
+        $stmt->execute( array( $uid, $gid));
+
+        return true;
+	}	
 
     /**
      * @brief Get all groups a user belongs to
