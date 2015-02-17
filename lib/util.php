@@ -130,13 +130,14 @@ class OC_User_Group_Admin_Util
         // No duplicate entries!
         if ( ! OC_User_Group_Admin_Util::inGroup( $uid, $gid ) ) {
             $accept= md5($uid.time());
-            $stmt = OC_DB::prepare( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `owner`, `verified`, `accept` ) VALUES( ?, ?, ?, ?, ? )" );
+	    $decline = md5($uid.time());
+            $stmt = OC_DB::prepare( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `owner`, `verified` ) VALUES( ?, ?, ?, ?)" );
             if(OC_User_Group_Admin_Util::hiddenGroupExists($gid)){
-							$stmt->execute( array( $gid, $uid, OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER, '0', $accept ));
+							$stmt->execute( array( $gid, $uid, OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER, '0'));
             }
             else{
-							$stmt->execute( array( $gid, $uid, OCP\USER::getUser(), '0', $accept ));
-						        OC_User_Group_Admin_Util::sendVerification( $uid, $accept, $gid, OCP\USER::getDisplayName() );
+							$stmt->execute( array( $gid, $uid, OCP\USER::getUser(), '0'));
+						        OC_User_Group_Admin_Util::sendVerification( $uid, $accept, $decline, $gid, OCP\USER::getDisplayName() );
             }
 
             return true;
@@ -146,7 +147,7 @@ class OC_User_Group_Admin_Util
     }
 	//ioanna
 
-    public static function sendVerification($uid, $accept, $gid, $owner) 
+    public static function sendVerification($uid, $accept, $decline, $gid, $owner) 
     {
 	
     	$to = $uid;
@@ -154,7 +155,8 @@ class OC_User_Group_Admin_Util
 	$subject = 'Group Invitation to Data DeiC';
         $message = 'You have been added to the group "'.$gid.'" by '.$owner.'. Click here to accept the invitation:
 		https://test.data.deic.dk/index.php/apps/user_group_admin?code='.$accept.'
-		 Click here to decline the invitation:';
+		 Click here to decline the invitation:
+		https://test.data.deic.dk/index.php/apps/user_group_admin?coded='.$decline;
        
         $headers = 'From: cloud@data.deic.dk' . "\r\n" .
         'Reply-To: cloud@data.deic.dk' . "\r\n" .
@@ -166,17 +168,17 @@ class OC_User_Group_Admin_Util
 
 //ioanna
 
-	public static function acceptInvitation($code) {
-		 $query = OC_DB::prepare("UPDATE `*PREFIX*user_group_admin_group_user` SET `verified` = true WHERE `accept` = ?");                                           
-	 	 $result = $query->execute( array( $code ));            
+	public static function acceptInvitation() {
+		 $query = OC_DB::prepare("UPDATE `*PREFIX*user_group_admin_group_user` SET `verified` = true ");                                           
+	 	 $result = $query->execute( array( ));            
    		 return $result;
         }
 //ioanna
 
-	public static function declineInvitation($code) {
-		$query = OC_DB::prepare("UPDATE `*PREFIX*user_group_admin_group_user` SET `verified` = false WHERE `accept` = ?");
-                 $result = $query->execute( array( $code ));
-                 return $result;
+	public static function declineInvitation($uid, $gid) {
+ 		OC_User_Group_Admin_Util::removeFromGroup( $uid, $gid);
+                
+                return true;
 	}
 //ioanna
 	 public static function searchUser($gid, $uid, $verified )
