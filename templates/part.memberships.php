@@ -10,7 +10,6 @@
                 <span class=\"group-actions\">
                     <a href=# class='action export group' original-title=" . $l->t('Export') . "><i class=\"fa fa-cloud-download\"></i></a>
                     <a href=# class='action leave group' original-title=" . $l->t('Remove') . "><i class=\"fa fa-times\"></i></a>
-<<<<<<< HEAD
                 </span></li>";
 		if (isset($_GET['code']) && $group != 'dtu.dk') {
        			echo "<script type='text/javascript'>
@@ -25,9 +24,6 @@
 			$result=OC_User_Group_Admin_Util::acceptInvitation($_GET['code']);
 
 		}
-=======
-                </span></li>" ;
->>>>>>> eec41da0891f40b301882d2865ac1ddfbfc1359e
         }
 
         // patch //////////////////////////////////////////////////////////////////////////////////////////////////////////////
