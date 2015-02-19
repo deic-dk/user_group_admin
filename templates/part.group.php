@@ -5,8 +5,8 @@
         foreach ($groups as $group) {
             echo "<li data-group=\"$group\"><i class=\"fa fa-users\"></i>".$group."
                 <span class=\"group-actions\">
-                    <a href=# class='action export group' original-title='Export'><i class=\"fa fa-cloud-download\"></i></a>
-                    <a href=# class='action remove group' original-title='Remove'><i class=\"fa fa-times\"></i></a>
+                    <a href=# class='action export group' original-title='Export'><i class=\"fa fa-cloud-download\">-></i></a>
+                    <a href=# class='action remove group' original-title='Remove'><i class=\"fa fa-times\">x</i></a>
                 </span></li>" ;
         }
 

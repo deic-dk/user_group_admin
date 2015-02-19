@@ -70,6 +70,20 @@
 				<notnull>true</notnull>
 				<length>128</length>
 			</field>
+
+			<field>
+                                <name>notification</name>
+                                <type>boolean</type>
+                                <notnull>true</notnull>
+                        </field>
+
+			<field>
+                                <name>decline</name>
+                                <type>text</type>
+                                <notnull>true</notnull>
+                                <length>128</length>
+                        </field>
+
 		</declaration>
 
 	</table>

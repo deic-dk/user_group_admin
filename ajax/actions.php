@@ -38,7 +38,7 @@ if ( isset($_POST['group']) ) {
       if ( isset($_POST['member'])) $result = OC_User_Group_Admin_Util::addToGroup( $_POST['member'] , $_POST['group'] );
       break;
     case "leavegroup":
-      $result = OC_User_Group_Admin_Util::removeSelf( OCP\User::getUser() , $_POST['group'] ) ;
+      $result = OC_User_Group_Admin_Util::removeFromGroup( OCP\User::getUser() , $_POST['group'] ) ;
       break;
     case "delgroup":
       $result = OC_User_Group_Admin_Util::deleteGroup( $_POST['group'] ) ;

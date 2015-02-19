@@ -130,13 +130,12 @@ class OC_User_Group_Admin_Util
         // No duplicate entries!
         if ( ! OC_User_Group_Admin_Util::inGroup( $uid, $gid ) ) {
             $accept= md5($uid.time());
-	    $decline = md5($uid.time());
-            $stmt = OC_DB::prepare( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `owner`, `verified` ) VALUES( ?, ?, ?, ?)" );
+	    $decline = $uid.time();
+            $stmt = OC_DB::prepare( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `owner`, `verified`, `accept`, `notification`,`decline` ) VALUES( ?, ?, ?, ?, ?, ?, ?)" );
             if(OC_User_Group_Admin_Util::hiddenGroupExists($gid)){
-							$stmt->execute( array( $gid, $uid, OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER, '0'));
-            }
-            else{
-							$stmt->execute( array( $gid, $uid, OCP\USER::getUser(), '0'));
+							$stmt->execute( array( $gid, $uid, OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER, '0', $accept, '0', $decline));
+            }else{
+							$stmt->execute( array( $gid, $uid, OCP\USER::getUser(), '0', $accept, '0', $decline));
 						        OC_User_Group_Admin_Util::sendVerification( $uid, $accept, $decline, $gid, OCP\USER::getDisplayName() );
             }
 
@@ -156,7 +155,7 @@ class OC_User_Group_Admin_Util
         $message = 'You have been added to the group "'.$gid.'" by '.$owner.'. Click here to accept the invitation:
 		https://test.data.deic.dk/index.php/apps/user_group_admin?code='.$accept.'
 		 Click here to decline the invitation:
-		https://test.data.deic.dk/index.php/apps/user_group_admin?coded='.$decline;
+		https://test.data.deic.dk/index.php/apps/user_group_admin?code='.$decline;
        
         $headers = 'From: cloud@data.deic.dk' . "\r\n" .
         'Reply-To: cloud@data.deic.dk' . "\r\n" .
@@ -168,27 +167,61 @@ class OC_User_Group_Admin_Util
 
 //ioanna
 
-	public static function acceptInvitation() {
-		 $query = OC_DB::prepare("UPDATE `*PREFIX*user_group_admin_group_user` SET `verified` = true ");                                           
-	 	 $result = $query->execute( array( ));            
+	public static function acceptInvitation($gid, $uid) {
+		 $query = OC_DB::prepare("UPDATE `*PREFIX*user_group_admin_group_user` SET `verified` = true WHERE `gid` = ? AND `uid` = ? ");                                           
+	 	 $result = $query->execute( array($gid, $uid ));            
    		 return $result;
         }
 //ioanna
 
 	public static function declineInvitation($uid, $gid) {
- 		OC_User_Group_Admin_Util::removeFromGroup( $uid, $gid);
-                
-                return true;
+ 		$query = OC_DB::prepare("UPDATE `*PREFIX*user_group_admin_group_user` SET `verified` = '2' WHERE `uid` = ? AND `gid` = ? ");
+                 $result = $query->execute( array($uid, $gid ));
+               
+
+                return $result;
 	}
 //ioanna
 	 public static function searchUser($gid, $uid, $verified )
          {
-         	$stmt = OC_DB::prepare( "SELECT `verified` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ? "  );
+         	$stmt = OC_DB::prepare( "SELECT `verified` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ?  "  );
         	$result = $stmt->execute( array($gid, $uid,  $verified ));
 
         	return $result->fetchRow() ? true : false ;
   
           }
+	public static function acceptedUser($gid, $uid, $verified, $accept, $notification ) {
+                $stmt = OC_DB::prepare( "SELECT `accept` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ? AND `accept` = ? AND `notification` = ?");
+                $result = $stmt->execute( array($gid, $uid,  $verified, $accept, $notification ));
+
+                return $result->fetchRow() ? true : false ;
+ 
+          }
+
+	public static function declinedUser($gid, $uid, $verified, $decline, $notification ) {
+                $stmt = OC_DB::prepare( "SELECT `decline` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ? AND `decline` = ? AND `notification` = ?" );
+                $result = $stmt->execute( array($gid, $uid,  $verified, $decline, $notification ));
+
+                return $result->fetchRow() ? true : false ;
+
+          }
+        
+	public static function isNotified($gid, $uid, $verified, $notification) {
+		 $stmt = OC_DB::prepare( "SELECT `notification` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ? AND `notification` = ?" );
+                $result = $stmt->execute( array($gid, $uid, $verified, $notification ));
+
+                return $result->fetchRow() ? true : false ;
+
+          }
+ 
+
+//ioanmna
+	public static function Notification($uid, $gid, $accept, $decline) {
+		$query = OC_DB::prepare("UPDATE `*PREFIX*user_group_admin_group_user` SET `notification` = true WHERE `gid` = ? AND `uid` = ? AND `accept` = ? OR `decline` = ?  ");
+		 $result = $query->execute( array($gid, $uid, $accept, $decline ));
+                 return $result;
+
+	} 
 
     /**
      * @brief Removes a user from a group
@@ -206,14 +239,6 @@ class OC_User_Group_Admin_Util
         return true;
     }
 
-//ioanna
-	public static function removeSelf( $uid, $gid)
-	{
-	$stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `gid` = ?" );
-        $stmt->execute( array( $uid, $gid));
-
-        return true;
-	}	
 
     /**
      * @brief Get all groups a user belongs to
