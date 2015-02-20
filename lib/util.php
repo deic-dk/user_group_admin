@@ -239,6 +239,14 @@ class OC_User_Group_Admin_Util
         return true;
     }
 
+    public static function removeSelf( $uid, $gid )
+    {
+        $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `gid` = ?" );
+        $stmt->execute( array( $uid, $gid));
+
+        return true;
+    }
+   
 
     /**
      * @brief Get all groups a user belongs to

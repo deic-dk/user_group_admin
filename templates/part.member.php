@@ -72,17 +72,19 @@ if (OC_User_Group_Admin_Util::inGroup(OC_User::getUser() , $_['group'] ) ){
                          $status = '';
                } elseif ($notgroupmembers) {
 			 $status = 'Pending...'; 
-                } else {
-                         $status = 'Member declined the invitation';
+               } else {
+                        $status = 'Member declined the invitation';
+
                 }
-		$name = OC_User::getDisplayName($member);
+		$name = OC_User::getDisplayName($member) ;
                  
                 echo "<li data-member=$member title=\"".OC_User::getDisplayName($member)."\"><i class=\"fa fa-user\"></i>$name 
-		<li>($member)</li> 
                 <span class=\"member-actions\">
                     <a href=# class='action remove member' original-title=" . $l->t('Remove') . "><i class=\"fa fa-times\">x</i></a>
                 </span>
-		<li><i>$status</i></li>
+		<div>($member)</div>
+                <div><i>$status</i></div>
+
                 </li>" ;
             }
         
