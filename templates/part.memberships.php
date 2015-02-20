@@ -6,7 +6,7 @@
 		$notification = OC_User_Group_Admin_Util::isNotified($group, OC_User::getUser(), '0', '0' );
 		$verified = OC_User_Group_Admin_Util::acceptedUser($group, OC_User::getUser(), '0', $_GET['code'], '0' );
 		$declined = OC_User_Group_Admin_Util::declinedUser($group, OC_User::getUser(), '0', $_GET['code'], '0' );
-
+		$checkagain = OC_User_Group_Admin_Util::acceptedUser($group, OC_User::getUser(), '2', $_GET['code'], '0' );
 
 	if ($ingroup) {
 
@@ -17,7 +17,7 @@
                 </span></li>";}
 
 		if ( $group != 'dtu.dk' ) {
-			if ( $verified ) {
+			if ( $verified || $checkagain) {
        				echo "<script type='text/javascript'>
 					window.alert(\"You have accepted the invitation to the following group:  $group\");
 
