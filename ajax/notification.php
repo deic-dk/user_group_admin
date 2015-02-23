@@ -14,6 +14,5 @@ if($_POST['action'] == "acceptinvitation") {
 } elseif($_POST['action'] == "declineinvitation") {
         $result = OC_User_Group_Admin_Util::declineInvitation(OCP\USER::getUser(), $group);
 }
-
 ?>
 

@@ -42,7 +42,6 @@ foreach ( $groups as $group ) {
                                         type: 'post',
                                         data: { 'group': $('#group1').attr('value'), 'action': 'acceptinvitation'},
                                         success: function(data, status) {
-					//	window.alert($('#group1').attr('value'));
                                         }
                                         });
                                          $(this).dialog( 'close' ); } },
@@ -53,12 +52,10 @@ foreach ( $groups as $group ) {
                                         type: 'post',
                                         data: {'group': $('#group1').attr('value'), 'action': 'declineinvitation'},
                                         success: function(data, status) {
-					//	window.alert($('#group1').attr('value'));
                                         }
                                         });
                                         $(this).dialog( 'close' ); } } ] });
                                 </script>";
-		//	$status = OC_User_Group_Admin_Util::Notification ( OCP\USER::getUser (), $group, $_GET ['code'] );
 			break;
 		}
 	}
