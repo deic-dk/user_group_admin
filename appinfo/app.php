@@ -8,7 +8,7 @@ OCP\Util::connectHook('OC_User', 'post_deleteUser', 'OC_User_Group_Admin_Hooks',
 OC_Group::useBackend( new OC_User_Group_Admin_Backend() );
 
 OCP\Util::addScript('user_group_admin','script');
-//OCP\Util::addStyle ('user_group_admin','style');
+OCP\Util::addStyle ('user_group_admin','style');
 
 
 OCP\App::addNavigationEntry(

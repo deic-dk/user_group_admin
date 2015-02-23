@@ -33,17 +33,16 @@
 		          	$status = OC_User_Group_Admin_Util::Notification(OCP\USER::getUser(), $group, $_GET['code']);
 
 			}elseif ( $notification == true && isset($_GET['code']) == false) {
-                                echo "<div id='dialog' title='Basic dialog'>
-  <p>\"You have been invited to the following group:  $group Press Accept to accept the invitation or Decline to reject it\"</p>
+                                echo "<div id='dialog' title='Group Invitation'>
+  <p>\"You have been invited to the following group: <div id = 'group' value = $group> $group</div> Press Accept to accept the invitation or Decline to reject it\"</p>
 </div>";
                                  echo "<script type='text/javascript'>
                                          $( '#dialog' ).dialog({ buttons: [ { id:'test','data-test':'data test', text: 'Accept', click: function() {
                                         $.ajax({
                                         url:OC.linkTo('user_group_admin', 'ajax/notification.php'),
                                         type: 'post',
-                                        data: { 'action': 'acceptinvitation'},
+                                        data: { 'group': $('#group').attr('value'), 'action': 'acceptinvitation'},
                                         success: function(data, status) {
-                                                window.alert('accept');
                                         }
                                         });
                                          $(this).dialog( 'close' ); } },
@@ -52,9 +51,8 @@
                                         $.ajax({
                                         url:OC.linkTo('user_group_admin', 'ajax/notification.php'),
                                         type: 'post',
-                                        data: { 'action': 'declineinvitation'},
+                                        data: {'group': $('#group').attr('value'), 'action': 'declineinvitation'},
                                         success: function(data, status) {
-                                                window.alert('decline');
                                         }
                                         });
                                         $(this).dialog( 'close' ); } } ] });
