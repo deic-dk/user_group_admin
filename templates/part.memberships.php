@@ -7,6 +7,7 @@ foreach ( $groups as $group ) {
 	$verified = OC_User_Group_Admin_Util::acceptedUser ( $group, OC_User::getUser (), '0', $_GET ['code'], '0' );
 	$declined = OC_User_Group_Admin_Util::declinedUser ( $group, OC_User::getUser (), '0', $_GET ['code'], '0' );
 	$checkagain = OC_User_Group_Admin_Util::acceptedUser ( $group, OC_User::getUser (), '2', $_GET ['code'], '0' );
+        $owner = OC_User_Group_Admin_Util::groupOwner($group);
 	
 	if ($ingroup) {
 		
@@ -21,7 +22,6 @@ foreach ( $groups as $group ) {
 		if ($verified || $checkagain) {
 			echo "<script type='text/javascript'>
 					window.alert(\"You have accepted the invitation to the following group:  $group\");
-
 				</script>";
 			$result = OC_User_Group_Admin_Util::acceptInvitation ( $group, OCP\USER::getUser () );
 			$status = OC_User_Group_Admin_Util::Notification ( OCP\USER::getUser (), $group, $_GET ['code'] );
@@ -33,7 +33,7 @@ foreach ( $groups as $group ) {
 			$status = OC_User_Group_Admin_Util::Notification ( OCP\USER::getUser (), $group, $_GET ['code'] );
 		} elseif ($notification == true && isset ( $_GET ['code'] ) == false) {
 			echo "<div id='dialog' title='Group Invitation'>
-  <p>\"You have been invited to the following group: <div id = 'group1' value = $group> $group</div> Press Accept to accept the invitation or Decline to reject it\"</p>
+  <p>You have been invited to the following group: <div id = 'group1' value = $group> $group</div> by <b>$owner</b> . Press Accept to accept the invitation or Decline to reject it</p>
 </div>";
 			echo "<script type='text/javascript'>
                                          $( '#dialog' ).dialog({ buttons: [ { id:'test','data-test':'data test', text: 'Accept', click: function() {
@@ -45,7 +45,6 @@ foreach ( $groups as $group ) {
                                         }
                                         });
                                          $(this).dialog( 'close' ); } },
-
                                         { id:'test2','data-test':'data test', text: 'Decline', click: function() {
                                         $.ajax({
                                         url:OC.linkTo('user_group_admin', 'ajax/notification.php'),
@@ -60,7 +59,6 @@ foreach ( $groups as $group ) {
 		}
 	}
 }
-
 // patch //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 if (OCP\App::isEnabled ( 'group_virtual' ) and OC_Group::inGroup ( OC_User::getUser (), 'admin' )) {
 	foreach ( \OC_Group_Virtual::getGroups () as $group ) {

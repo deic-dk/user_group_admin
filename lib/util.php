@@ -52,10 +52,11 @@ class OC_User_Group_Admin_Util {
 		}
 		
 		// Add group and exit
-		$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` ) VALUES( ? , ? )" );
+		$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` , `ownersname`) VALUES( ? , ?, ? )" );
 		$result = $stmt->execute ( array (
 				$gid,
-				OCP\USER::getUser () 
+				OCP\USER::getUser (),
+				OCP\USER::getDisplayName () 
 		) );
 		
 		return $result ? true : false;
@@ -290,7 +291,24 @@ class OC_User_Group_Admin_Util {
 		) );
 		return $result;
 	}
-	
+
+
+	/**
+         * Returns the owner of a group.  
+         */
+
+ 	public static function groupOwner($gid) {
+		$stmt = OC_DB::prepare ( "SELECT `ownersname` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = :name " );
+		$params = array(
+		    'name' => $gid);
+		$stmt->execute($params);
+                $row = $stmt->fetch (); 
+                $owner  = $row["ownersname"];
+
+		return $owner; 
+
+	}
+
 	/**
 	 * @brief Removes a user from a group
 	 * 
@@ -314,7 +332,6 @@ class OC_User_Group_Admin_Util {
 	 * @brief Get all groups a user belongs to
 	 * 
 	 * @param string $uid
-	 *        	Name of the user
 	 * @return array with group names
 	 *        
 	 *         This function fetches all groups a user belongs to. It does not check
