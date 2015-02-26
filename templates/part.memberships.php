@@ -42,6 +42,7 @@ foreach ( $groups as $group ) {
                                         type: 'post',
                                         data: { 'group': $('#group1').attr('value'), 'action': 'acceptinvitation'},
                                         success: function(data, status) {
+						location.reload();		
                                         }
                                         });
                                          $(this).dialog( 'close' ); } },
@@ -51,6 +52,7 @@ foreach ( $groups as $group ) {
                                         type: 'post',
                                         data: {'group': $('#group1').attr('value'), 'action': 'declineinvitation'},
                                         success: function(data, status) {
+						location.reload();
                                         }
                                         });
                                         $(this).dialog( 'close' ); } } ] });
