@@ -74,7 +74,6 @@ if (OC_User_Group_Admin_Util::inGroup(OC_User::getUser() , $_['group'] ) ){
 			 $status = 'Pending...'; 
                } else {
                         $status = 'Member declined the invitation';
-
                 }
 		$name = OC_User::getDisplayName($member) ;
                  
@@ -84,7 +83,6 @@ if (OC_User_Group_Admin_Util::inGroup(OC_User::getUser() , $_['group'] ) ){
                 </span>
 		<div>($member)</div>
                 <div><i>$status</i></div>
-
                 </li>" ;
             }
         

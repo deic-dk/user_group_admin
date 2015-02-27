@@ -291,12 +291,9 @@ class OC_User_Group_Admin_Util {
 		) );
 		return $result;
 	}
-
-
 	/**
          * Returns the owner of a group.  
          */
-
  	public static function groupOwner($gid) {
 		$stmt = OC_DB::prepare ( "SELECT `ownersname` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = :name " );
 		$params = array(
@@ -304,11 +301,8 @@ class OC_User_Group_Admin_Util {
 		$stmt->execute($params);
                 $row = $stmt->fetch (); 
                 $owner  = $row["ownersname"];
-
 		return $owner; 
-
 	}
-
 	/**
 	 * @brief Removes a user from a group
 	 * 

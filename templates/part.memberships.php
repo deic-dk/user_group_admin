@@ -22,16 +22,21 @@ foreach ( $groups as $group ) {
 		if ($verified || $checkagain) {
 			echo "<script type='text/javascript'>
 					window.alert(\"You have accepted the invitation to the following group:  $group\");
+					location.reload();
+
 				</script>";
 			$result = OC_User_Group_Admin_Util::acceptInvitation ( $group, OCP\USER::getUser () );
 			$status = OC_User_Group_Admin_Util::Notification ( OCP\USER::getUser (), $group, $_GET ['code'] );
 		} elseif ($declined) {
 			echo "<script type='text/javascript'>
                                 	window.alert(\"You have declined the invitation to the following group:  $group\");
+					location.reload();
+
                         	</script>";
 			$result = OC_User_Group_Admin_Util::declineInvitation ( OCP\USER::getUser (), $group );
 			$status = OC_User_Group_Admin_Util::Notification ( OCP\USER::getUser (), $group, $_GET ['code'] );
-		} elseif ($notification == true && isset ( $_GET ['code'] ) == false) {
+
+	        }elseif ($notification == true && isset ( $_GET ['code'] ) == false) {
 			echo "<div id='dialog' title='Group Invitation'>
   <p>You have been invited to the following group: <div id = 'group1' value = $group> $group</div> by <b>$owner</b> . Press Accept to accept the invitation or Decline to reject it</p>
 </div>";
