@@ -30,7 +30,6 @@ OCP\App::checkAppEnabled('user_group_admin');
 OCP\App::setActiveNavigationEntry( 'user_group_admin' );
 
 
-
 $tmpl = new OCP\Template('user_group_admin', 'groups', 'user');
 $tmpl->assign( 'groups' , OC_User_Group_Admin_Util::getGroups() , true );
 $tmpl->printPage();

@@ -6,10 +6,11 @@ OC::$CLASSPATH['OC_User_Group_Admin_Hooks']   ='apps/user_group_admin/lib/hooks.
 
 OCP\Util::connectHook('OC_User', 'post_deleteUser', 'OC_User_Group_Admin_Hooks', 'post_deleteUser');
 OC_Group::useBackend( new OC_User_Group_Admin_Backend() );
+OCP\App::registerAdmin('user_group_admin', 'settings');
+
+
 
 OCP\Util::addScript('user_group_admin','script');
-//OCP\Util::addStyle ('user_group_admin','style');
-
 
 OCP\App::addNavigationEntry(
     array( 'id'    => 'user_group_admin',

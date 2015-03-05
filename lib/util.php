@@ -181,14 +181,15 @@ class OC_User_Group_Admin_Util {
 	 */
 	public static function sendVerification($uid, $accept, $decline, $gid, $owner) {
 		$to = $uid;
-		
-		$subject = 'Group Invitation to Data DeiC';
+	        $url = 	OCP\Config::getAppValue('user_group_admin', 'appurl', '');
+		$sender = OCP\Config::getAppValue('user_group_admin', 'sender', '');
+		$subject = OCP\Config::getAppValue('user_group_admin', 'subject', '');
 		$message = 'You have been added to the group "' . $gid . '" by ' . $owner . '. Click here to accept the invitation:
-		https://test.data.deic.dk/index.php/apps/user_group_admin?code=' . $accept . '
+		'.$url . $accept . '
 		 Click here to decline the invitation:
-		https://test.data.deic.dk/index.php/apps/user_group_admin?code=' . $decline;
+		'.$url . $decline;
 		
-		$headers = 'From: cloud@data.deic.dk' . "\r\n" . 'Reply-To: cloud@data.deic.dk' . "\r\n" . 'X-Mailer: PHP/' . phpversion ();
+		$headers = 'From: '.$sender . "\r\n" . 'Reply-To: ' .$sender. "\r\n" . 'X-Mailer: PHP/' . phpversion ();
 		mail ( $to, $subject, $message, $headers, "-r " . $to );
 	}
 	
@@ -425,4 +426,3 @@ class OC_User_Group_Admin_Util {
 		return $users;
 	}
 }
-

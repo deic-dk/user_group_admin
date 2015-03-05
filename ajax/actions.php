@@ -32,7 +32,7 @@ OCP\JSON::callCheck();
 if ( isset($_POST['group']) ) {
   switch ($_POST['action']) {
     case "addgroup":
-      $result = OC_User_Group_Admin_Util::createGroup( $_POST['group'] ) ;
+      $result = OC_User_Group_Admin_Util::createGroup( $_POST['group'], OC_User::getUser() ) ;
       break;
     case "addmember":
       if ( isset($_POST['member'])) $result = OC_User_Group_Admin_Util::addToGroup( $_POST['member'] , $_POST['group'] );
@@ -67,6 +67,14 @@ if ( isset($_POST['group']) ) {
   	    OCP\JSON::success();
     }     
   } else {
-    OCP\JSON::error(array('data' => array('title'=> $_POST['action']  , 'message' => 'error' ))) ;
+
+    switch ($_POST['action']) {
+      case "addgroup":
+    	OCP\JSON::error(array('data' => array('title'=> 'Add Group'  , 'message' => 'This group name already exists in the database. Please choose another one.' ))) ;
+	break;
+      case "addmember":
+	OCP\JSON::error(array('data' => array('title'=> 'Add Member'  , 'message' => 'Wrong name' ))) ;
+	break;
+	}
   }
 }
