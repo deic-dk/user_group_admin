@@ -156,7 +156,7 @@
                                 </a>
                                 <ul class='dropdown-menu' style='display:none;'>
                                         <li><a id='exportgroup' data-action='Export' href='#'>
-                                                <span>Export</span>
+                                         <i class='icon-export-alt'>&nbsp</i>       <span>Export</span>
                                         </a></li>
                                 </ul>
                         </div></div>
