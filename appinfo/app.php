@@ -9,9 +9,6 @@ OC_Group::useBackend( new OC_User_Group_Admin_Backend() );
 OCP\App::registerAdmin('user_group_admin', 'settings');
 
 
-
-OCP\Util::addScript('user_group_admin','script');
-
 OCP\App::addNavigationEntry(
     array( 'id'    => 'user_group_admin',
            'order' => 4,

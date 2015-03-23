@@ -29,7 +29,11 @@ OCP\App::checkAppEnabled('user_group_admin');
 
 OCP\App::setActiveNavigationEntry( 'user_group_admin' );
 
+OCP\Util::addStyle('user_group_admin', 'user_group_admin');
+OCP\Util::addStyle('files', 'files');
 
-$tmpl = new OCP\Template('user_group_admin', 'groups', 'user');
+OCP\Util::addScript('user_group_admin','newscript');
+
+$tmpl = new OCP\Template('user_group_admin', 'main', 'user');
 $tmpl->assign( 'groups' , OC_User_Group_Admin_Util::getGroups() , true );
 $tmpl->printPage();
