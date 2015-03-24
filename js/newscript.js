@@ -35,7 +35,6 @@ OC.UserGroup = {
 				var theint = parseInt($('td.'+OC.UserGroup.groupSelected+' a#nomembers').html(),10)
 			    theint++;
 			    $('td.'+OC.UserGroup.groupSelected+' a#nomembers').text(theint);
-				window.alert(jsondata.data.page);
 			    $('td.'+OC.UserGroup.groupSelected+' #dropdown').html(jsondata.data.page);	
 			//	$('.drop').html('<li data-member='+member+'<div style="float:left;"> '+member+'</div><span class="member-actions" style="float:right"><a href="#" class="removemember" original-title="Remove"><i class="icon icon-trash"></i></a></span><span style="float:right"><i></i></span><br> <div style="float:right"><i>Pending</i></div></li>'); 
                 OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].push(member);

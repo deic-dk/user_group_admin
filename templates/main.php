@@ -78,7 +78,7 @@
 	$groups = $_['groups'] ;	
 	$groupmemberships = OC_User_Group_Admin_Util::getUserGroups ( OC_User::getUser () );
 	foreach ($groups as $group) {
-		echo "<tr id='owner'><td id=\"$group\" class='groupsname' data-group=\"$group\"  style='height:34px;' ><div class='col-xs-1 text-right '></div>
+		echo "<tr id='owner'><td id=\"$group\" class='groupsname' data-group=\"$group\"  style='height:34px;' ><div class='row'><div class='col-xs-1 text-right '></div>
 		<div class='col-xs-8 filelink-wrap'><i class='icon-users     deic_green icon'>&nbsp</i>
 		$group</div>
 			<div class='col-xs-3 fileactions-wrap text-right'>
@@ -103,7 +103,7 @@
                         <div id='invitation' style='display:none;'>An invitation was sent to the user.</div>
                 </div>
 
-		</div></div>
+		</div></div></div>
 		</td>";
 		$members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
                 $size = count($members);
@@ -122,15 +122,15 @@
                } elseif ($notgroupmembers) {
                          $status = 'Pending...';
                } else {
-                        $status = 'Member declined the invitation';
+                        $status = 'User declined the invitation';
                 }
                 $name = OC_User::getDisplayName($member) ;
                 echo "<li data-member=$member title=\"".OC_User::getDisplayName($member)."\" ><i class=\"fa fa-user\"></i><div style='float:left;'>$name</div>
                 <span class=\"member-actions\" style='float:right'>
-                    <a href=# class='removemember' original-title=" . $l->t('Remove') . "><i class=\"icon icon-trash\"></i></a>
+                    <a href=# class='removemember' original-title=" . $l->t('Remove') . "><i class=\"icon icon-cancel-circled\"></i></a>
                 </span>
-                <span style='float:right'><i>($member)</i></span><br>
-                <div style='float:right'><i>$status</i></div>
+                <span style='float:right'><i>($member) &nbsp</i></span><br>
+                <div style='float:right'><i>$status &nbsp &nbsp &nbsp</i></div>
                 </li><br>" ;
             }
 
@@ -145,7 +145,7 @@
 	foreach ($groupmemberships as $groupmembership) {
 	         $ingroup = OC_User_Group_Admin_Util::searchUser ( $groupmembership, OC_User::getUser (), '1' );	
 		if ($ingroup) {
-	         echo "<tr id='member'><td  id=\"$groupmembership\" class='groupsname' data-group=\"$groupmembership\" style='height:34px;' ><div class='col-xs-4 col-sm-1'></div>
+	         echo "<tr id='member'><td  id=\"$groupmembership\" class='groupsname' data-group=\"$groupmembership\" style='height:34px;' ><div class='row'><div class='col-xs-4 col-sm-1'></div>
 		<div class='col-xs-8 filelink-wrap'><i class='icon-users     deic_green icon'>&nbsp</i> 
 
 	$groupmembership</div>
@@ -161,7 +161,7 @@
                                         </a></li>
                                 </ul>
                         </div></div>
-		</div>	
+		</div></div>	
 		</td>";
 		$members = OC_User_Group_Admin_Util::usersInGroup( $groupmembership ) ;
 	        $size = count($members);	

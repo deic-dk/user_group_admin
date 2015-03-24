@@ -16,10 +16,10 @@ $size = count($members); ?>
                 $name = OC_User::getDisplayName($member) ;
                 echo "<li data-member=$member title=\"".OC_User::getDisplayName($member)."\" ><i class=\"fa fa-user\"></i><div style='float:left;'>$name</div>
                 <span class=\"member-actions\" style='float:right'>
-                    <a href=# class='removemember' original-title=" . $l->t('Remove') . "><i class=\"icon icon-trash\"></i></a>
+                    <a href=# class='removemember' original-title=" . $l->t('Remove') . "><i class=\"icon icon-cancel-circled\"></i></a>
                 </span>
-                <span style='float:right'><i>($member)</i></span><br>
-                <div style='float:right'><i>$status</i></div>
+                <span style='float:right'><i>($member) &nbsp</i></span><br>
+                <div style='float:right'><i>$status &nbsp &nbsp &nbsp</i></div>
                 </li><br>" ;
 }  ?>
 
