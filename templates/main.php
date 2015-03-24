@@ -106,39 +106,40 @@
 		</div></div>
 		</td>";
 		$members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
-		$size = count($members);
-		echo "<td id='members' class=\"$group\"><div class='nomembers'><a id='nomembers' href='#'>$size</a>
-	             <div id='dropdown' class='drop' data-item-type='folder' style='overflow-y: scroll; display:none;' >
+                $size = count($members);
+                echo "<td id='members' class=\"$group\"><div class='nomembers'><a id='nomembers' href='#'>$size</a>
+                     <div id='dropdown' class='drop' data-item-type='folder' style='overflow-y: scroll; display:none;' >
                         <span role='status' aria-live='polite' class='ui-helper-hidden-accessible'></span>
-		<strong style='float:left;'>Members</strong><br>";
-		if ($size==0) {
-			echo "<div style='float:left;'><i>No members yet</i></div>";
-		}
+                <strong style='float:left;'>Members</strong><br>";
+                if ($size==0) {
+                        echo "<div style='float:left;'><i>No members yet</i></div>";
+                }
             foreach ($members as $member) {
-		$groupmembers = OC_User_Group_Admin_Util::searchUser($group, $member, '1');
-		$notgroupmembers = OC_User_Group_Admin_Util::searchUser($group, $member, '0');
-		if($groupmembers){
+                $groupmembers = OC_User_Group_Admin_Util::searchUser($group, $member, '1');
+                $notgroupmembers = OC_User_Group_Admin_Util::searchUser($group, $member, '0');
+                if($groupmembers){
                          $status = '';
                } elseif ($notgroupmembers) {
-			 $status = 'Pending...'; 
+                         $status = 'Pending...';
                } else {
                         $status = 'Member declined the invitation';
                 }
-		$name = OC_User::getDisplayName($member) ;
-                echo "<li data-member=$member title=\"".OC_User::getDisplayName($member)."\" ><i class=\"fa fa-user\"></i><div style='float:left;'>$name</div> 
-		<span class=\"member-actions\" style='float:right'>
+                $name = OC_User::getDisplayName($member) ;
+                echo "<li data-member=$member title=\"".OC_User::getDisplayName($member)."\" ><i class=\"fa fa-user\"></i><div style='float:left;'>$name</div>
+                <span class=\"member-actions\" style='float:right'>
                     <a href=# class='removemember' original-title=" . $l->t('Remove') . "><i class=\"icon icon-trash\"></i></a>
                 </span>
-		<span style='float:right'><i>($member)</i></span><br>
+                <span style='float:right'><i>($member)</i></span><br>
                 <div style='float:right'><i>$status</i></div>
                 </li><br>" ;
-            }	
+            }
 
-	    echo "</div>
+            echo "</div>
 
-                </div>	
+                </div>
 
-		</td>";
+                </td>";
+	
 		echo "<td>Owner</td></tr>";
 	}
 	foreach ($groupmemberships as $groupmembership) {

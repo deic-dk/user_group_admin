@@ -57,7 +57,7 @@ if ( isset($_POST['group']) ) {
         OCP\JSON::success(array('data' => array('page'=>$page)));
   	    break;
   	  case "addmember":  
-        $tmpl = new OCP\Template("user_group_admin", "part.member");
+        $tmpl = new OCP\Template("user_group_admin", "members");
         $tmpl->assign( 'group' , $_POST['group'] , false );
         $tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $_POST['group'] ) , false );
         $page = $tmpl->fetchPage();

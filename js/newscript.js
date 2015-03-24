@@ -35,7 +35,9 @@ OC.UserGroup = {
 				var theint = parseInt($('td.'+OC.UserGroup.groupSelected+' a#nomembers').html(),10)
 			    theint++;
 			    $('td.'+OC.UserGroup.groupSelected+' a#nomembers').text(theint);
-
+				window.alert(jsondata.data.page);
+			    $('td.'+OC.UserGroup.groupSelected+' #dropdown').html(jsondata.data.page);	
+			//	$('.drop').html('<li data-member='+member+'<div style="float:left;"> '+member+'</div><span class="member-actions" style="float:right"><a href="#" class="removemember" original-title="Remove"><i class="icon icon-trash"></i></a></span><span style="float:right"><i></i></span><br> <div style="float:right"><i>Pending</i></div></li>'); 
                 OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].push(member);
                 OC.UserGroup.initDropDown() ;
 			$('div#invitation').fadeIn('slow');	
@@ -98,7 +100,7 @@ $(document).ready(function() {
 			$('#newgroup').slideToggle();
 		});    
 
-//window.alert('#groupstable td[data-group="'+$(this).attr('data-group')+'"]');
+//not useful right now	/////////////////////////////
 $('#filestable tbody tr td .fileselect').live('click', function() {  
 	var groupSelected = $(this).attr('id') ;
 	var status = $(this).closest('tr').attr('id') ;
@@ -125,7 +127,7 @@ $('#filestable tbody tr td .fileselect').live('click', function() {
     });
 }
   }); 
-
+////////////////////////////////////////////////////
 $(".dropdown-toggle").live('click', function() {
     var groupSelected = $(this).closest('td').attr('id') ;
 	$("#"+groupSelected+" div.fileactions").find("ul").toggle();
@@ -207,7 +209,6 @@ $('#filestable td .removemember').live('click', function() {
     OC.UserGroup.groupSelected = $(this).closest('td').attr('class') ;
     var container = $(this).parents('li').first();
     var member    = container.data('member');
-	window.alert(OC.UserGroup.groupSelected);
     $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { member : member , group : OC.UserGroup.groupSelected , action : "delmember"} , function ( jsondata ){
       if(jsondata.status == 'success' ) {
         container.remove();
@@ -217,7 +218,7 @@ $('#filestable td .removemember').live('click', function() {
         var index = OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].indexOf(member);
         OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].splice(index, 1);
 			var html = '<div><i>No members yet</i></div>';
-			$(html).append($('#filestable tr').find('td#'+OC.UserGroup.groupSelected));
+//			$(html).append($('#filestable tr').find('td#'+OC.UserGroup.groupSelected));
       }else{
         OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
       }           
@@ -226,5 +227,7 @@ $('#filestable td .removemember').live('click', function() {
     $('.tipsy').remove();
 
   });
+
+
 					   
 });
