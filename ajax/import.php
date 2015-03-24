@@ -23,33 +23,36 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 OCP\User::checkLoggedIn();
 OCP\App::checkAppEnabled('user_group_admin');
 
-if (isset($_FILES['import_group_file'])) {
-
+$import = true;
+if (isset($_FILES['import_group_file']['tmp_name'])) {
     $from    = $_FILES['import_group_file']['tmp_name'];
-        
-    $content = file_get_contents ( $from ) ;
-    $members = unserialize( $content ) ;
-
+	$content = file_get_contents ( $from ); 
+	 $members = file($from, FILE_IGNORE_NEW_LINES);
     if ( is_array( $members ) ){
-
         $group  = $members[0] ;
         array_shift($members);
-
         $result = OC_User_Group_Admin_Util::createGroup( $group ) ;
         if ( $result ) {
             foreach ( $members as $member ) {
                 if ( OCP\User::userExists( $member ) and OCP\User::getUser() != $member ){
-                    OC_User_Group_Admin_Util::addToGroup( $member , $group ) ;
-                }
+                    OC_User_Group_Admin_Util::addToGroup( $member , $group, OCP\USER::getUser () ) ;
+				}
+				elseif (OCP\User::userExists( $member ) ==false){
+				 // echo "<script type='text/javascript'>
+				//	          window.alert('The user  cannot be added to the group because he/she does not have an account in Data Deic.  '  );
+				//		</script>";
+					$import = false;
+				}
+
             }
         }
 
     }
 
-    header( 'Location: ' . OCP\Util::linkToAbsolute( 'user_group_admin' , 'index.php' ) ) ;
 
 }
+header( 'Location: ' . OCP\Util::linkToAbsolute( 'user_group_admin' , 'index.php' ) ) ;
+

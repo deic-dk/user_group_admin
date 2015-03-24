@@ -145,8 +145,6 @@ $(".dropdown-toggle").live('click', function() {
 $("#filestable td #removegroup").live('click', function() {
         var status = $(this).closest('tr').attr('id') ;
 	var groupSelected = $(this).closest('td').attr('id') ;
-        window.alert(status);
-        window.alert(groupSelected);
         if (status == 'owner') {
                 $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : groupSelected , action : "delgroup"} , function ( jsondata){
                           if(jsondata.status == 'success' ) {
@@ -228,6 +226,8 @@ $('#filestable td .removemember').live('click', function() {
 
   });
 
-
+$('#import_group_file').change(function() {
+      $('#import_group_form').submit();
+	    });
 					   
 });

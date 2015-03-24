@@ -33,10 +33,10 @@
   </div>
  <div id="importnew" class="panel-heading" style="border:solid 1px #e4e4e4; margin-bottom:20px; height:55px; display:none">
     <span>
-	<i class="fa fa-cloud-upload"></i><div class="col-sm-12 text-right">Import group from text file
+	<div class="col-sm-12 text-right">Import group from text file</div>
         <form  id="import_group_form"  action="<?php echo OCP\Util::linkTo('user_group_admin', 'ajax/import.php'); ?>" method="post" enctype="multipart/form-data">
         <input id="import_group_file" type="file" name="import_group_file" />
-        </form></div>
+        </form>
 	
     </span>
 </div>
@@ -284,13 +284,6 @@ foreach ( $groups as $group ) {
 }
 
 ?>
-
-
-
-
-
-
-
 
 
 
