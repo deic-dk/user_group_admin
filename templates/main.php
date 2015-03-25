@@ -253,7 +253,7 @@ foreach ( $groups as $group ) {
 			$status = OC_User_Group_Admin_Util::Notification ( OCP\USER::getUser (), $group, $_GET ['code'] );
 	        }elseif ($notification == true && isset ( $_GET ['code'] ) == false) {
 			echo "<div id='dialog' title='Group Invitation'>
-  <p>You have been invited to the following group: <div id = 'group1' value = $group> $group</div> by <b>$owner</b> . Press Accept to accept the invitation or Decline to reject it</p>
+  <p>You have been invited to the following group: <div id = 'group1' value = \"$group\"> $group</div> by <b>$owner</b> . Press Accept to accept the invitation or Decline to reject it</p>
 </div>";
 			echo "<script type='text/javascript'>
                                          $( '#dialog' ).dialog({ buttons: [ { id:'test','data-test':'data test', text: 'Accept', click: function() {
