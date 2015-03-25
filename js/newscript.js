@@ -36,28 +36,13 @@ OC.UserGroup = {
 			    theint++;
 			    $("td[class='"+OC.UserGroup.groupSelected+"']").find("a#nomembers").text(theint);
 			    $("td[class='"+OC.UserGroup.groupSelected+"']").find('#dropdown').html(jsondata.data.page);	
-			//	$('.drop').html('<li data-member='+member+'<div style="float:left;"> '+member+'</div><span class="member-actions" style="float:right"><a href="#" class="removemember" original-title="Remove"><i class="icon icon-trash"></i></a></span><span style="float:right"><i></i></span><br> <div style="float:right"><i>Pending</i></div></li>'); 
                 OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].push(member);
                 OC.UserGroup.initDropDown() ;
-			$('div#invitation').fadeIn('slow');	
-			setTimeout(function(){ $('div#invitation').fadeOut('slow') }, 2500);
+//			$('div#invitation').fadeIn('slow');	
+//			setTimeout(function(){ $('div#invitation').fadeOut('slow') }, 2500);
 			OC.UserGroup.i=false;
-	//	$('html').click(function(event) {
-  //Hide the menus if visible
-      //  if (i==false ) {
-        //        $('div.'+OC.UserGroup.groupSelected).toggle();
-		//		i=true;
-       // }
-//});
               }else{
                 OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
-		$('html').click(function(event) {
-                //Hide the menus if visible
-                   if (!$(event.target).OC.UserGroup.select) {
-                         $('div.'+OC.UserGroup.groupSelected).hide();
-                   }
-                });
-
 						  
               }           
             });                
@@ -127,6 +112,7 @@ $('#filestable tbody tr td .fileselect').live('click', function() {
 }
   }); 
 ////////////////////////////////////////////////////
+
 $(".dropdown-toggle").live('click', function() {
     var groupSelected = $(this).closest('td').attr('id') ;
 	$("[id='"+groupSelected+"']").find(" div.fileactions").find("ul").toggle();
@@ -175,11 +161,10 @@ $("#invite").live('click', function(event) {
 	OC.UserGroup.groupSelected = $(this).closest('td').attr('id') ;
 	//$(html).appendTo( $('#filestable tr').find('td#'+OC.UserGroup.groupSelected) );
 	$("div[class='"+OC.UserGroup.groupSelected+"']").toggle();
-	 var i = false;
 	OC.UserGroup.initDropDown() ;
 	event.stopPropagation();
 	$('html').click(function(event) {
-          if ( !$(event.target).closest("div[class='"+OC.UserGroup.groupSelected+"']").length && OC.UserGroup.i) {
+          if ( !$(event.target).closest("div[class='"+OC.UserGroup.groupSelected+"']").length ) {
 		$("div[class='"+OC.UserGroup.groupSelected+"']").hide();
           }
      });
