@@ -34,10 +34,9 @@
  <div id="importnew" class="panel-heading" style="border:solid 1px #e4e4e4; margin-bottom:20px; height:55px; display:none">
     <span>
 	<div class="col-sm-12 text-right">Import group from text file</div>
-        <form  id="import_group_form"  action="<?php echo OCP\Util::linkTo('user_group_admin', 'ajax/import.php'); ?>" method="post" enctype="multipart/form-data">
+	<form  id="import_group_form"  action="<?php echo OCP\Util::linkTo('user_group_admin', 'ajax/import.php'); ?>" method="post" enctype="multipart/form-data">
         <input id="import_group_file" type="file" name="import_group_file" />
-        </form>
-	
+        </form>		
     </span>
 </div>
 
@@ -52,7 +51,7 @@
       <div class="col-xs-4 col-sm-1"></div>
       <div class="col-xs-3 col-sm-6">	  
         <a class="name sort columntitle" data-sort="descr">
-		  <span>Group name</span>         
+		  <span class="text-semibold">Group name</span>         
           <span class="sort-indicator hidden icon-triangle-n"></span>
 	    </a>
       </div>
@@ -83,7 +82,7 @@
 		$group</div>
 			<div class='col-xs-3 fileactions-wrap text-right'>
 			<div class='btn-group btn-group-xs fileactions'>
-				<a id='removegroup' class='btn btn-flat btn-default action-primary action action-edit' href='#'>Delete</a>
+				<a id='invite' class='btn btn-flat btn-default action-primary action action-edit' href='#'>Invite</a>
 				<a id='dropdownbtn' class='btn btn-flat btn-default dropdown-toggle' data-toggle='dropdown' href='#' aria-expanded='true'>
 					<i class='icon-angle-down'></i>
 		 	        </a>	
@@ -91,8 +90,8 @@
 					<li><a id='exportgroup' data-action='Export' href='#'>
 					<i class='icon-export-alt'>&nbsp</i>	<span>Export</span>
 					</a></li>
-					<li class='invite' ><a id='invite' data-action='Invite' href='#'>
-					<i class='icon-user'>&nbsp</i>	<span>Invite</span>
+					<li class='removegroup' ><a id='removegroup' data-action='Invite' href='#'>
+					<i class='icon-trash'>&nbsp</i>	<span>Delete</span>
 
 					</a></li>
 				</ul>
@@ -282,6 +281,7 @@ foreach ( $groups as $group ) {
 		}
 	}
 }
+
 
 ?>
 

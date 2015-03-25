@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ownCloud - user_group_admin
  *
@@ -25,7 +24,6 @@
  */
 OCP\User::checkLoggedIn();
 OCP\App::checkAppEnabled('user_group_admin');
-
 $import = true;
 if (isset($_FILES['import_group_file']['tmp_name'])) {
     $from    = $_FILES['import_group_file']['tmp_name'];
@@ -46,13 +44,8 @@ if (isset($_FILES['import_group_file']['tmp_name'])) {
 				//		</script>";
 					$import = false;
 				}
-
             }
         }
-
     }
-
-
 }
 header( 'Location: ' . OCP\Util::linkToAbsolute( 'user_group_admin' , 'index.php' ) ) ;
-
