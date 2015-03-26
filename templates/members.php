@@ -8,9 +8,9 @@ $size = count($members); ?>
                 $notgroupmembers = OC_User_Group_Admin_Util::searchUser($group, $member, '0');
                 if($groupmembers){
                          $status = '';
-               } elseif ($notgroupmembers) {
+                } elseif ($notgroupmembers) {
                          $status = 'Pending...';
-               } else {
+                } else {
                         $status = 'Member declined the invitation';
                 }
                 $name = OC_User::getDisplayName($member) ;

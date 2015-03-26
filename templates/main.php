@@ -134,13 +134,8 @@
                 </li><br>" ;
             }
 
-            echo "</div>
-
-                </div>
-
-                </td>";
-	
-		echo "<td>Owner</td></tr>";
+            echo "</div></div></td>";
+            echo "<td>Owner</td></tr>";
 	}
 	foreach ($groupmemberships as $groupmembership) {
 	         $ingroup = OC_User_Group_Admin_Util::searchUser ( $groupmembership, OC_User::getUser (), '1' );	
@@ -169,32 +164,28 @@
                      <div id='dropdown' class='drop' data-item-type='folder' style='overflow-y: scroll; display:none;' >
                         <span role='status' aria-live='polite' class='ui-helper-hidden-accessible'></span>
 		<div ><strong style='float:left;' >Owner</strong></div><br>";
-      $stmt = OC_DB::prepare( "SELECT `owner` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?" ); 
-      $result = $stmt->execute( array($groupmembership));
-	  $owners = array();                                                                                                           
-      while ($row = $result->fetchRow()) {                                                                                         
-        $owners[] = $row['owner'];                                                                                                 
-      }   
-      foreach ($owners as $member) {
-		$name = OC_User::getDisplayName($member) ;
-        echo "<li data-member=$member><i class=\"fa fa-user\"></i><div style='float:left;'> $name</div>
-		<span  style='float:right;'><i>($member)</i></span>
-              </li><br>" ;
-      }
+      		$stmt = OC_DB::prepare( "SELECT `owner` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?" ); 
+      		$result = $stmt->execute( array($groupmembership));
+	  	$owners = array();                                                                                                           
+      		while ($row = $result->fetchRow()) {                                                                                         
+        		$owners[] = $row['owner'];                                                                                                 
+      		}   
+      		foreach ($owners as $member) {
+			$name = OC_User::getDisplayName($member) ;
+        	echo "<li data-member=$member><i class=\"fa fa-user\"></i><div style='float:left;'> $name</div>
+			<span  style='float:right;'><i>($member)</i></span>
+              	</li><br>" ;
+      		}
 		////////////////////////
 		echo "<strong style='float:left;'>Members</strong>";
-            foreach ($members as $member) {
-                $name = OC_User::getDisplayName($member) ;
-                echo "<br><li data-member=$member title=\"".OC_User::getDisplayName($member)."\"><i class=\"fa fa-user\"></i><div style='float:left;'>$name</div>
-                <span  style='float:right;'><i>($member)</i></span>
-                </li>" ;
-            }  
+            	foreach ($members as $member) {
+                	$name = OC_User::getDisplayName($member) ;
+                	echo "<br><li data-member=$member title=\"".OC_User::getDisplayName($member)."\"><i class=\"fa fa-user\"></i><div style='float:left;'>$name</div>
+                	<span  style='float:right;'><i>($member)</i></span>
+                	</li>" ;
+            	}  
 
-            echo "</div>
-
-                </div>
-
-                </td>";
+ 	        echo "</div></div></td>";
 	
 		echo "<td>Member</td></tr>";
 		}}
