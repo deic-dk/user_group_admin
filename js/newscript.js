@@ -5,7 +5,6 @@
 OC.UserGroup = {
 	groupSelected : '' ,
         groupMember : [] ,
-	i: true,
 	initDropDown : function() {
         OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER]  = [];
         OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_GROUP] = [];
@@ -31,16 +30,13 @@ OC.UserGroup = {
             var member = selected.item.value.shareWith;
             $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { member : member , group : OC.UserGroup.groupSelected , action : "addmember"} , function ( jsondata ){
               if(jsondata.status == 'success' ) {
-                $('.ui-autocomplete-input').val('');
-				var theint = parseInt($("td[class='"+OC.UserGroup.groupSelected+"']").find("a#nomembers").html(),10)
+              		    $('.ui-autocomplete-input').val('');
+		            var theint = parseInt($("td[class='"+OC.UserGroup.groupSelected+"']").find("a#nomembers").html(),10)
 			    theint++;
 			    $("td[class='"+OC.UserGroup.groupSelected+"']").find("a#nomembers").text(theint);
 			    $("td[class='"+OC.UserGroup.groupSelected+"']").find('#dropdown').html(jsondata.data.page);	
-                OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].push(member);
-                OC.UserGroup.initDropDown() ;
-//			$('div#invitation').fadeIn('slow');	
-//			setTimeout(function(){ $('div#invitation').fadeOut('slow') }, 2500);
-			OC.UserGroup.i=false;
+                            OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].push(member);
+               		    OC.UserGroup.initDropDown() ;
               }else{
                 OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
 						  
@@ -208,9 +204,49 @@ $('#filestable td .removemember').live('click', function() {
     $('.tipsy').remove();
 
   });
-
 $('#import_group_file').change(function() {
-      $('#import_group_form').submit();
-	    });
- 
+      $('#import_group_form').submit(); 
+});
+$("#browse").click(function () {
+    $("#test").click();
+})
+
+$("#save").click(function () {
+var formData = new FormData($('#testfile')[0]);
+            $.ajax({
+                url: OC.filePath('user_group_admin', 'ajax', 'import.php'),  //server script to process data
+                type: 'POST',
+                xhr: function() {  // custom xhr
+                    myXhr = $.ajaxSettings.xhr();
+                    if(myXhr.upload){ // if upload property exists
+                      //  myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // progressbar
+                    }
+                    return myXhr;
+                },
+                //Ajax events
+                success:  function(jsondata) {
+			window.alert('ok');
+                },
+                error:  function() {
+                    alert("Något gick fel");
+                },
+                // Form data
+                data: formData,
+                //Options to tell JQuery not to process data or worry about content-type
+                cache: false,
+                contentType: false,
+                processData: false
+            }, 'json');
+
+});
+
+$("#clear").click(function () {
+     $('#testfile').val('');
+})
+
+$('#test').change(function () {
+    $('#testfile').val($(this).val());
+})
+	  
+
 });

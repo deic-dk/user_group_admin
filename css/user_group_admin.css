@@ -15,6 +15,28 @@ li
   list-style-type: none;
 }
 
+#test {
+    position:absolute;
+    display:none;
+}
+#testfile {
+    height: 26px;
+    text-decoration: none;
+    background-color: #eee;
+    border:1px solid #ccc;
+    border-radius:3px;
+    float:left;
+    margin-right:5px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    color:#aaa;
+    text-indent:5px;
+}
+#actionbtnBrowse, #actionbtnSave {
+    margin:0 !important;
+    width:60px;
+}
+
 #groupstable {
 	position: relative;
 	top: 24px;

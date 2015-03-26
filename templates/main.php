@@ -33,10 +33,11 @@
   </div>
  <div id="importnew" class="panel-heading" style="border:solid 1px #e4e4e4; margin-bottom:20px; height:55px; display:none">
     <span>
-	<div class="col-sm-12 text-right">Import group from text file</div>
-	<form  id="import_group_form"  action="<?php echo OCP\Util::linkTo('user_group_admin', 'ajax/import.php'); ?>" method="post" enctype="multipart/form-data">
+	Import group from text file:
+	<span style="margin-left:30px; margin-bottom:20px; position:absolute">
+	<form  id="import_group_form" action="<?php echo OCP\Util::linkTo('user_group_admin', 'ajax/import.php'); ?>"  method="post" enctype="multipart/form-data">
         <input id="import_group_file" type="file" name="import_group_file" />
-        </form>		
+        </form></span>
     </span>
 </div>
 
@@ -50,24 +51,24 @@
     <div id="headerName-container" class="row">
       <div class="col-xs-4 col-sm-1"></div>
       <div class="col-xs-3 col-sm-6">	  
-        <a class="name sort columntitle" data-sort="descr">
+        <div class="name sort columntitle" data-sort="descr">
 		  <span class="text-semibold">Group name</span>         
           <span class="sort-indicator hidden icon-triangle-n"></span>
-	    </a>
+	    </div>
       </div>
     </div>
   </th>
   <th id="headerDisplay" class="column-display">
-    <a class="display sort columntitle" data-sort="public">
+    <div class="display sort columntitle" data-sort="public">
       <span>Members</span>
       <span class="sort-indicator hidden icon-triangle-n"></span>
-    </a>
+    </div>
   </th>
   <th id="headerDisplay" class="column-display">
-    <a class="size sort columntitle" data-sort="size">
+    <div class="size sort columntitle" data-sort="size">
       <span>Status</span>
       <span class="sort-indicator hidden icon-triangle-n"></span>
-    </a>
+    </div>
   </th>
   
 </tr>
@@ -79,7 +80,7 @@
 	foreach ($groups as $group) {
 		echo "<tr id='owner'><td id=\"$group\" class='groupsname' data-group=\"$group\"  style='height:34px;' ><div class='row'><div class='col-xs-1 text-right '></div>
 		<div class='col-xs-8 filelink-wrap'><i class='icon-users     deic_green icon'>&nbsp</i>
-		$group</div>
+		<span class='nametext'>$group</span></div>
 			<div class='col-xs-3 fileactions-wrap text-right'>
 			<div class='btn-group btn-group-xs fileactions'>
 				<a id='invite' class='btn btn-flat btn-default action-primary action action-edit' href='#'>Invite</a>
