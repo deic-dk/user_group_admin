@@ -130,7 +130,7 @@
                     <a href=# class='removemember' original-title=" . $l->t('Remove') . "><i class=\"icon icon-cancel-circled\"></i></a>
                 </span>
                 <span style='float:right'><i>($member) &nbsp</i></span><br>
-                <div style='float:right'><i>$status &nbsp &nbsp &nbsp</i></div>
+                <div style='float:right; padding-right: 25px;'><i>$status </i></div>
                 </li><br>" ;
             }
 
