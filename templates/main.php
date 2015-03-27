@@ -78,7 +78,7 @@
 	$groups = $_['groups'] ;	
 	$groupmemberships = OC_User_Group_Admin_Util::getUserGroups ( OC_User::getUser () );
 	foreach ($groups as $group) {
-		echo "<tr id='owner'><td id=\"$group\" class='groupsname' data-group=\"$group\"  style='height:34px;' ><div class='row'><div class='col-xs-1 text-right '></div>
+		echo "<tr id='owner'><td id=\"$group\" class='groupsname' data-group=\"$group\" style='height:34px' ><div class='row'><div class='col-xs-1 text-right '></div>
 		<div class='col-xs-8 filelink-wrap'><i class='icon-users     deic_green icon'>&nbsp</i>
 		<span class='nametext'>$group</span></div>
 			<div class='col-xs-3 fileactions-wrap text-right'>
@@ -108,7 +108,7 @@
 		$members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
                 $size = count($members);
                 echo "<td id='members' class=\"$group\"><div class='nomembers'><a id='nomembers' href='#'>$size</a>
-                     <div id='dropdown' class='drop' data-item-type='folder' style='overflow-y: scroll; display:none;' >
+                     <div id='dropdown' class='drop' data-item-type='folder' style='overflow-y: scroll; z-index:1; display:none;' >
                         <span role='status' aria-live='polite' class='ui-helper-hidden-accessible'></span>
                 <strong style='float:left;'>Members</strong><br>";
                 if ($size==0) {
@@ -143,7 +143,7 @@
 	         echo "<tr id='member'><td  id=\"$groupmembership\" class='groupsname' data-group=\"$groupmembership\" style='height:34px;' ><div class='row'><div class='col-xs-4 col-sm-1'></div>
 		<div class='col-xs-8 filelink-wrap'><i class='icon-users     deic_green icon'>&nbsp</i> 
 
-	$groupmembership</div>
+                <span class='nametext'>	$groupmembership</span></div>
 			<div class='col-xs-3 fileactions-wrap text-right'>
 			<div id='dropdownbtn' class='btn-group btn-group-xs fileactions'>
                                 <a id='removegroup' class='btn btn-flat btn-default action-primary action action-edit' href='#'>Delete</a>
@@ -161,7 +161,7 @@
 		$members = OC_User_Group_Admin_Util::usersInGroup( $groupmembership ) ;
 	        $size = count($members);	
 		echo "<td id='memberships'><div class='nomembers'><a id='nomembers' href='#'>$size</a>
-                     <div id='dropdown' class='drop' data-item-type='folder' style='overflow-y: scroll; display:none;' >
+                     <div id='dropdown' class='drop' data-item-type='folder' style='overflow-y: scroll; z-index:1; display:none;' >
                         <span role='status' aria-live='polite' class='ui-helper-hidden-accessible'></span>
 		<div ><strong style='float:left;' >Owner</strong></div><br>";
       		$stmt = OC_DB::prepare( "SELECT `owner` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?" ); 
