@@ -97,25 +97,30 @@ $(document).ready(function() {
 	$("#filestable td #removegroup").live('click', function() {
 		var status = $(this).closest('tr').attr('id') ;
 		var groupSelected = $(this).closest('td').attr('id') ;
-		if (status == 'owner') {
-			$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : groupSelected , action : "delgroup"} , function ( jsondata){
-				if(jsondata.status == 'success' ) {
-					location.reload();
-				}else{
-					OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
-				}
-			});
+		$( '#dialogalert' ).dialog({ buttons: [ { id:'test','data-test':'data test', text: 'Delete', click: function() {
+					if (status == 'owner') {
+                        $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : groupSelected , action : "delgroup"} , function ( jsondata){
+                                if(jsondata.status == 'success' ) {
+                                        location.reload();
+                                }else{
+                                        OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
+                                }
+                        });
 
-		}else {
-			$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : groupSelected , action : "leavegroup"} , function ( jsondata){
+                }else {
+                        $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : groupSelected , action : "leavegroup"} , function ( jsondata){
 
-				if(jsondata.status == 'success' ) {
-					location.reload();
-				}else{
-					OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
-				}
-			});
-		}
+                                if(jsondata.status == 'success' ) {
+                                        location.reload();
+                                }else{
+                                        OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
+                                }
+                        });
+                }
+
+                                         $(this).dialog( 'close' ); } },
+                                        { id:'test2','data-test':'data test', text: 'Cancel', click: function() {
+                                        $(this).dialog( 'close' ); } } ] });
 
 	});
 

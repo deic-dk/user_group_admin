@@ -273,18 +273,8 @@ foreach ( $groups as $group ) {
 		}
 	}
 }
-
-
+echo "<div id='dialogalert' title='Delete Confirmation' style='display:none;' ><p>Are you sure you want to delete this group?</p></div>";
 ?>
 
 
 
-<div class="hidden" id="deleteConfirm" title="<?php p($l->t('Delete tag')) ?>"> 
-    <div>
-        <span id="deleteType"></span>
-        <?php p($l->t('Are you sure you want to delete the tag:')) ?><br />
-        <div style="width: 100%; text-align: center; padding: 5px 0px 15px 0px; font-weight: bold;" id="tagToDelete"></div>
-        <?php p($l->t('This operation cannot be undone.')) ?><br />
-    </div>
-    <input type="hidden" name="deleteID" id="deleteID" value="-1" />
-</div>
