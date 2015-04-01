@@ -14,6 +14,6 @@ OCP\App::addNavigationEntry(
            'order' => 4,
            'href'  => OCP\Util::linkTo( 'user_group_admin' , 'index.php' ),
            'icon'  => OCP\Util::imagePath( 'user_group_admin', 'nav-icon.png' ),
-           'name'  => 'My Groups' )
+           'name'  => 'Teams' )
          );
 
