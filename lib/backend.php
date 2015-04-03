@@ -39,6 +39,7 @@ class OC_User_Group_Admin_Backend extends OC_Group_Backend
      */
     public function inGroup( $uid, $gid )
     {
+    		// Not necessary to ask master, as a user is added to all groups set in his session, by files_sharding/filesessionhandler.php
         // check
         $stmt = OC_DB::prepare( "SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `owner` = ?" );
         $result = $stmt->execute( array( $gid, $uid , OCP\USER::getUser() ));
@@ -56,6 +57,9 @@ class OC_User_Group_Admin_Backend extends OC_Group_Backend
      */
     public function getUserGroups( $uid )
     {
+    
+    		// Not necessary to ask master, as a user is added to all groups set in his session, by files_sharding/filesessionhandler.php
+    		
         // No magic!
         $stmt = OC_DB::prepare( "SELECT `gid` FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ?" );
         $result = $stmt->execute( array( $uid ));
@@ -79,6 +83,12 @@ class OC_User_Group_Admin_Backend extends OC_Group_Backend
      */
     public function getGroups($search = '', $limit = null, $offset = null)
     {
+    
+				if(\OCP\App::isEnabled('files_sharding') && !OCA\FilesSharding\Lib::isMaster()){
+					$groups = \OCA\FilesSharding\Lib::ws('getGroups', array('search' => $_GET['search']));
+					return $groups;
+				}
+    
         $stmt = OC_DB::prepare('SELECT `gid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` LIKE ? AND (`owner` = ? OR `uid` = ? AND `owner` != ?)  GROUP BY `gid`', $limit, $offset);
         $user = OCP\USER::getUser();
         $result = $stmt->execute(array($search.'%', $user, $user, self::$HIDDEN_GROUP_OWNER));
@@ -99,6 +109,11 @@ class OC_User_Group_Admin_Backend extends OC_Group_Backend
      */
     public function groupExists($gid)
     {
+	    	if(\OCP\App::isEnabled('files_sharding') && !OCA\FilesSharding\Lib::isMaster()){
+	    		$groupExists = \OCA\FilesSharding\Lib::ws('groupExists', array('group_id' => $gid));
+	    		return $groupExists;
+	    	}
+	    	
         $query = OC_DB::prepare('SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ? AND `owner` = ?' );
         $result = $query->execute(array($gid,OCP\USER::getUser()))->fetchOne();
         if ($result) {
@@ -118,7 +133,13 @@ class OC_User_Group_Admin_Backend extends OC_Group_Backend
      */
     public function usersInGroup($gid, $search = '', $limit = null, $offset = null)
     {
-        $stmt = OC_DB::prepare('SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` LIKE ?', $limit, $offset);
+    		if(\OCP\App::isEnabled('files_sharding') && !OCA\FilesSharding\Lib::isMaster()){
+					$groups = \OCA\FilesSharding\Lib::ws('usersInGroup', array('group_id' => $gid, 'search' => $search,
+							'limit' => $limit, 'offset' => $offset));
+					return $groups;
+				}
+
+				$stmt = OC_DB::prepare('SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` LIKE ?', $limit, $offset);
         $result = $stmt->execute(array($gid, $search.'%'));
         $users = array();
         while ($row = $result->fetchRow()) {
