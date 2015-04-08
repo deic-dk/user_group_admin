@@ -46,6 +46,13 @@ if ( isset($_POST['group']) ) {
     case "delmember":
       if ( isset($_POST['member'])) $result = OC_User_Group_Admin_Util::removeFromGroup( $_POST['member'] , $_POST['group'] ) ;
       break;
+    case "showmembers":
+      $result = true;
+      break;
+    case "showmemberships":
+      $result = true;
+      break;
+	
   }
   		
   if ($result) {
@@ -63,6 +70,21 @@ if ( isset($_POST['group']) ) {
         $page = $tmpl->fetchPage();
         OCP\JSON::success(array('data' => array('page'=>$page)));
   	    break;
+	case "showmembers":
+	$tmpl = new OCP\Template("user_group_admin", "members");
+        $tmpl->assign( 'group' , $_POST['group'] , false );
+        $tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $_POST['group'] ) , false );
+        $page = $tmpl->fetchPage();
+        OCP\JSON::success(array('data' => array('page'=>$page)));
+            break;
+	case "showmemberships":
+        $tmpl = new OCP\Template("user_group_admin", "memberships");
+        $tmpl->assign( 'group' , $_POST['group'] , false );
+        $tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $_POST['group'] ) , false );
+        $page = $tmpl->fetchPage();
+        OCP\JSON::success(array('data' => array('page'=>$page)));
+            break;
+
   	  default:
   	    OCP\JSON::success();
     }     

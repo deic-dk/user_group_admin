@@ -31,9 +31,9 @@ OC.UserGroup = {
             $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { member : member , group : OC.UserGroup.groupSelected , action : "addmember"} , function ( jsondata ){
               if(jsondata.status == 'success' ) {
                             $('.ui-autocomplete-input').val('');
-                            var theint = parseInt($("td[class='"+OC.UserGroup.groupSelected+"']").find("a#nomembers").html(),10)
+                            var theint = parseInt($("td[class='"+OC.UserGroup.groupSelected+"']").find("span#nomembers").html(),10)
                             theint++;
-                            $("td[class='"+OC.UserGroup.groupSelected+"']").find("a#nomembers").text(theint);
+                            $("td[class='"+OC.UserGroup.groupSelected+"']").find("span#nomembers").text(theint);
                             $("td[class='"+OC.UserGroup.groupSelected+"']").find('#dropdown').html(jsondata.data.page);
                             OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].push(member);
                             OC.UserGroup.initDropDown() ;
@@ -94,7 +94,7 @@ $(document).ready(function() {
 		);
 	});
 
-	$("#filestable td #removegroup").live('click', function() {
+	$("#groupstable td #removegroup").live('click', function() {
 		var status = $(this).closest('tr').attr('id') ;
 		var groupSelected = $(this).closest('td').attr('id') ;
 		$( '#dialogalert' ).dialog({ buttons: [ { id:'test','data-test':'data test', text: 'Delete', click: function() {
@@ -124,7 +124,7 @@ $(document).ready(function() {
 
 	});
 
-	$("#filestable td #exportgroup").live('click', function() {
+	$("#groupstable td #exportgroup").live('click', function() {
 		var groupSelected = $(this).closest('td').attr('id') ;
 		document.location.href = OC.linkTo('user_group_admin', 'ajax/export.php') + '?group=' + groupSelected;
 	});
@@ -141,28 +141,49 @@ $(document).ready(function() {
 		});
 	});
 
-	$(" .nomembers").live('click', function(event) {
-		$('.drop', this).toggle();
-		event.stopPropagation();
-		var i=true;
-		$('html').click(function(event) {
-        if (i==true) {
-           $(".drop").hide();
-        }
+$(" .name").live('click', function() {
+		 var group = $(this).closest('td').attr('id') ;
+		var itext = '<div class="itext">Select a group</div>'; 
+		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmembers"} ,
+                function ( jsondata ){
+                        if(jsondata.status == 'success' ) {
+				$('.dropnew').css('display', 'block');
+				$('.dropnew').html(jsondata.data.page);
+
+                        }else{
+                                OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
+                        }
 		});
+	if ($(this).closest('tr').attr('id')=='member') {
+		 $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmemberships"} ,
+                function ( jsondata ){
+                        if(jsondata.status == 'success' ) {
+                                $('.dropnew').css('display', 'block');
+                                $('.dropnew').html(jsondata.data.page);
+                        }else{
+                                OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
+                        }
+                });
+	
+	}
+                $('html').click(function(event) {
+        if ( !$(event.target).closest(".dropnew").length && !$(event.target).closest(".text-right").length ) {
+		$('.dropnew').html(itext);
+        }
+                });
+	});	
 
-	});
 
-	$('#filestable td .removemember').live('click', function() {
-		OC.UserGroup.groupSelected = $(this).closest('td').attr('class') ;
+	$(' .removemember').live('click', function() {
+		group =$('.groupname').attr('id') ; 
 		var container = $(this).parents('li').first();
 		var member    = container.data('member');
-		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { member : member , group : OC.UserGroup.groupSelected , action : "delmember"} , function ( jsondata ){
+		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { member : member , group : group , action : "delmember"} , function ( jsondata ){
 			if(jsondata.status == 'success' ) {
 				container.remove();
-				var theint = parseInt($("td[class='"+OC.UserGroup.groupSelected+"']").find(" a#nomembers").html(),10)
+				var theint = parseInt($("td[class='"+group+"']").find(" span#nomembers").html(),10)
 				theint--;
-				$("td[class='"+OC.UserGroup.groupSelected+"']").find("a#nomembers").text(theint);
+				$("td[class='"+group+"']").find("span#nomembers").text(theint);
 				var index = OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].indexOf(member);
 				OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].splice(index, 1);				
 			}else{
