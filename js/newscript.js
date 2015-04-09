@@ -196,8 +196,8 @@ $(" .name").live('click', function() {
 				var theint = parseInt($("td[class='"+group+"']").find(" span#nomembers").html(),10)
 				theint--;
 				$("td[class='"+group+"']").find("span#nomembers").text(theint);
-				var index = OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].indexOf(member);
-				OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].splice(index, 1);				
+			//	var index = OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].indexOf(member);
+				//OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].splice(index, 1);				
 			}else{
 				OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
 			} 

@@ -1,10 +1,10 @@
 <?php
 $group=$_['group'];
 $members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
-$size = count($members); ?>
-		<div class='groupname' id=<?php echo $group;?>><strong><?php echo $group;?></strong></div> 
-                <strong class='left'>Members</strong><br>
-<?php 
+$size = count($members); 
+
+	echo	"<div class='groupname' id= \"$group\" ><strong><?php echo $group;?></strong></div> 
+                <strong class='left'>Members</strong><br>";
 	$group=$_['group'];
 	$members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
 	$size = count($members);
