@@ -36,6 +36,16 @@ OC.UserGroup = {
                             $("td[class='"+OC.UserGroup.groupSelected+"']").find("span#nomembers").text(theint);
                             $("td[class='"+OC.UserGroup.groupSelected+"']").find('#dropdown').html(jsondata.data.page);
                             OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].push(member);
+			    $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: OC.UserGroup.groupSelected, action : "showmembers"} ,
+                function ( jsondata ){
+                        if(jsondata.status == 'success' ) {
+                                $('.dropnew').css('display', 'block');
+                                $('.dropnew').html(jsondata.data.page);
+
+                        }else{
+                                OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
+                        }
+                });	
                             OC.UserGroup.initDropDown() ;
               }else{
                 OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
@@ -144,6 +154,7 @@ $(document).ready(function() {
 $(" .name").live('click', function() {
 		 var group = $(this).closest('td').attr('id') ;
 		var itext = '<div class="itext">Select a group</div>'; 
+	if ($(this).closest('tr').attr('id')=='owner'){ 
 		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmembers"} ,
                 function ( jsondata ){
                         if(jsondata.status == 'success' ) {
@@ -154,7 +165,8 @@ $(" .name").live('click', function() {
                                 OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
                         }
 		});
-	if ($(this).closest('tr').attr('id')=='member') {
+	}
+	else if ($(this).closest('tr').attr('id')=='member') {
 		 $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmemberships"} ,
                 function ( jsondata ){
                         if(jsondata.status == 'success' ) {
@@ -167,7 +179,7 @@ $(" .name").live('click', function() {
 	
 	}
                 $('html').click(function(event) {
-        if ( !$(event.target).closest(".dropnew").length && !$(event.target).closest(".text-right").length ) {
+        if ( !$(event.target).closest(".dropnew").length && !$(event.target).closest(".text-right").length && !$(event.target).closest(".ui-corner-all").length) {
 		$('.dropnew').html(itext);
         }
                 });
