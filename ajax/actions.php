@@ -57,12 +57,6 @@ if ( isset($_POST['group']) ) {
   		
   if ($result) {
     switch ($_POST['action']) {
-      case "addgroup":
-        $tmpl = new OCP\Template("user_group_admin", "part.group");
-        $tmpl->assign( 'groups' , OC_User_Group_Admin_Util::getGroups() , true );
-        $page = $tmpl->fetchPage();
-        OCP\JSON::success(array('data' => array('page'=>$page)));
-  	    break;
   	  case "addmember":  
         $tmpl = new OCP\Template("user_group_admin", "members");
         $tmpl->assign( 'group' , $_POST['group'] , false );
