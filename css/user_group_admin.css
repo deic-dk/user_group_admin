@@ -83,7 +83,7 @@ input.edittag {
         font-size: 12px;
         top:-8px;
         width:39%;
-        z-index:1000;
+        z-index:-1;
 	float:right;
 }
 
