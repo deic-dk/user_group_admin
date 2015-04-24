@@ -58,8 +58,8 @@ class OC_User_Group_Admin_Util {
 				OCP\USER::getUser (),
 				OCP\USER::getDisplayName () 
 		) );
-	 	$query = OC_DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
-                $query->execute(array('user_group_admin', 'created', none, '', none, $gid, '', OCP\USER::getUser (), OCP\USER::getUser (), time(), 40, 'group_created'));	
+		//$query = OC_DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
+                //$query->execute(array('user_group_admin', 'created', none, '', none, $gid, '', OCP\USER::getUser (), OCP\USER::getUser (), time(), 40, 'group_created'));
 		return $result ? true : false;
 	}
 	public static function createHiddenGroup($gid) {

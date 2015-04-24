@@ -33,6 +33,7 @@ if ( isset($_POST['group']) ) {
   switch ($_POST['action']) {
     case "addgroup":
       $result = OC_User_Group_Admin_Util::createGroup( $_POST['group'], OC_User::getUser() ) ;
+	$activity = OC_User_Group_Hooks::groupCreate($_POST['group']);
       break;
     case "addmember":
       if ( isset($_POST['member'])) $result = OC_User_Group_Admin_Util::addToGroup( $_POST['member'] , $_POST['group'] );
@@ -42,6 +43,7 @@ if ( isset($_POST['group']) ) {
       break;
     case "delgroup":
       $result = OC_User_Group_Admin_Util::deleteGroup( $_POST['group'] ) ;
+	$activity = OC_User_Group_Hooks::groupDelete($_POST['group']);
       break;
     case "delmember":
       if ( isset($_POST['member'])) $result = OC_User_Group_Admin_Util::removeFromGroup( $_POST['member'] , $_POST['group'] ) ;
