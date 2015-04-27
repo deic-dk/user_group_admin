@@ -211,5 +211,3 @@ $(" .name").live('click', function() {
 	});
 
 });
-
-

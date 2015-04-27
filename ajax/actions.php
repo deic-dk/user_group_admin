@@ -36,7 +36,10 @@ if ( isset($_POST['group']) ) {
 	$activity = OC_User_Group_Hooks::groupCreate($_POST['group']);
       break;
     case "addmember":
-      if ( isset($_POST['member'])) $result = OC_User_Group_Admin_Util::addToGroup( $_POST['member'] , $_POST['group'] );
+      if ( isset($_POST['member'])) {
+	$result = OC_User_Group_Admin_Util::addToGroup( $_POST['member'] , $_POST['group'] );
+	$activity = OC_User_Group_Hooks::groupShare($_POST['group'], $_POST['member']);
+	}
       break;
     case "leavegroup":
       $result = OC_User_Group_Admin_Util::removeFromGroup( OCP\User::getUser() , $_POST['group'] ) ;
