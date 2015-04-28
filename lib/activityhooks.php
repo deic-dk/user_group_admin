@@ -9,7 +9,7 @@ class OC_User_Group_Hooks {
 	}
 	public static function groupShare($group, $uid) {
 		$params = array($group, $uid);
-	 	OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'shared', 'shared_user_self', 'shared_by');	
+	 	OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'shared', 'shared_user_self', 'shared_with_by');	
 	}
 	public static function addNotificationsForGroupAction( $group, $activityType, $subject, $subjectBy) {
 		if ($activityType == 'shared') {
@@ -37,7 +37,9 @@ class OC_User_Group_Hooks {
 		if ($streamSetting) {
 			if ($type == 'shared') {
 				$query = OC_DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
-                                $query->execute(array('user_group_admin', $subject, serialize($path), '', none, none, '', $user, $auser, time(), 40, $type));
+                                $query->execute(array('user_group_admin', $subject, serialize($path), '', none, $path[0], '', $user, $user, time(), 40, $type));
+				$query = OC_DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
+                                $query->execute(array('user_group_admin', 'shared_with_by', serialize(array($path[0],$user)), '', none, $path[0], '', $user, $auser, time(), 40, $type));
 			}else {
 				$query = OC_DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
                 		$query->execute(array('user_group_admin', $subject, serialize(array($path)), '', none, none, '', $user, $auser, time(), 40, $type));
