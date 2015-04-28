@@ -179,7 +179,6 @@ foreach ( $groups as $group ) {
         $owner = OC_User_Group_Admin_Util::groupOwner($group);
 	
 	
-	if ($group != 'dtu.dk') {
 		if ($verified || $checkagain) {
 			echo "<script type='text/javascript'>
 					window.alert(\"You have accepted the invitation to the following group:  $group\");
@@ -222,7 +221,6 @@ foreach ( $groups as $group ) {
                                 </script>";
 			break;
 		}
-	}
 }
 echo "<div id='dialogalert' title='Delete Confirmation' style='display:none;' ><p>Are you sure you want to delete this group?</p></div>";
 ?>
