@@ -169,15 +169,10 @@
 
 <?php
 $groups = OC_User_Group_Admin_Util::getUserGroups ( OC_User::getUser () );
-// ioanna
 foreach ( $groups as $group ) {
-	$ingroup = OC_User_Group_Admin_Util::searchUser ( $group, OC_User::getUser (), '1' );
-	$notification = OC_User_Group_Admin_Util::isNotified ( $group, OC_User::getUser (), '0', '0' );
 	$verified = OC_User_Group_Admin_Util::acceptedUser ( $group, OC_User::getUser (), '0', $_GET ['code'], '0' );
 	$declined = OC_User_Group_Admin_Util::declinedUser ( $group, OC_User::getUser (), '0', $_GET ['code'], '0' );
 	$checkagain = OC_User_Group_Admin_Util::acceptedUser ( $group, OC_User::getUser (), '2', $_GET ['code'], '0' );
-        $owner = OC_User_Group_Admin_Util::groupOwner($group);
-	
 	
 		if ($verified || $checkagain) {
 			echo "<script type='text/javascript'>
@@ -193,34 +188,7 @@ foreach ( $groups as $group ) {
                         	</script>";
 			$result = OC_User_Group_Admin_Util::declineInvitation ( OCP\USER::getUser (), $group );
 			$status = OC_User_Group_Admin_Util::Notification ( OCP\USER::getUser (), $group, $_GET ['code'] );
-	        }elseif ($notification == true && isset ( $_GET ['code'] ) == false) {
-			echo "<div id='dialog' title='Group Invitation'>
-  <p>You have been invited to the following group: <div id = 'group1' value = \"$group\"> $group</div> by <b>$owner</b> . Press Accept to accept the invitation or Decline to reject it</p>
-</div>";
-			echo "<script type='text/javascript'>
-                                         $( '#dialog' ).dialog({ buttons: [ { id:'test','data-test':'data test', text: 'Accept', click: function() {
-                                        $.ajax({
-                                        url:OC.linkTo('user_group_admin', 'ajax/notification.php'),
-                                        type: 'post',
-                                        data: { 'group': $('#group1').attr('value'), 'action': 'acceptinvitation'},
-                                        success: function(data, status) {
-						location.reload();		
-                                        }
-                                        });
-                                         $(this).dialog( 'close' ); } },
-                                        { id:'test2','data-test':'data test', text: 'Decline', click: function() {
-                                        $.ajax({
-                                        url:OC.linkTo('user_group_admin', 'ajax/notification.php'),
-                                        type: 'post',
-                                        data: {'group': $('#group1').attr('value'), 'action': 'declineinvitation'},
-                                        success: function(data, status) {
-						location.reload();
-                                        }
-                                        });
-                                        $(this).dialog( 'close' ); } } ] });
-                                </script>";
-			break;
-		}
+	        }
 }
 echo "<div id='dialogalert' title='Delete Confirmation' style='display:none;' ><p>Are you sure you want to delete this group?</p></div>";
 ?>

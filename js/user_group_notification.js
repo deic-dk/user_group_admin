@@ -1,12 +1,12 @@
 $(document).ready(function() {
 	$(document).on ("click", "#accept", function () {
-        	window.alert($(this).attr('value') );
 		$.ajax({
                      url:OC.linkTo('user_group_admin', 'ajax/notification.php'),
                      type: 'post',
                      data: { 'group': $(this).attr('value'), 'action': 'acceptinvitation'},
                      success: function(data, status) {
-                        location.reload();
+			$("#accept").parent().parent().html('You joined group <b>'+$("#accept").attr('value')+'</b>');
+			$("#accept").parent().text("");
                      }
                 });
     });	
@@ -16,7 +16,8 @@ $(document).ready(function() {
                      type: 'post',
                      data: {'group': $(this).attr('value'), 'action': 'declineinvitation'},
                      success: function(data, status) {
-			location.reload();
+			$("#decline").parent().parent().html('You rejected an invitation to group <b>'+$("#decline").attr('value') + '</b>');
+                        $("#decline").parent().text("");
                      }
                 });
 	});

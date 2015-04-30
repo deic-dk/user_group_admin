@@ -43,6 +43,8 @@ if ( isset($_POST['group']) ) {
       break;
     case "leavegroup":
       $result = OC_User_Group_Admin_Util::removeFromGroup( OCP\User::getUser() , $_POST['group'] ) ;
+	$groupOwner = OC_User_Group_Admin_Util::groupOwner($_POST['group']);
+	$activity = OC_User_Group_Hooks::groupLeave($_POST['group'], $groupOwner);
       break;
     case "delgroup":
       $result = OC_User_Group_Admin_Util::deleteGroup( $_POST['group'] ) ;
