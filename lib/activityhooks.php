@@ -1,6 +1,7 @@
 <?php
 use \OCP\Util;
 class OC_User_Group_Hooks {
+	 
 	public static function groupCreate($params) {
 		OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'file_created', 'created_self', 'created_by');		
 	}
@@ -41,29 +42,29 @@ class OC_User_Group_Hooks {
 
 	protected static function addNotificationsForUser($user, $auser, $subject, $path, $isFile, $streamSetting, $emailSetting, $priority , $type ) {
 		$link = ''; 
-		
+	        $app = 'user_group_admin';	
 		if ($streamSetting) {
 			if ($type == 'shared') {
-				$query = OC_DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
-                                $query->execute(array('user_group_admin', $subject, serialize($path), '', none, $path[0], '', $user, $user, time(), 40, $type));
-				$query = OC_DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
-                                $query->execute(array('user_group_admin', 'shared_with_by', serialize(array($path[0],$user)), '', none, $path[0], '', $user, $auser, time(), 40, $type));
+				OC_User_Group_Hooks::addData($app, $subject, $path, $user, $user, time(), 40, $type);
+				OC_User_Group_Hooks::addData($app, 'shared_with_by', array($path[0],$user), $user, $auser, time(), 40, $type);	
+
 			}else if ($type == 'file_deleted'){
 				if ($subject == 'deleted_self') {
-					$query = OC_DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
-                                	$query->execute(array('user_group_admin', $subject, serialize(array($path)), '', none, none, '', $user, $auser, time(), 40, $type));
-                        	}else {
-					$query = OC_DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
-                                	$query->execute(array('user_group_admin', 'deleted_self', serialize($path), '', none, none, '', $user, $user, time(), 40, $type));
-					$query = OC_DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
-                                	$query->execute(array('user_group_admin', $subject, serialize(array($path[0],$user)), '', none, $path[0], '', $user, $auser, time(), 40, $type));
-				}
- 
+					OC_User_Group_Hooks::addData($app, $subject, array($path), $user, $auser, time(), 40, $type);
+        		       	}else {
+					OC_User_Group_Hooks::addData($app, 'deleted_self', $path, $user, $user, time(), 40, $type);
+					OC_User_Group_Hooks::addData($app, $subject, array($path[0],$user), $user, $auser, time(), 40, $type);
+				} 
 			}else {
-				$query = OC_DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
-                		$query->execute(array('user_group_admin', $subject, serialize(array($path)), '', none, none, '', $user, $auser, time(), 40, $type));
+				OC_User_Group_Hooks::addData($app, $subject, array($path), $user, $auser, time(), 40, $type);
+
 			}
 		}
+
+	}
+	public static function addData($app, $subject, $path, $user, $auser, $time, $priority, $type){
+		$query = OC_DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
+                $query->execute(array($app, $subject, serialize($path), '', none, none, '', $user, $auser, $time, $priority, $type));
 
 	}
 
