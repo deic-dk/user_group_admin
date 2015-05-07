@@ -170,9 +170,9 @@
 <?php
 $groups = OC_User_Group_Admin_Util::getUserGroups ( OC_User::getUser () );
 foreach ( $groups as $group ) {
-	$verified = OC_User_Group_Admin_Util::acceptedUser ( $group, OC_User::getUser (), '0', $_GET ['code'], '0' );
-	$declined = OC_User_Group_Admin_Util::declinedUser ( $group, OC_User::getUser (), '0', $_GET ['code'], '0' );
-	$checkagain = OC_User_Group_Admin_Util::acceptedUser ( $group, OC_User::getUser (), '2', $_GET ['code'], '0' );
+	$verified = OC_User_Group_Admin_Util::acceptedUser ( $group, OC_User::getUser (), '0', $_GET ['code']);
+	$declined = OC_User_Group_Admin_Util::declinedUser ( $group, OC_User::getUser (), '0', $_GET ['code']);
+	$checkagain = OC_User_Group_Admin_Util::acceptedUser ( $group, OC_User::getUser (), '2', $_GET ['code']);
 	
 		if ($verified || $checkagain) {
 			echo "<script type='text/javascript'>
@@ -180,14 +180,12 @@ foreach ( $groups as $group ) {
 					location.reload();
 				</script>";
 			$result = OC_User_Group_Admin_Util::acceptInvitation ( $group, OCP\USER::getUser () );
-			$status = OC_User_Group_Admin_Util::Notification ( OCP\USER::getUser (), $group, $_GET ['code'] );
 		} elseif ($declined) {
 			echo "<script type='text/javascript'>
                                 	window.alert(\"You have declined the invitation to the following group:  $group\");
 					location.reload();
                         	</script>";
 			$result = OC_User_Group_Admin_Util::declineInvitation ( OCP\USER::getUser (), $group );
-			$status = OC_User_Group_Admin_Util::Notification ( OCP\USER::getUser (), $group, $_GET ['code'] );
 	        }
 }
 echo "<div id='dialogalert' title='Delete Confirmation' style='display:none;' ><p>Are you sure you want to delete this group?</p></div>";

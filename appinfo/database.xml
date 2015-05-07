@@ -27,13 +27,6 @@
 				<length>64</length>
 			</field>
 
-			<field>
-                                <name>ownersname</name>
-                                <type>text</type>
-                                <notnull>true</notnull>
-                                <length>64</length>
-                        </field>
-
 
 		</declaration>
 
@@ -79,11 +72,6 @@
 				<length>128</length>
 			</field>
 
-			<field>
-                                <name>notification</name>
-                                <type>boolean</type>
-                                <notnull>true</notnull>
-                        </field>
 
 			<field>
                                 <name>decline</name>

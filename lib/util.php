@@ -52,14 +52,11 @@ class OC_User_Group_Admin_Util {
 		}
 		
 		// Add group and exit
-		$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` , `ownersname`) VALUES( ? , ?, ? )" );
+		$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` ) VALUES( ? , ? )" );
 		$result = $stmt->execute ( array (
 				$gid,
-				OCP\USER::getUser (),
-				OCP\USER::getDisplayName () 
+				OCP\USER::getUser ()
 		) );
-		//$query = OC_DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
-                //$query->execute(array('user_group_admin', 'created', none, '', none, $gid, '', OCP\USER::getUser (), OCP\USER::getUser (), time(), 40, 'group_created'));
 		return $result ? true : false;
 	}
 	public static function createHiddenGroup($gid) {
@@ -147,7 +144,7 @@ class OC_User_Group_Admin_Util {
 		if (! OC_User_Group_Admin_Util::inGroup ( $uid, $gid )) {
 			$accept = md5 ( $uid . time () );
 			$decline = $uid . time ();
-			$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `owner`, `verified`, `accept`, `notification`,`decline` ) VALUES( ?, ?, ?, ?, ?, ?, ?)" );
+			$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `owner`, `verified`, `accept`, `decline` ) VALUES( ?, ?, ?, ?, ?, ?)" );
 			if (OC_User_Group_Admin_Util::hiddenGroupExists ( $gid )) {
 				$stmt->execute ( array (
 						$gid,
@@ -155,7 +152,6 @@ class OC_User_Group_Admin_Util {
 						OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER,
 						'0',
 						$accept,
-						'0',
 						$decline 
 				) );
 			} else {
@@ -165,7 +161,6 @@ class OC_User_Group_Admin_Util {
 						OCP\USER::getUser (),
 						'0',
 						$accept,
-						'0',
 						$decline 
 				) );
 				OC_User_Group_Admin_Util::sendVerification ( $uid, $accept, $decline, $gid, OCP\USER::getDisplayName () );
@@ -236,14 +231,13 @@ class OC_User_Group_Admin_Util {
 	/**
 	 * Checks if a user has accepted the invitation via mail.
 	 */
-	public static function acceptedUser($gid, $uid, $verified, $accept, $notification) {
-		$stmt = OC_DB::prepare ( "SELECT `accept` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ? AND `accept` = ? AND `notification` = ?" );
+	public static function acceptedUser($gid, $uid, $verified, $accept) {
+		$stmt = OC_DB::prepare ( "SELECT `accept` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ? AND `accept` = ? " );
 		$result = $stmt->execute ( array (
 				$gid,
 				$uid,
 				$verified,
-				$accept,
-				$notification 
+				$accept
 		) );
 		
 		return $result->fetchRow () ? true : false;
@@ -252,50 +246,18 @@ class OC_User_Group_Admin_Util {
 	/**
 	 * Checks if a user has declined the invitation via email.
 	 */
-	public static function declinedUser($gid, $uid, $verified, $decline, $notification) {
-		$stmt = OC_DB::prepare ( "SELECT `decline` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ? AND `decline` = ? AND `notification` = ?" );
+	public static function declinedUser($gid, $uid, $verified, $decline) {
+		$stmt = OC_DB::prepare ( "SELECT `decline` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ? AND `decline` = ? " );
 		$result = $stmt->execute ( array (
 				$gid,
 				$uid,
 				$verified,
-				$decline,
-				$notification 
+				$decline
 		) );
 		
 		return $result->fetchRow () ? true : false;
 	}
 	
-	/**
-	 * Checks if the user has responded to the mail invitation and if so returns true.
-	 */
-	public static function isNotified($gid, $uid, $verified, $notification) {
-		$stmt = OC_DB::prepare ( "SELECT `notification` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ? AND `notification` = ?" );
-		$result = $stmt->execute ( array (
-				$gid,
-				$uid,
-				$verified,
-				$notification 
-		) );
-		
-		return $result->fetchRow () ? true : false;
-	}
-	
-	/**
-	 * Updates the database if the user has responded to the email.
-	 */
-	public static function Notification($uid, $gid, $accept, $decline) {
-		$query = OC_DB::prepare ( "UPDATE `*PREFIX*user_group_admin_group_user` SET `notification` = true WHERE `gid` = ? AND `uid` = ? AND `accept` = ? OR `decline` = ?  " );
-		$result = $query->execute ( array (
-				$gid,
-				$uid,
-				$accept,
-				$decline 
-		) );
-		return $result;
-	}
-	/**
-         * Returns the owner of a group.  
-         */
  	public static function groupOwner($gid) {
 		$stmt = OC_DB::prepare ( "SELECT `owner` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = :name " );
 		$params = array(
