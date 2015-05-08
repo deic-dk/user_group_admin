@@ -98,6 +98,11 @@ input.edittag {
 }
 
 
+.avatar {
+        vertical-align: middle;
+        display: inline-block;
+        margin-right: 5px;
+}
 
 
 

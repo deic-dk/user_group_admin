@@ -3,13 +3,14 @@ $group=$_['group'];
 $members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
 $size = count($members);
 
-        echo    "<div class='groupname' id= \"$group\" ><strong>$group</strong></div>
-                <strong class='left'>Members</strong><br>";
+//        echo    "<div class='groupname' id= \"$group\" ><strong>$group</strong></div>
+  //              <strong class='left'>Members</strong><br>";
         $group=$_['group'];
         $members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
-        $size = count($members);
-        if ($size==0) {
-                        echo "<div class='left'><i>No members yet</i></div>";
+        $size = count($members) +1;
+	//echo "<div style='text-align:left'>$size members</div>";
+        if ($size==1) {
+                        echo "<div id=\"emptysearch\">No members yet</div>";
                 }
         foreach ($members as $member) {
                 $groupmembers = OC_User_Group_Admin_Util::searchUser($group, $member, '1');
@@ -21,7 +22,8 @@ $size = count($members);
                 } else {
                         $status = 'Member declined the invitation';
                 }
-                $name = OC_User::getDisplayName($member) ;
+                $name = OC_User_Group_Admin_Util::prepareUser($member);
+		//echo $name;
                 echo "<li data-member=$member title=\"".OC_User::getDisplayName($member)."\" ><i class=\"fa fa-user\"></i><div class='left'
 >$name</div>
                 <span class=\"member-actions\" style='float:right'>

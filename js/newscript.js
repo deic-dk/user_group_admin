@@ -153,13 +153,27 @@ $(document).ready(function() {
 
 $(" .name").live('click', function() {
 		 var group = $(this).closest('td').attr('id') ;
-		var itext = '<div class="itext">Select a group</div>'; 
+		var itext = '<div class="itext">Select a group</div>';
+		var number = $("td[class='"+group+"']").find("span#nomembers").html();
+	var html = '<div><span id="tagid" class=""><h3 class="oc-dialog-title">Team \''+ group+'\'</h3></span><a class="oc-dialog-close close svg"></a><div id="meta_data_container">\
+				'+number+' members<div id="emptysearch"></div><ul id="meta_data_keys"></ul></div><div class="dropmembers" style="text-align:center;"></div>\
+          <div style="position:absolute;bottom:0;left:0;" ><button class="btn btn-primary btn-flat"><i class="icon-user"></i>Invite user</button></div></div>';
+			
+
+			$(html).dialog({
+			  dialogClass: "oc-dialog notitle",
+			  resizeable: false,
+			  draggable: false,
+			  height: 800,
+			  width: 1024
+			});
+		$('.ui-helper-clearfix').css("display", "none");
 	if ($(this).closest('tr').attr('id')=='owner'){ 
 		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmembers"} ,
                 function ( jsondata ){
                         if(jsondata.status == 'success' ) {
 				$('.dropnew').css('display', 'block');
-				$('.dropnew').html(jsondata.data.page);
+				$('.dropmembers').html(jsondata.data.page);
 
                         }else{
                                 OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;

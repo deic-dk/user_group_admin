@@ -388,4 +388,12 @@ class OC_User_Group_Admin_Util {
 		
 		return $users;
 	}
+
+	public static function prepareUser($user) {
+		$displayName = \OCP\User::getDisplayName($user);
+//		$param = \OCP\Util::sanitizeHTML($user);
+	//	$displayName = \OCP\Util::sanitizeHTML($displayName);
+
+		return '<div class="avatar" data-user="' . $param . '"></div>'. '<strong>' . $displayName . '</strong>';
+	}
 }
