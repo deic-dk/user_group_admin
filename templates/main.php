@@ -85,7 +85,7 @@
 		<a class='name'><span class='nametext'>$group</span></a></div>
 			<div class='col-xs-3 fileactions-wrap text-right'>
 			<div class='btn-group btn-group-xs fileactions'>
-				<a id='invite' class='btn btn-flat btn-default action-primary action action-edit' href='#'>Invite</a>
+				<a  class='btn btn-flat btn-default action-primary action action-edit' href='#'>Invite</a>
 				<a id='dropdownbtn' class='btn btn-flat btn-default dropdown-toggle' data-toggle='dropdown' href='#' aria-expanded='true'>
 					<i class='icon-angle-down'></i>
 		 	        </a>	
@@ -108,7 +108,7 @@
 		</div></div></div>
 		</td>";
 		$members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
-                $size = count($members);
+                $size = count($members) + 1;
                 echo "<td id='members' class=\"$group\"><div class='nomembers'><span id='nomembers'>$size</span>
                 </div></td>";
             echo "<td>Owner</td></tr>";
@@ -135,7 +135,7 @@
 		</div></div>	
 		</td>";
 		$members = OC_User_Group_Admin_Util::usersInGroup( $groupmembership ) ;
-	        $size = count($members);	
+	        $size = count($members) + 1;	
 		echo "<td id='memberships' class=\"$groupmembership\"><div class='nomemberships'><span id='nomembers' >$size</span>
  	        </div></td>";
 	

@@ -34,13 +34,13 @@ OC.UserGroup = {
                             var theint = parseInt($("td[class='"+OC.UserGroup.groupSelected+"']").find("span#nomembers").html(),10)
                             theint++;
                             $("td[class='"+OC.UserGroup.groupSelected+"']").find("span#nomembers").text(theint);
-                            $("td[class='"+OC.UserGroup.groupSelected+"']").find('#dropdown').html(jsondata.data.page);
+                            $("td[class='"+OC.UserGroup.groupSelected+"']").find('.dropmembers').html(jsondata.data.page);
                             OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].push(member);
 			    $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: OC.UserGroup.groupSelected, action : "showmembers"} ,
                 function ( jsondata ){
                         if(jsondata.status == 'success' ) {
                                 $('.dropnew').css('display', 'block');
-                                $('.dropnew').html(jsondata.data.page);
+                                $('.dropmembers').html(jsondata.data.page);
 
                         }else{
                                 OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
@@ -140,13 +140,18 @@ $(document).ready(function() {
 	});
 
 	$("#invite").live('click', function(event) {
-		OC.UserGroup.groupSelected = $(this).closest('td').attr('id') ;
-		$("div[class='"+OC.UserGroup.groupSelected+"']").toggle();
+		OC.UserGroup.groupSelected = $(".oc-dialog-title").children('span').attr('id') ;
+		//$("div[class='"+OC.UserGroup.groupSelected+"']").toggle();
+		$(".userselect").css("display", "block");
 		OC.UserGroup.initDropDown() ;
 		event.stopPropagation();
 		$('html').click(function(event) {
-			if ( !$(event.target).closest("div[class='"+OC.UserGroup.groupSelected+"']").length ) {
-				$("div[class='"+OC.UserGroup.groupSelected+"']").hide();
+			if ( !$(event.target).closest("div[class='userselect']").length)  {
+				if (!$(event.target).closest(".ui-corner-all").length) {
+					$("div[class='userselect']").show();
+				}else {
+					$("div[class='userselect']").hide();
+				}
 			}
 		});
 	});
@@ -155,18 +160,23 @@ $(" .name").live('click', function() {
 		 var group = $(this).closest('td').attr('id') ;
 		var itext = '<div class="itext">Select a group</div>';
 		var number = $("td[class='"+group+"']").find("span#nomembers").html();
-	var html = '<div><span id="tagid" class=""><h3 class="oc-dialog-title">Team \''+ group+'\'</h3></span><a class="oc-dialog-close close svg"></a><div id="meta_data_container">\
-				'+number+' members<div id="emptysearch"></div><ul id="meta_data_keys"></ul></div><div class="dropmembers" style="text-align:center;"></div>\
-          <div style="position:absolute;bottom:0;left:0;" ><button class="btn btn-primary btn-flat"><i class="icon-user"></i>Invite user</button></div></div>';
+	var html = '<div><span id="tagid" class=""><h3 class="oc-dialog-title">Team <span id=\''+ group+'\'>\''+ group+'\'</span></h3></span><a class="oc-dialog-close close svg"></a><div id="meta_data_container">\
+				<span class="memberscount">'+number+'</span> members<div id="emptysearch"></div><ul id="meta_data_keys"></ul></div><div class="dropmembers" style="text-align:center;"></div>\
+          <div style="position:absolute;bottom:1;left:0;" ><button id="invite" class="invite btn btn-primary btn-flat"><i class="icon-user"></i>Invite user</button></div><div class="userselect" style="width:50%; margin: 0 auto; display:none;"><input id="mkgroup" type="text" placeholder="Invite user ..." class="ui-autocomplete-input" autocomplete="off">\
+                        <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span></div>\
+                        </div>';
 			
 
 			$(html).dialog({
-			  dialogClass: "oc-dialog notitle",
+			  dialogClass: "oc-dialog",
 			  resizeable: false,
 			  draggable: false,
-			  height: 800,
-			  width: 1024
+			  height: 600,
+			  width: 720 
 			});
+			 $('.oc-dialog-close').live('click', function() {
+				$(".oc-dialog").hide();
+        });
 		$('.ui-helper-clearfix').css("display", "none");
 	if ($(this).closest('tr').attr('id')=='owner'){ 
 		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmembers"} ,
@@ -185,11 +195,12 @@ $(" .name").live('click', function() {
                 function ( jsondata ){
                         if(jsondata.status == 'success' ) {
                                 $('.dropnew').css('display', 'block');
-                                $('.dropnew').html(jsondata.data.page);
+                                $('.dropmembers').html(jsondata.data.page);
                         }else{
                                 OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
                         }
                 });
+		$('.invite').hide();
 	
 	}
                 $('html').click(function(event) {
@@ -201,15 +212,15 @@ $(" .name").live('click', function() {
 
 
 	$(' .removemember').live('click', function() {
-		group =$('.groupname').attr('id') ; 
+		group = $(".oc-dialog-title").children('span').attr('id') ; 
 		var container = $(this).parents('li').first();
 		var member    = container.data('member');
 		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { member : member , group : group , action : "delmember"} , function ( jsondata ){
 			if(jsondata.status == 'success' ) {
 				container.remove();
-				var theint = parseInt($("td[class='"+group+"']").find(" span#nomembers").html(),10)
+				var theint = parseInt($(".memberscount").html(),10)
 				theint--;
-				$("td[class='"+group+"']").find("span#nomembers").text(theint);
+				$(".memberscount").text(theint);
 			//	var index = OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].indexOf(member);
 				//OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].splice(index, 1);				
 			}else{
@@ -224,4 +235,9 @@ $(" .name").live('click', function() {
 		$('#import_group_form').submit();
 	});
 
+	$('.oc-dialog-close').live('click', function() {
+		//$( this ).dialog( "close" );
+	});
+
 });
+

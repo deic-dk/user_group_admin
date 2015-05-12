@@ -1,17 +1,17 @@
 <?php
-$group=$_['group'];
-$members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
-$size = count($members);
 
-//        echo    "<div class='groupname' id= \"$group\" ><strong>$group</strong></div>
-  //              <strong class='left'>Members</strong><br>";
         $group=$_['group'];
         $members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
         $size = count($members) +1;
-	//echo "<div style='text-align:left'>$size members</div>";
         if ($size==1) {
                         echo "<div id=\"emptysearch\">No members yet</div>";
                 }
+	$owner = OC_User::getUser();
+	$ownerAvatar = OC_User_Group_Admin_Util::prepareUser($owner);
+echo "<li data-member=$owner title=\"".OC_User::getDisplayName($owner)."\" ><i class=\"fa fa-user\"></i><div class='left'
+>$ownerAvatar</div><span style='float:right'><i>($owner) &nbsp</i></span><br>
+                
+                </li><br>" ;	
         foreach ($members as $member) {
                 $groupmembers = OC_User_Group_Admin_Util::searchUser($group, $member, '1');
                 $notgroupmembers = OC_User_Group_Admin_Util::searchUser($group, $member, '0');
