@@ -4,7 +4,7 @@
 <div id="app-content-meta_data" class="viewcontainer">
 <div id="controls">
   <div class="row">
-    <div class="col-sm-12 text-right">
+    <div class="" style="margin-left: 19px;">
       <div class="actions creatable">
         <div id="create" original-title="">
 		  <a id="create" class="btn btn-primary btn-flat" href="#"><i class="icon-users"></i>
@@ -17,7 +17,7 @@
     </div>
       </div>
   </div>
-  <div id="newgroup" class="panel-heading" style="border:solid 1px #e4e4e4; margin-bottom:20px; height:55px; display:none">
+  <div id="newgroup" class="panel-heading" style="width:60%; border:solid 1px #e4e4e4; margin-bottom:20px; height:55px; display:none">
      <span>
 	  <input class="editgroup" id="newgroup" type="text" placeholder="New group name..."> 
 	  
@@ -31,7 +31,7 @@
 	    </span>
       </span>
   </div>
- <div id="importnew" class="panel-heading" style="border:solid 1px #e4e4e4; margin-bottom:20px; height:55px; display:none">
+ <div id="importnew" class="panel-heading" style="width:60%; border:solid 1px #e4e4e4; margin-bottom:20px; height:55px; display:none">
     <span>
 	Import group from text file:
 	<span style="margin-left:30px; margin-bottom:20px; position:absolute">
@@ -43,9 +43,6 @@
 
  </div> 
 </div>
-<div id='dropdownmembers' class='dropnew' data-item-type='folder' style='display:block' ><div class='itext'>Select a group</div>
-                        <span role='status' aria-live='polite' class='ui-helper-hidden-accessible'>
-			<div class='itext'>Select a group</div></span></div>
 <table id="groupstable" class="panel" style="width=20px;">
 <thead class="panel-heading">
 <tr>

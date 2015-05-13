@@ -40,7 +40,7 @@ table td.groupsname .nametext {
 
 #groupstable {
 	position: relative;
-	top: -10px;
+	top: -1px;
 	width: 60%;
 	z-index: 1000px;
 }
@@ -87,8 +87,6 @@ input.edittag {
 }
 
 .left {
-	float:left;
-	padding-left:2px;
 }
 
 .border {

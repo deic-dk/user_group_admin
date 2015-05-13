@@ -35,6 +35,9 @@ OC.UserGroup = {
                             theint++;
                             $("td[class='"+OC.UserGroup.groupSelected+"']").find("span#nomembers").text(theint);
                             $("td[class='"+OC.UserGroup.groupSelected+"']").find('.dropmembers').html(jsondata.data.page);
+				var intnew = parseInt($(".memberscount").html(),10)
+                                intnew++;
+                                $(".memberscount").text(intnew);
                             OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].push(member);
 			    $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: OC.UserGroup.groupSelected, action : "showmembers"} ,
                 function ( jsondata ){
@@ -221,6 +224,9 @@ $(" .name").live('click', function() {
 				var theint = parseInt($(".memberscount").html(),10)
 				theint--;
 				$(".memberscount").text(theint);
+				var int2 = parseInt($("td[class='"+group+"']").find("span#nomembers").html(),10)
+                            	int2--;
+                            	$("td[class='"+group+"']").find("span#nomembers").text(int2);
 			//	var index = OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].indexOf(member);
 				//OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].splice(index, 1);				
 			}else{

@@ -12,7 +12,7 @@ $size = count($members);
                 foreach ($owners as $member) {
                         $name = OC_User::getDisplayName($member) ;
                 echo "<li data-member=$member><i class=\"fa fa-user\"></i><div class='left'> $name</div>
-                        <span  style='float:right;'><i>($member)</i></span><span style='position:relative; float:right;' >Owner</span>
+                        <span ><i>($member)</i></span><span style='position:relative; ' >Owner</span>
                 </li><br>" ;
                 }
                 ////////////////////////
@@ -20,7 +20,7 @@ $size = count($members);
                         $name = OC_User::getDisplayName($member) ;
                         echo "<br><li data-member=$member title=\"".OC_User::getDisplayName($member)."\"><i class=\"fa fa-user\"></i><div
 class='left'>$name</div>
-                        <span  style='float:right;'><i>($member)</i></span>
+                        <span ><i>($member)</i></span>
                         </li>" ;
                 }
 
