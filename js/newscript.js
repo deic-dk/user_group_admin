@@ -187,7 +187,13 @@ $(" .name").live('click', function() {
                         if(jsondata.status == 'success' ) {
 				$('.dropnew').css('display', 'block');
 				$('.dropmembers').html(jsondata.data.page);
+				$('.avatar').each(function() {
+                                	var element = $(this);
+                                	element.avatar(element.data('user'), 28);
+                        	});
 
+				//var element = $(this);
+                                //element.avatar(element.data('user'), 28);
                         }else{
                                 OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
                         }
