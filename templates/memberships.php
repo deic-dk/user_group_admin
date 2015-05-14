@@ -10,17 +10,17 @@ $size = count($members);
 
                 }
                 foreach ($owners as $member) {
-                        $name = OC_User::getDisplayName($member) ;
-                echo "<li data-member=$member><i class=\"fa fa-user\"></i><div class='left'> $name</div>
-                        <span ><i>($member)</i></span><span style='position:relative; ' >Owner</span>
-                </li><br>" ;
+			$name = OC_User_Group_Admin_Util::prepareUser($member);
+                echo "<li data-member=$member><i class=\"fa fa-user\"></i><span class='left'> $name </span>
+                        <span style='font-size:80%'><i>($member) </i></span><span style='position:relative; font-size:80%; color:#FF8C00' >Owner</span>
+                </li>" ;
                 }
                 ////////////////////////
                 foreach ($members as $member) {
-                        $name = OC_User::getDisplayName($member) ;
-                        echo "<br><li data-member=$member title=\"".OC_User::getDisplayName($member)."\"><i class=\"fa fa-user\"></i><div
-class='left'>$name</div>
-                        <span ><i>($member)</i></span>
+			$name = OC_User_Group_Admin_Util::prepareUser($member);
+                        echo "<br><li data-member=$member title=\"".OC_User::getDisplayName($member)."\"><i class=\"fa fa-user\"></i><span
+class='left'>$name </span>
+                        <span style='font-size:80%'><i>($member)</i></span>
                         </li>" ;
                 }
 

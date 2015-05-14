@@ -35,15 +35,20 @@ OC.UserGroup = {
                             theint++;
                             $("td[class='"+OC.UserGroup.groupSelected+"']").find("span#nomembers").text(theint);
                             $("td[class='"+OC.UserGroup.groupSelected+"']").find('.dropmembers').html(jsondata.data.page);
-				var intnew = parseInt($(".memberscount").html(),10)
+				var intnew = parseInt($("div[class='"+OC.UserGroup.groupSelected+"']").find(".memberscount").html(),10)
                                 intnew++;
-                                $(".memberscount").text(intnew);
+                                $("div[class='"+OC.UserGroup.groupSelected+"']").find(".memberscount").text(intnew);
                             OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].push(member);
 			    $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: OC.UserGroup.groupSelected, action : "showmembers"} ,
                 function ( jsondata ){
                         if(jsondata.status == 'success' ) {
                                 $('.dropnew').css('display', 'block');
                                 $('.dropmembers').html(jsondata.data.page);
+				$('.avatar').each(function() {
+                                        var element = $(this);
+                                        element.avatar(element.data('user'), 28);
+                                });
+
 
                         }else{
                                 OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
@@ -143,7 +148,7 @@ $(document).ready(function() {
 	});
 
 	$("#invite").live('click', function(event) {
-		OC.UserGroup.groupSelected = $(".oc-dialog-title").children('span').attr('id') ;
+		OC.UserGroup.groupSelected = $(this).parents('div').prev().attr('id'); 
 		//$("div[class='"+OC.UserGroup.groupSelected+"']").toggle();
 		$(".userselect").css("display", "block");
 		OC.UserGroup.initDropDown() ;
@@ -158,14 +163,15 @@ $(document).ready(function() {
 			}
 		});
 	});
+	
 
 $(" .name").live('click', function() {
 		 var group = $(this).closest('td').attr('id') ;
 		var itext = '<div class="itext">Select a group</div>';
 		var number = $("td[class='"+group+"']").find("span#nomembers").html();
-	var html = '<div><span id="tagid" class=""><h3 class="oc-dialog-title">Team <span id=\''+ group+'\'>\''+ group+'\'</span></h3></span><a class="oc-dialog-close close svg"></a><div id="meta_data_container">\
-				<span class="memberscount">'+number+'</span> members<div id="emptysearch"></div><ul id="meta_data_keys"></ul></div><div class="dropmembers" style="text-align:center;"></div>\
-          <div style="position:absolute;bottom:1;left:0;" ><button id="invite" class="invite btn btn-primary btn-flat"><i class="icon-user"></i>Invite user</button></div><div class="userselect" style="width:50%; margin: 0 auto; display:none;"><input id="mkgroup" type="text" placeholder="Invite user ..." class="ui-autocomplete-input" autocomplete="off">\
+	var html = '<div><span id="tagid" class=""><h3 class="oc-dialog-title" style="padding-left:25px;">Team <span>\''+ group+'\'</span></h3></span><a class="oc-dialog-close close svg"></a><div id="meta_data_container" class=\''+ group+'\'>\
+				<span class="memberscount" style="padding-left:25px;" >'+number+'</span> members<div id="emptysearch"></div><ul id="meta_data_keys"></ul></div><div class="dropmembers" id=\''+ group+'\' style="width:60%; margin: 0 auto;"></div>\
+          <div style="position:absolute; bottom:50px; left:40px;" ><button id="invite" class="invite btn btn-primary btn-flat"><i class="icon-user"></i>Invite user</button></div><div class="userselect" style="width:60%; padding-left:170px; display:none;"><input id="mkgroup" type="text" placeholder="Invite user ..." class="ui-autocomplete-input" autocomplete="off">\
                         <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span></div>\
                         </div>';
 			
@@ -192,8 +198,6 @@ $(" .name").live('click', function() {
                                 	element.avatar(element.data('user'), 28);
                         	});
 
-				//var element = $(this);
-                                //element.avatar(element.data('user'), 28);
                         }else{
                                 OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
                         }
@@ -205,6 +209,10 @@ $(" .name").live('click', function() {
                         if(jsondata.status == 'success' ) {
                                 $('.dropnew').css('display', 'block');
                                 $('.dropmembers').html(jsondata.data.page);
+				$('.avatar').each(function() {
+                                        var element = $(this);
+                                        element.avatar(element.data('user'), 28);
+                                });
                         }else{
                                 OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
                         }
@@ -221,15 +229,15 @@ $(" .name").live('click', function() {
 
 
 	$(' .removemember').live('click', function() {
-		group = $(".oc-dialog-title").children('span').attr('id') ; 
+		group = $(this).parents('div').attr('id');
 		var container = $(this).parents('li').first();
 		var member    = container.data('member');
 		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { member : member , group : group , action : "delmember"} , function ( jsondata ){
 			if(jsondata.status == 'success' ) {
 				container.remove();
-				var theint = parseInt($(".memberscount").html(),10)
+				var theint = parseInt($("div[class='"+group+"']").find(".memberscount").html(),10)
 				theint--;
-				$(".memberscount").text(theint);
+				$("div[class='"+group+"']").find(".memberscount").text(theint);
 				var int2 = parseInt($("td[class='"+group+"']").find("span#nomembers").html(),10)
                             	int2--;
                             	$("td[class='"+group+"']").find("span#nomembers").text(int2);

@@ -394,6 +394,6 @@ class OC_User_Group_Admin_Util {
 		$param = \OCP\Util::sanitizeHTML($user);
 		$displayName = \OCP\Util::sanitizeHTML($displayName);
 
-		return '<div class="avatar" data-user="' . $param . '"></div>'. '<strong>' . $displayName . '</strong>';
+		return '<div class="avatar" data-user="' . $param . '"></div>'. '<strong style="font-size:92%">' . $displayName . '</strong>';
 	}
 }

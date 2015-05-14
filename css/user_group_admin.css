@@ -24,7 +24,7 @@ table td.filename input.filename {
 }
 table td.groupsname .nametext {
         position: absolute;
-        left: 40px;
+        left: 29px;
         padding: 0;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -100,10 +100,12 @@ input.edittag {
         vertical-align: middle;
         display: inline-block;
         margin-right: 5px;
+	border-radius: 25px;
 }
 
-
-
+.avatar img {
+	border-radius: 25px;
+}
 
 
 #meta_data_tags_container {

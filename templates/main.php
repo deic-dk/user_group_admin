@@ -78,21 +78,17 @@
 	$groupmemberships = OC_User_Group_Admin_Util::getUserGroups ( OC_User::getUser () );
 	foreach ($groups as $group) {
 		echo "<tr id='owner' class=\"$group\"><td id=\"$group\" class='groupsname' name=\"$group\" data-group=\"$group\" style='height:34px' ><div class='row'><div class='col-xs-1 text-right '></div>
-		<div class='col-xs-8 filelink-wrap'><i class='icon-users     deic_green icon'>&nbsp;</i>
-		<a class='name'><span class='nametext'>$group</span></a></div>
+		<div class='col-xs-8 filelink-wrap' style='padding-left:4px;'><a class='name'><i class='icon-users     deic_green icon'></i>
+		       <span class='nametext'>$group</span></a></div>
 			<div class='col-xs-3 fileactions-wrap text-right'>
 			<div class='btn-group btn-group-xs fileactions'>
-				<a  class='btn btn-flat btn-default action-primary action action-edit' href='#'>Invite</a>
+				<a  class='btn btn-flat btn-default action-primary action action-edit' id='removegroup' href='#'>Delete</a>
 				<a id='dropdownbtn' class='btn btn-flat btn-default dropdown-toggle' data-toggle='dropdown' href='#' aria-expanded='true'>
 					<i class='icon-angle-down'></i>
 		 	        </a>	
 				<ul class='dropdown-menu' style='display:none;'>
 					<li><a id='exportgroup' data-action='Export' href='#'>
 					<i class='icon-export-alt'>&nbsp</i>	<span>Export</span>
-					</a></li>
-					<li class='removegroup' ><a id='removegroup' data-action='Invite' href='#'>
-					<i class='icon-trash'>&nbsp</i>	<span>Delete</span>
-
 					</a></li>
 				</ul>
 			</div>
@@ -114,8 +110,7 @@
 	         $ingroup = OC_User_Group_Admin_Util::searchUser ( $groupmembership, OC_User::getUser (), '1' );	
 		if ($ingroup) {
 	         echo "<tr id='member' class=\"$group\"><td  id=\"$groupmembership\" class='groupsname' data-group=\"$groupmembership\" style='height:34px;' ><div class='row'><div class='col-xs-4 col-sm-1'></div>
-		<div class='col-xs-8 filelink-wrap'><i class='icon-users     deic_green icon'>&nbsp</i> 
-		<a class='name'>
+		<div class='col-xs-8 filelink-wrap' style='padding-left:4px;'><a class='name'><i class='icon-users     deic_green icon'></i> 
                 <span class='nametext'>	$groupmembership</span></a></div>
 			<div class='col-xs-3 fileactions-wrap text-right'>
 			<div id='dropdownbtn' class='btn-group btn-group-xs fileactions'>
