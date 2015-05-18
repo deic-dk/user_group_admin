@@ -15,6 +15,43 @@ li
   list-style-type: none;
 }
 
+.newgroupform {
+	margin-left:20px; 
+	margin-bottom:20px; 
+	position:absolute
+}
+
+.newimportform {
+	margin-left:35px; 
+	margin-bottom:20px; 
+	position:absolute
+}
+
+.normaltext {
+	font-size:80%
+} 
+
+.ownertext {
+	position:relative; 
+	font-size:80%; 
+	color:#FF8C00
+} 
+
+#spanaction {
+	display:inline-block; 
+	position:relative; 
+	padding-top:4px; 
+	float:right
+} 
+
+.apanel {
+	width:60%;
+	border:solid 1px #e4e4e4;
+	margin-bottom:20px;
+	height:55px; 
+	display:none
+}
+
 table  td.groupsname span.name span.nametext {font-weight:bold; }
 table td.filename input.filename {
 	width: 70%;

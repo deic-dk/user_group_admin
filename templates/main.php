@@ -17,11 +17,11 @@
     </div>
       </div>
   </div>
-  <div id="newgroup" class="panel-heading" style="width:60%; border:solid 1px #e4e4e4; margin-bottom:20px; height:55px; display:none">
+  <div id="newgroup" class="panel-heading apanel">
      <span>
 	  <input class="editgroup" id="newgroup" type="text" placeholder="New group name..."> 
 	  
-	    <span style="margin-left:20px; margin-bottom:20px; position:absolute">	
+	    <span class="newgroupform">	
 		  <div id="ok" class="btn-group" original-title="">
 		    <a class="btn btn-default btn-flat" href="#">Ok</a>
           </div>
@@ -31,10 +31,10 @@
 	    </span>
       </span>
   </div>
- <div id="importnew" class="panel-heading" style="width:60%; border:solid 1px #e4e4e4; margin-bottom:20px; height:55px; display:none">
+ <div id="importnew" class="panel-heading apanel">
     <span>
 	Import group from text file:
-	<span style="margin-left:30px; margin-bottom:20px; position:absolute">
+	<span class="newimportform" style="margin-left:30px; margin-bottom:20px; position:absolute">
 	<form  id="import_group_form" action="<?php echo OCP\Util::linkTo('user_group_admin', 'ajax/import.php'); ?>"  method="post" enctype="multipart/form-data">
         <input id="import_group_file" type="file" name="import_group_file" />
         </form></span>
@@ -168,15 +168,13 @@ foreach ( $groups as $group ) {
 	
 		if ($verified || $checkagain) {
 			echo "<script type='text/javascript'>
-					window.alert(\"You have accepted the invitation to the following group:  $group\");
 					location.reload();
 				</script>";
 			$result = OC_User_Group_Admin_Util::acceptInvitation ( $group, OCP\USER::getUser () );
 		} elseif ($declined) {
-			echo "<script type='text/javascript'>
-                                	window.alert(\"You have declined the invitation to the following group:  $group\");
-					location.reload();
-                        	</script>";
+			 echo "<script type='text/javascript'>
+                                        location.reload();
+                                </script>";
 			$result = OC_User_Group_Admin_Util::declineInvitation ( OCP\USER::getUser (), $group );
 	        }
 }

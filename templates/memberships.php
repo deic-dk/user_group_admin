@@ -12,7 +12,7 @@ $size = count($members);
                 foreach ($owners as $member) {
 			$name = OC_User_Group_Admin_Util::prepareUser($member);
                 echo "<li data-member=$member><i class=\"fa fa-user\"></i><span class='left'> $name </span>
-                        <span style='font-size:80%'><i>($member) </i></span><span style='position:relative; font-size:80%; color:#FF8C00' >Owner</span>
+                        <span class='normaltext'><i>($member) </i></span><span class='ownertext' >Owner</span>
                 </li>" ;
                 }
                 ////////////////////////
@@ -20,7 +20,7 @@ $size = count($members);
 			$name = OC_User_Group_Admin_Util::prepareUser($member);
                         echo "<br><li data-member=$member title=\"".OC_User::getDisplayName($member)."\"><i class=\"fa fa-user\"></i><span
 class='left'>$name </span>
-                        <span style='font-size:80%'><i>($member)</i></span>
+                        <span class='normaltext'><i>($member)</i></span>
                         </li>" ;
                 }
 

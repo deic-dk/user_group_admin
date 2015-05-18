@@ -38,12 +38,13 @@ OC.UserGroup = {
 				var intnew = parseInt($("div[class='"+OC.UserGroup.groupSelected+"']").find(".memberscount").html(),10)
                                 intnew++;
                                 $("div[class='"+OC.UserGroup.groupSelected+"']").find(".memberscount").text(intnew);
+				$("div[class='userselect']").show();
                             OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].push(member);
 			    $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: OC.UserGroup.groupSelected, action : "showmembers"} ,
                 function ( jsondata ){
                         if(jsondata.status == 'success' ) {
-                                $('.dropnew').css('display', 'block');
                                 $('.dropmembers').html(jsondata.data.page);
+				$("div[class='userselect']").show();
 				$('.avatar').each(function() {
                                         var element = $(this);
                                         element.avatar(element.data('user'), 28);
@@ -146,20 +147,14 @@ $(document).ready(function() {
 		var groupSelected = $(this).closest('td').attr('id') ;
 		document.location.href = OC.linkTo('user_group_admin', 'ajax/export.php') + '?group=' + groupSelected;
 	});
-
 	$("#invite").live('click', function(event) {
 		OC.UserGroup.groupSelected = $(this).parents('div').prev().attr('id'); 
-		//$("div[class='"+OC.UserGroup.groupSelected+"']").toggle();
 		$(".userselect").css("display", "block");
 		OC.UserGroup.initDropDown() ;
 		event.stopPropagation();
 		$('html').click(function(event) {
-			if ( !$(event.target).closest("div[class='userselect']").length)  {
-				if (!$(event.target).closest(".ui-corner-all").length) {
-					$("div[class='userselect']").show();
-				}else {
+			if ( !$(event.target).closest("div[class='userselect']").length )  {
 					$("div[class='userselect']").hide();
-				}
 			}
 		});
 	});
@@ -167,7 +162,6 @@ $(document).ready(function() {
 
 $(" .name").live('click', function() {
 		 var group = $(this).closest('td').attr('id') ;
-		var itext = '<div class="itext">Select a group</div>';
 		var number = $("td[class='"+group+"']").find("span#nomembers").html();
 	var html = '<div><span id="tagid" class=""><h3 class="oc-dialog-title" style="padding-left:25px;">Team <span>\''+ group+'\'</span></h3></span><a class="oc-dialog-close close svg"></a><div id="meta_data_container" class=\''+ group+'\'>\
 				<span class="memberscount" style="padding-left:25px;" >'+number+'</span> members<div id="emptysearch"></div><ul id="meta_data_keys"></ul></div><div class="dropmembers" id=\''+ group+'\' style="width:60%; margin: 0 auto;"></div>\
@@ -191,7 +185,6 @@ $(" .name").live('click', function() {
 		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmembers"} ,
                 function ( jsondata ){
                         if(jsondata.status == 'success' ) {
-				$('.dropnew').css('display', 'block');
 				$('.dropmembers').html(jsondata.data.page);
 				$('.avatar').each(function() {
                                 	var element = $(this);
@@ -207,7 +200,6 @@ $(" .name").live('click', function() {
 		 $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmemberships"} ,
                 function ( jsondata ){
                         if(jsondata.status == 'success' ) {
-                                $('.dropnew').css('display', 'block');
                                 $('.dropmembers').html(jsondata.data.page);
 				$('.avatar').each(function() {
                                         var element = $(this);
@@ -220,11 +212,6 @@ $(" .name").live('click', function() {
 		$('.invite').hide();
 	
 	}
-                $('html').click(function(event) {
-        if ( !$(event.target).closest(".dropnew").length && !$(event.target).closest(".text-right").length && !$(event.target).closest(".ui-corner-all").length) {
-		$('.dropnew').html(itext);
-        }
-                });
 	});	
 
 
@@ -255,9 +242,6 @@ $(" .name").live('click', function() {
 		$('#import_group_form').submit();
 	});
 
-	$('.oc-dialog-close').live('click', function() {
-		//$( this ).dialog( "close" );
-	});
 
 });
 
