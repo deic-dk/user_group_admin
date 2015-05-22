@@ -1,5 +1,4 @@
 <!--This applies to the new version of My Groups-->
-
 <div id="app-content" style="transition: all 0.3s ease 0s;">
 <div id="app-content-meta_data" class="viewcontainer">
 <div id="controls">
