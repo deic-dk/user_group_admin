@@ -39,12 +39,11 @@ class Activity implements IExtension {
 	protected $config;
 	protected $helper;
 
-	public function __construct(Factory $languageFactory, IURLGenerator $URLGenerator, IManager $activityManager, ActivityHelper $helper, IConfig $config) {
+	public function __construct(Factory $languageFactory, IURLGenerator $URLGenerator, IManager $activityManager, IConfig $config) {
 		$this->languageFactory = $languageFactory;
 		$this->URLGenerator = $URLGenerator;
 		$this->l = $this->getL10N();
 		$this->activityManager = $activityManager;
-		$this->helper = $helper;
 		$this->config = $config;
 	}
 	/**
