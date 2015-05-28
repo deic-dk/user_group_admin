@@ -1,9 +1,21 @@
 <?php
 use \OCP\Util;
-OC::$CLASSPATH['UserSettings'] = OC::$SERVERROOT.'/themes/deic_theme_oc7/apps/activity/lib/usersettings.php';
-OC::$CLASSPATH['Data']    = OC::$SERVERROOT.'/themes/deic_theme_oc7/apps/activity/lib/data.php';
+//OC::$CLASSPATH['UserSettings'] = OC::$SERVERROOT.'/apps/activity/lib/usersettings.php';
+//OC::$CLASSPATH['Data']    = OC::$SERVERROOT.'/apps/activity/lib/data.php';
 
 class OC_User_Group_Hooks {
+		public static function register() {
+		\OCP\Util::connectHook('OC_Activity', 'post_create', 'OC_User_Group_Hooks', 'groupCreate');
+		\OCP\Util::connectHook('OC_Activity', 'delete', 'OC_User_Group_Hooks', 'groupDelete');
+		\OCP\Util::connectHook('OC_Activity', 'post_shared', 'OC_User_Group_Hooks', 'groupShare');
+
+		// hooking up the activity manager
+		$am = \OC::$server->getActivityManager();
+		$am->registerConsumer(function() {
+			return new Consumer();
+		});
+	}
+
 	public static function groupCreate($params) {
 		OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'created_self', 'created_by');		
 	}
@@ -32,8 +44,8 @@ class OC_User_Group_Hooks {
 			}
 		}
 		$userSubject = $subject;
-		$filteredStreamUsers = UserSettings::filterUsersBySetting(array($user), 'stream', 'group');
-                $filteredEmailUsers = UserSettings::filterUsersBySetting(array($user), 'email', 'group');
+		$filteredStreamUsers = \OCA\Activity\UserSettings::filterUsersBySetting(array($user), 'stream', 'group');
+                $filteredEmailUsers = \OCA\Activity\UserSettings::filterUsersBySetting(array($user), 'email', 'group');
 		foreach (array($user) as $user) {
 
 		//if (!empty($filteredStreamUsers) && !empty($filteredEmailUsers)) {
@@ -53,30 +65,30 @@ class OC_User_Group_Hooks {
 	        $app = 'user_group_admin';	
 		if ($streamSetting) {
 			if ($subject == 'shared_user_self') {
-				Data::send($app, $subject, $path, '', array(), '', '', $user, $type, 40);
-				Data::send($app, 'shared_with_by', array($path[0],$user), '', array(), '', '', $auser, $type, 40); 
+				\OCA\Activity\Data::send($app, $subject, $path, '', array(), '', '', $user, $type, 40);
+				\OCA\Activity\Data::send($app, 'shared_with_by', array($path[0],$user), '', array(), '', '', $auser, $type, 40); 
 
 			}else if ($subject == 'deleted_self') {
-				Data::send($app, $subject, array($path), '', array(), '', '', $auser,$type, 40); 
+				\OCA\Activity\Data::send($app, $subject, array($path), '', array(), '', '', $auser,$type, 40); 
         	 	}else if ($subject == 'deleted_by'){
-				Data::send($app, 'deleted_self', $path, '', array(), '', '', $user, $type, 40);
-				Data::send($app, $subject, array($path[0],$user), '', array(), '', '', $auser, $type, 40);   
+				\OCA\Activity\Data::send($app, 'deleted_self', $path, '', array(), '', '', $user, $type, 40);
+				\OCA\Activity\Data::send($app, $subject, array($path[0],$user), '', array(), '', '', $auser, $type, 40);   
 			}else {
-				Data::send($app, $subject, array($path), '', array(), '', '', $auser, $type, 40);
+				\OCA\Activity\Data::send($app, $subject, array($path), '', array(), '', '', $auser, $type, 40);
 			}
 		}
 		if ($emailSetting) {
 			$latestSend = time() + $emailSetting;
 			if ($subject == 'shared_user_self') {
-				Data::storeMail($app, $subject, $path, $user, 'group', $latestSend);
-				Data::storeMail($app, 'shared_with_by', array($path[0],$user), $auser, 'group', $latestSend);
+				\OCA\Activity\Data::storeMail($app, $subject, $path, $user, 'group', $latestSend);
+				\OCA\Activity\Data::storeMail($app, 'shared_with_by', array($path[0],$user), $auser, 'group', $latestSend);
 			}else if ($subject == 'deleted_self'){
-				Data::storeMail($app, $subject, array($path), $auser, 'group', $latestSend);	
+				\OCA\Activity\Data::storeMail($app, $subject, array($path), $auser, 'group', $latestSend);	
 			}else if ($subject == 'deleted_by'){
-				Data::storeMail($app, 'deleted_self', array($path), $user, 'group', $latestSend);
-				Data::storeMail($app, $subject, array($path[0],$user), $auser, 'group', $latestSend);
+				\OCA\Activity\Data::storeMail($app, 'deleted_self', array($path), $user, 'group', $latestSend);
+				\OCA\Activity\Data::storeMail($app, $subject, array($path[0],$user), $auser, 'group', $latestSend);
 			}else {
-				Data::storeMail($app, $subject, array($path), $user, 'group', $latestSend);
+				\OCA\Activity\Data::storeMail($app, $subject, array($path), $user, 'group', $latestSend);
 			}
 		}		 
 	}
