@@ -76,8 +76,7 @@ class Activity implements IExtension {
 	public function getDefaultTypes($method) {
 		if ($method === 'stream') {
 			$settings = array();
-			$settings[] = self::TYPE_SHARE_CREATED;
-			$settings[] = self::TYPE_SHARE_DELETED;
+			$settings[] = self::TYPE_GROUP;
 			return $settings;
 		}
 		return false;
@@ -115,16 +114,17 @@ class Activity implements IExtension {
 				return (string) $this->l->t('You invited %2$s to group %1$s', $preparedParams);
 			case 'shared_with_by':
 				if ($isNotified) {
-					return $this->l->t('You have been invited to group %1$s by %2$s<div id="invite_div" style="display:none"><a href="#" id="accept" class="btn btn-default btn-flat" value = \'%1$s\'>Accept</a><a href="#" class="btn btn-default btn-flat" id="decline" value = \'%1$s\'>Decline</a></div>', $preparedParams);
+					array_push($preparedParams, $params[0]);
+					return (string) $this->l->t('You have been invited to group %1$s by %2$s<div id="invite_div" style="display:block"><a href="#" id="accept" class="btn btn-default btn-flat" value = \'%3$s\' >Accept</a><a href="#" class="btn btn-default btn-flat" id="decline" value = \'%3$s\'>Decline</a></div>', $preparedParams );
 				}else if ($hasAccepted) {
-					return $this->l->t('You joined group %1$s', $preparedParams);
+					return (string) $this->l->t('You joined group %1$s', $preparedParams);
 				}else if ($hasDeclined) {
-					return $this->l->t('You rejected an invitation to group %1$s', $preparedParams);
+					return (string) $this->l->t('You rejected an invitation to group %1$s', $preparedParams);
 				}else {
-					return $this->l->t('Group invitation to %1$s', $preparedParams);
+					return (string) $this->l->t('Group invitation to %1$s', $preparedParams);
 				}
 		        case 'deleted_by':
-				return $this->l->t('%2$s left group %1$s', $preparedParams);	
+				return (string) $this->l->t('%2$s left group %1$s', $preparedParams);	
 			default:
 				return false;
 		}
@@ -245,54 +245,15 @@ class Activity implements IExtension {
 	 * @return string
 	 */
 	protected function prepareFileParam($app, $param, $stripPath, $highlightParams) {
-		$param = $this->fixLegacyFilename($param);
-			$parent_dir = $param;
-		$param = trim($param, '/');
-                
-			$fileLink = \OCP\Util::linkTo('files', 'index.php', array('dir' => $parent_dir));
-			list($path, $name) = $this->splitPathFromFilename($param);
-			if (!$stripPath || $path === '') {
-				if (!$highlightParams) {
-					return $param;
-				}
-				if ($app === 'user_group_admin') {
-					return '<a class="filename" href="/index.php/apps/user_group_admin">' . \OCP\Util::sanitizeHTML($param) . '</a>';
-				}else {
-				return '<a class="filename" href="' . $fileLink . '">' . Util::sanitizeHTML($param) . '</a>';
-				}
-			}
-			if (!$highlightParams) {
-				return $name;
-			}
+		if ($app === 'user_group_admin') {
+			return '<a class="filename" href="/index.php/apps/user_group_admin">' . \OCP\Util::sanitizeHTML($param) . '</a>';
+		}else {
+			return '<a class="filename" >' . Util::sanitizeHTML($param) . '</a>';
+		}
 		$title = ' title="' . $this->l->t('in %s', array(Util::sanitizeHTML($path))) . '"';
 		return '<a class="filename tooltip" href="' . $fileLink . '"' . $title . '>' . Util::sanitizeHTML($name) . '</a>';
 	}
-	/**
-	 * Prepend leading slash to filenames of legacy activities
-	 * @param string $filename
-	 * @return string
-	 */
-	protected function fixLegacyFilename($filename) {
-		if (strpos($filename, '/') !== 0) {
-			return '/' . $filename;
-		}
-		return $filename;
-	}
-	/**
-	 * Split the path from the filename string
-	 *
-	 * @param string $filename
-	 * @return array Array with path and filename
-	 */
-	protected function splitPathFromFilename($filename) {
-		if (strrpos($filename, '/') !== false) {
-			return array(
-				trim(substr($filename, 0, strrpos($filename, '/')), '/'),
-				substr($filename, strrpos($filename, '/') + 1),
-			);
-		}
-		return array('', $filename);
-	}
+
 	/**
 	 * Returns a list of grouped parameters
 	 *
@@ -363,12 +324,10 @@ class Activity implements IExtension {
 			switch ($activity['subject']) {
 				case 'created_self':
 				case 'created_by':
-				case 'changed_self':
-				case 'changed_by':
 				case 'deleted_self':
 				case 'deleted_by':
-				case 'restored_self':
-				case 'restored_by':
+				case 'shared_user_self':
+				case 'shared_with_by':
 					return 0;
 			}
 		}
@@ -403,8 +362,7 @@ class Activity implements IExtension {
 	public function filterNotificationTypes($types, $filter) {
 		if ($filter === self::FILTER_FILES ) {
 			return array_intersect([
-				self::TYPE_SHARE_CREATED,
-				self::TYPE_SHARE_DELETED
+				self::TYPE_GROUP
 			], $types);
 		}
 		return false;
@@ -420,23 +378,10 @@ class Activity implements IExtension {
 	 */
 	public function getQueryForFilter($filter) {
 		$user = $this->activityManager->getCurrentUserId();
-		// Display actions from all files
-		if ($filter === self::FILTER_FILES) {
-			return ['`app` = ?', ['user_group_admin']];
-		}
+		return ['`app` = ?', ['user_group_admin']];
 		if (!$user) {
-			// Remaining filters only work with a user/token
 			return false;
 		}
 		return false;
-	}
-	/**
-	 * Is the file actions favorite limitation enabled?
-	 *
-	 * @param string $user
-	 * @return bool
-	 */
-	protected function userSettingFavoritesOnly($user) {
-		return true;
 	}
 }
