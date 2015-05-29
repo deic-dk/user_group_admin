@@ -5,7 +5,7 @@ $(document).ready(function() {
                      type: 'post',
                      data: { 'group': $(this).attr('value'), 'action': 'acceptinvitation'},
                      success: function(data, status) {
-			$("#accept").parent().parent().html('You joined group <b>'+$("#accept").attr('value')+'</b>');
+			$("#accept").parent().parent().html('You joined group <a class="filename" href="/index.php/apps/user_group_admin">'+$("#accept").attr('value')+'</a>');
 			$("#accept").parent().text("");
                      }
                 });
@@ -16,7 +16,7 @@ $(document).ready(function() {
                      type: 'post',
                      data: {'group': $(this).attr('value'), 'action': 'declineinvitation'},
                      success: function(data, status) {
-			$("#decline").parent().parent().html('You rejected an invitation to group <b>'+$("#decline").attr('value') + '</b>');
+			$("#decline").parent().parent().html('You rejected an invitation to group <a class="filename" href="/index.php/apps/user_group_admin">'+$("#decline").attr('value') + '</a>');
                         $("#decline").parent().text("");
                      }
                 });

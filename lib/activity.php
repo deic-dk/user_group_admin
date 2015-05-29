@@ -360,11 +360,6 @@ class Activity implements IExtension {
 	 * @return array|false
 	 */
 	public function filterNotificationTypes($types, $filter) {
-		if ($filter === self::FILTER_FILES ) {
-			return array_intersect([
-				self::TYPE_GROUP
-			], $types);
-		}
 		return false;
 	}
 	/**
