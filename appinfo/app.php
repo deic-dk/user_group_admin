@@ -18,7 +18,7 @@ OCP\App::addNavigationEntry(
     array( 'id'    => 'user_group_admin',
            'order' => 4,
            'href'  => OCP\Util::linkTo( 'user_group_admin' , 'index.php' ),
-           'icon'  => OCP\Util::imagePath( 'user_group_admin', 'nav-icon.png' ),
+//           'icon'  => OCP\Util::imagePath( 'user_group_admin', 'nav-icon.png' ),
            'name'  => 'Teams' )
          );
 \OC::$server->getActivityManager()->registerExtension(function() {
