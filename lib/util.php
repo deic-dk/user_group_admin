@@ -299,7 +299,7 @@ class OC_User_Group_Admin_Util {
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `owner` != ?" );
 		$result = $stmt->execute ( array (
 				$uid,
-				OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER 
+				$uid 
 		) );
 		
 		$groups = array ();
@@ -393,7 +393,6 @@ class OC_User_Group_Admin_Util {
 		$displayName = \OCP\User::getDisplayName($user);
 		$param = \OCP\Util::sanitizeHTML($user);
 		$displayName = \OCP\Util::sanitizeHTML($displayName);
-
 		return '<div class="avatar" data-user="' . $param . '"></div>'. '<strong style="font-size:92%">' . $displayName . '</strong>';
 	}
 }

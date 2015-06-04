@@ -159,11 +159,12 @@
 </div>
 
 <?php
-$groups = OC_User_Group_Admin_Util::getUserGroups ( OC_User::getUser () );
-foreach ( $groups as $group ) {
-	$verified = OC_User_Group_Admin_Util::acceptedUser ( $group, OC_User::getUser (), '0', $_GET ['code']);
-	$declined = OC_User_Group_Admin_Util::declinedUser ( $group, OC_User::getUser (), '0', $_GET ['code']);
-	$checkagain = OC_User_Group_Admin_Util::acceptedUser ( $group, OC_User::getUser (), '2', $_GET ['code']);
+if (isset($_GET ['code']))  { 
+	$groups = OC_User_Group_Admin_Util::getUserGroups ( OC_User::getUser () );
+	foreach ( $groups as $group ) {
+		$verified = OC_User_Group_Admin_Util::acceptedUser ( $group, OC_User::getUser (), '0', $_GET ['code']);
+		$declined = OC_User_Group_Admin_Util::declinedUser ( $group, OC_User::getUser (), '0', $_GET ['code']);
+		$checkagain = OC_User_Group_Admin_Util::acceptedUser ( $group, OC_User::getUser (), '2', $_GET ['code']);
 	
 		if ($verified || $checkagain) {
 			echo "<script type='text/javascript'>
@@ -176,6 +177,7 @@ foreach ( $groups as $group ) {
                                 </script>";
 			$result = OC_User_Group_Admin_Util::declineInvitation ( OCP\USER::getUser (), $group );
 	        }
+	}
 }
 echo "<div id='dialogalert' title='Delete Confirmation' style='display:none;' ><p>Are you sure you want to delete this group?</p></div>";
 ?>

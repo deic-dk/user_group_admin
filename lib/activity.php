@@ -25,6 +25,7 @@ use OCP\Activity\IManager;
 use OCP\IConfig;
 use OCP\IL10N;
 use OCP\IURLGenerator;
+use \OCP\User;
 
 class Activity implements IExtension {
 	const FILTER_FILES = 'user_group_admin';
@@ -114,8 +115,8 @@ class Activity implements IExtension {
 				return (string) $this->l->t('You invited %2$s to group %1$s', $preparedParams);
 			case 'shared_with_by':
 				if ($isNotified) {
-					array_push($preparedParams, $params[0]);
-					return (string) $this->l->t('You have been invited to group %1$s by %2$s<div id="invite_div" style="display:block"><a href="#" id="accept" class="btn btn-default btn-flat" value = \'%3$s\' >Accept</a><a href="#" class="btn btn-default btn-flat" id="decline" value = \'%3$s\'>Decline</a></div>', $preparedParams );
+					//array_push($preparedParams, $params[0]);
+					return (string) $this->l->t('You have been invited to group %1$s by %2$s<div id="invite_div" style="display:block"><a href="#" id="accept" class="btn btn-default btn-flat" value =\'%1$s\'  >Accept</a><a href="#" class="btn btn-default btn-flat" id="decline" value = \'%1$s\'>Decline</a></div>', $preparedParams );
 				}else if ($hasAccepted) {
 					return (string) $this->l->t('You joined group %1$s', $preparedParams);
 				}else if ($hasDeclined) {
@@ -245,13 +246,52 @@ class Activity implements IExtension {
 	 * @return string
 	 */
 	protected function prepareFileParam($app, $param, $stripPath, $highlightParams) {
-		if ($app === 'user_group_admin') {
-			return '<a class="filename" href="/index.php/apps/user_group_admin">' . \OCP\Util::sanitizeHTML($param) . '</a>';
-		}else {
-			return '<a class="filename" >' . Util::sanitizeHTML($param) . '</a>';
+		$param = $this->fixLegacyFilename($param);
+		$parent_dir = (substr_count($param, '/') == 1) ? '/' : dirname($param);
+		$param = trim($param, '/');
+                
+	//		$fileLink = \OCP\Util::linkTo('files', 'index.php', array('dir' => $parent_dir));
+			list($path, $name) = $this->splitPathFromFilename($param);
+			if (!$stripPath || $path === '') {
+				if (!$highlightParams) {
+					return $param;
+				}
+				if ($app === 'user_group_admin') {
+					return '<a class="filename" href="/index.php/apps/user_group_admin">' . \OCP\Util::sanitizeHTML($param) . '</a>';
+				}
+			}
+			if (!$highlightParams) {
+				return $name;
+			}
+		$title = ' title="' . $this->l->t('in %s', array(\OCP\Util::sanitizeHTML($path))) . '"';
+		return '<a class="filename tooltip" href="/index.php/apps/user_group_admin"' . $title . '>' . \OCP\Util::sanitizeHTML($name) . '</a>';
+	}
+
+	/**
+	 * Prepend leading slash to filenames of legacy activities
+	 * @param string $filename
+	 * @return string
+	 */
+	protected function fixLegacyFilename($filename) {
+		if (strpos($filename, '/') !== 0) {
+			return '/' . $filename;
 		}
-		$title = ' title="' . $this->l->t('in %s', array(Util::sanitizeHTML($path))) . '"';
-		return '<a class="filename tooltip" href="' . $fileLink . '"' . $title . '>' . Util::sanitizeHTML($name) . '</a>';
+		return $filename;
+	}
+	/**
+	 * Split the path from the filename string
+	 *
+	 * @param string $filename
+	 * @return array Array with path and filename
+	 */
+	protected function splitPathFromFilename($filename) {
+		if (strrpos($filename, '/') !== false) {
+			return array(
+				trim(substr($filename, 0, strrpos($filename, '/')), '/'),
+				substr($filename, strrpos($filename, '/') + 1),
+			);
+		}
+		return array('', $filename);
 	}
 
 	/**
