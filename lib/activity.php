@@ -28,7 +28,6 @@ use OCP\IURLGenerator;
 use \OCP\User;
 
 class Activity implements IExtension {
-	const FILTER_FILES = 'user_group_admin';
 	const TYPE_SHARE_CREATED = 'group_created';
 	const TYPE_GROUP = 'group';
 	const TYPE_SHARE_DELETED = 'group_deleted';
@@ -250,7 +249,6 @@ class Activity implements IExtension {
 		$parent_dir = (substr_count($param, '/') == 1) ? '/' : dirname($param);
 		$param = trim($param, '/');
                 
-	//		$fileLink = \OCP\Util::linkTo('files', 'index.php', array('dir' => $parent_dir));
 			list($path, $name) = $this->splitPathFromFilename($param);
 			if (!$stripPath || $path === '') {
 				if (!$highlightParams) {

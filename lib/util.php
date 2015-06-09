@@ -71,7 +71,7 @@ class OC_User_Group_Admin_Util {
 		}
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*groups` WHERE `gid` = ?" );
 		$result = $stmt->execute ( array (
-				$gid 
+			$gid 
 		) );
 		if ($result->fetchRow ()) {
 			return false;
@@ -139,7 +139,7 @@ class OC_User_Group_Admin_Util {
 	 *        	Name of the group in which add the user
 	 * @return bool Adds a user to a group.
 	 */
-	public static function addToGroup($uid, $gid, $owner) {
+	public static function addToGroup($uid, $gid) {
 		// No duplicate entries!
 		if (! OC_User_Group_Admin_Util::inGroup ( $uid, $gid )) {
 			$accept = md5 ( $uid . time () );
@@ -149,8 +149,8 @@ class OC_User_Group_Admin_Util {
 				$stmt->execute ( array (
 						$gid,
 						$uid,
-						OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER,
-						'0',
+						OCP\USER::getUser (),
+						'1',
 						$accept,
 						$decline 
 				) );
@@ -334,10 +334,10 @@ class OC_User_Group_Admin_Util {
 		return $groups;
 	}
 	public static function hiddenGroupExists($gid) {
-		$query = OC_DB::prepare ( 'SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ? AND `owner` = ?' );
+		$query = OC_DB::prepare ( 'SELECT `gid` FROM `*PREFIX*groups` WHERE `gid` = ?' );
 		$result = $query->execute ( array (
-				$gid,
-				OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER 
+				$gid
+				 
 		) )->fetchOne ();
 		if ($result) {
 			return true;
