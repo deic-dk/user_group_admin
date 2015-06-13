@@ -115,7 +115,7 @@ class Activity implements IExtension {
 			case 'shared_with_by':
 				if ($isNotified) {
 					//array_push($preparedParams, $params[0]);
-					return (string) $this->l->t('You have been invited to group %1$s by %2$s<div id="invite_div" style="display:block"><a href="#" id="accept" class="btn btn-default btn-flat" value =\'%1$s\'  >Accept</a><a href="#" class="btn btn-default btn-flat" id="decline" value = \'%1$s\'>Decline</a></div>', $preparedParams );
+					return (string) $this->l->t('You have been invited to group %1$s by %2$s<div id="invite_div" style="display:none"><a href="#" id="accept" class="btn btn-default btn-flat" value =\'%1$s\'  >Accept</a>&nbsp<a href="#" class="btn btn-default btn-flat" id="decline" value = \'%1$s\'>Decline</a></div>', $preparedParams );
 				}else if ($hasAccepted) {
 					return (string) $this->l->t('You joined group %1$s', $preparedParams);
 				}else if ($hasDeclined) {
@@ -191,14 +191,14 @@ class Activity implements IExtension {
 		$parameterList = $plainParameterList = array();
 		foreach ($params as $parameter) {
 			if ($paramType === 'file') {
-				$parameterList[] = $this->prepareFileParam($app, $parameter, $stripPath, $highlightParams);
-				$plainParameterList[] = $this->prepareFileParam($app, $parameter, false, false);
+				$parameterList[] = (string) $this->prepareFileParam($app, $parameter, $stripPath, $highlightParams);
+				$plainParameterList[] = (string) $this->prepareFileParam($app, $parameter, false, false);
 			} else {
-				$parameterList[] = $this->prepareParam($app, $parameter, $highlightParams);
-				$plainParameterList[] = $this->prepareParam($app, $parameter, false);
+				$parameterList[] = (string) $this->prepareParam($app, $parameter, $highlightParams);
+				$plainParameterList[] = (string) $this->prepareParam($app, $parameter, false);
 			}
 		}
-		return $this->joinParameterList($parameterList, $plainParameterList, $highlightParams);
+		return (string) $this->joinParameterList($parameterList, $plainParameterList, $highlightParams);
 	}
 	/**
 	 * Prepares a parameter for usage by adding highlights
@@ -358,17 +358,6 @@ class Activity implements IExtension {
 	 * @return integer|false
 	 */
 	public function getGroupParameter($activity) {
-		if ($activity['app'] === 'user_group_admin') {
-			switch ($activity['subject']) {
-				case 'created_self':
-				case 'created_by':
-				case 'deleted_self':
-				case 'deleted_by':
-				case 'shared_user_self':
-				case 'shared_with_by':
-					return 0;
-			}
-		}
 		return false;
 	}
 	/**

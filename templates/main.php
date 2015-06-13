@@ -35,7 +35,7 @@
 	Import group from text file:
 	<span class="newimportform" style="margin-left:30px; margin-bottom:20px; position:absolute">
 	<form  id="import_group_form" action="<?php echo OCP\Util::linkTo('user_group_admin', 'ajax/import.php'); ?>"  method="post" enctype="multipart/form-data">
-        <input id="import_group_file" type="file" name="import_group_file" />
+	<input id="import_group_file" type="file" name="import_group_file"> 
         </form></span>
     </span>
 </div>
