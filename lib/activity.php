@@ -101,10 +101,11 @@ class Activity implements IExtension {
                                 $params, $this->getSpecialParameterList('user_group_admin', $text),
                                 $stripPath, $highlightParams
                         );
-		$stmt = \OCP\DB::prepare ( "SELECT `verified` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ?  " );
-			$isNotified = $stmt->execute ( array ($params[0], \OCP\User::getUser(), '0') )->fetchRow () ? true : false;
-			$hasAccepted = $stmt->execute ( array ($params[0], \OCP\User::getUser(), '1') )->fetchRow () ? true : false;
-			$hasDeclined = $stmt->execute ( array ($params[0], \OCP\User::getUser(), '2') )->fetchRow () ? true : false;
+
+			$isNotified =  OC_User_Group_Admin_Util::searchUser($params[0], \OCP\User::getUser(), '0');
+			$hasAccepted = OC_User_Group_Admin_Util::searchUser($params[0], \OCP\User::getUser(), '1');
+			$hasDeclined = OC_User_Group_Admin_Util::searchUser($params[0], \OCP\User::getUser(), '2');
+
 		switch ($text) {
 			case 'created_self':
 				return (string) $this->l->t('You created group %1$s', $preparedParams);

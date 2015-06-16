@@ -1,6 +1,6 @@
 <!--This applies to the new version of My Groups-->
 <div id="app-content" style="transition: all 0.3s ease 0s;">
-<div id="app-content-meta_data" class="viewcontainer">
+<div id="app-content-user_group_admin" class="viewcontainer">
 <div id="controls">
   <div class="row">
     <div class="" style="margin-left: 19px;">
