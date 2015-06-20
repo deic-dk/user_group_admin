@@ -158,30 +158,36 @@ $(document).ready(function() {
 			}
 		});
 	});
-	
 
-$(" .name").live('click', function() {
-		 var group = $(this).closest('td').attr('id') ;
+	 $(document).click(function(e){
+          if (!$(e.target).parents().filter('.oc-dialog').length && !$(e.target).parents().filter('.name').length ) {
+                        $(".oc-dialog").hide();
+           }
+        });
+
+	$(" .name").live('click', function() {
+		var group = $(this).closest('td').attr('id') ;
 		var number = $("td[class='"+group+"']").find("span#nomembers").html();
-	var html = '<div><span id="tagid" class=""><h3 class="oc-dialog-title" style="padding-left:25px;">Team <span>\''+ group+'\'</span></h3></span><a class="oc-dialog-close close svg"></a><div id="meta_data_container" class=\''+ group+'\'>\
+		var html = '<div><span id="tagid" class=""><h3 class="oc-dialog-title" style="padding-left:25px;">Team <span>\''+ group+'\'</span></h3></span><a class="oc-dialog-close close svg"></a><div id="meta_data_container" class=\''+ group+'\'>\
 				<span class="memberscount" style="padding-left:25px;" >'+number+'</span> members<div id="emptysearch"></div><ul id="meta_data_keys"></ul></div><div class="dropmembers" id=\''+ group+'\' style="width:60%; margin: 0 auto;"></div>\
           <div style="position:absolute; bottom:50px; left:40px;" ><button id="invite" class="invite btn btn-primary btn-flat"><i class="icon-user"></i>Invite user</button></div><div class="userselect" style="width:60%; padding-left:170px; display:none;"><input id="mkgroup" type="text" placeholder="Invite user ..." class="ui-autocomplete-input" autocomplete="off">\
                         <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span></div>\
                         </div>';
-			
 
-			$(html).dialog({
+		$(html).dialog({
 			  dialogClass: "oc-dialog",
 			  resizeable: false,
 			  draggable: false,
 			  height: 600,
 			  width: 720 
 			});
-			 $('.oc-dialog-close').live('click', function() {
-				$(".oc-dialog").hide();
-        });
+
+		$('.oc-dialog-close').live('click', function() {
+			$(".oc-dialog").hide();
+        	});
+
 		$('.ui-helper-clearfix').css("display", "none");
-	if ($(this).closest('tr').attr('id')=='owner'){ 
+	    if ($(this).closest('tr').attr('id')=='owner'){ 
 		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmembers"} ,
                 function ( jsondata ){
                         if(jsondata.status == 'success' ) {

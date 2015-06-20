@@ -7,7 +7,7 @@
       <div class="actions creatable">
         <div id="create" original-title="">
 		  <a id="create" class="btn btn-primary btn-flat" href="#"><i class="icon-users"></i>
-               New group
+               New group 
           </a>
 	<div id="importgroup" class="btn-group">
 		<a id="importgroup" type="button" class="btn btn-default btn-flat">Import</a>
@@ -91,11 +91,6 @@
 					</a></li>
 				</ul>
 			</div>
-			<div id='dropdown' class=\"$group\" data-item-type='folder' style='display:none;' >
-                        <input id='mkgroup' type='text' placeholder='Invite user ...' class='ui-autocomplete-input' autocomplete='off'>
-                        <span role='status' aria-live='polite' class='ui-helper-hidden-accessible'></span>
-                        <div id='invitation' style='display:none;'>An invitation was sent to the user.</div>
-                </div>
 
 		</div></div></div>
 		</td>";

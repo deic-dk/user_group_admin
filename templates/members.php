@@ -19,7 +19,6 @@ echo "<li data-member=$owner title=\"".OC_User::getDisplayName($owner)."\" ><i c
                         $status = '<i style ="color:#F44336">Member declined the invitation';
                 }
                 $name = OC_User_Group_Admin_Util::prepareUser($member);
-		//echo $name;
                 echo "<li data-member=$member title=\"".OC_User::getDisplayName($member)."\" ><span class='left'>$name </span>
 		<span class='normaltext'><i>($member)</i></span>
                 <span class=\"member-actions\" id='spanaction'>
