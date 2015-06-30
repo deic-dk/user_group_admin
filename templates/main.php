@@ -3,7 +3,7 @@
 <div id="app-content-user_group_admin" class="viewcontainer">
 <div id="controls">
   <div class="row">
-    <div class="" style="margin-left: 19px;">
+    <div class="text-right" style="margin-right: 19px;">
       <div class="actions creatable">
         <div id="create" original-title="">
 		  <a id="create" class="btn btn-primary btn-flat" href="#"><i class="icon-users"></i>

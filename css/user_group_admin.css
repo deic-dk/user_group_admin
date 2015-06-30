@@ -78,7 +78,7 @@ table td.groupsname .nametext {
 #groupstable {
 	position: relative;
 	top: -1px;
-	width: 60%;
+/*	width: 60%;*/
 	z-index: 1000px;
 }
 
