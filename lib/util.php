@@ -177,13 +177,13 @@ class OC_User_Group_Admin_Util {
 	 */
 	public static function sendVerification($uid, $accept, $decline, $gid, $owner) {
 		$to = $uid;
+		$name = OCP\User::getDisplayName($uid);
 	        $url = 	OCP\Config::getAppValue('user_group_admin', 'appurl', '');
 		$sender = OCP\Config::getAppValue('user_group_admin', 'sender', '');
 		$subject = OCP\Config::getAppValue('user_group_admin', 'subject', '');
-		$message = 'You have been added to the group "' . $gid . '" by ' . $owner . '. Click here to accept the invitation:
-		'.$url . $accept . '
-		 Click here to decline the invitation:
-		'.$url . $decline;
+		$message = 'Dear '.$name.','."\n \n".'You have been added to the group "' . $gid . '" by ' . $owner . '. Click here to accept the invitation:'."\n".
+		$url . $accept ."\n \n".'or click here to decline:'."\n".
+		$url . $decline;
 		
 		$headers = 'From: '.$sender . "\r\n" . 'Reply-To: ' .$sender. "\r\n" . 'X-Mailer: PHP/' . phpversion ();
 		mail ( $to, $subject, $message, $headers, "-r " . $to );
