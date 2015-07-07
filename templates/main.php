@@ -17,7 +17,7 @@
       </div>
   </div>
   <div id="newgroup" class="panel-heading apanel">
-     <span>
+     <span class="spanpanel">
 	  <input class="editgroup" id="newgroup" type="text" placeholder="New group name..."> 
 	  
 	    <span class="newgroupform">	
@@ -31,7 +31,7 @@
       </span>
   </div>
  <div id="importnew" class="panel-heading apanel">
-    <span>
+    <span class="spanpanel">
 	Import group from text file:
 	<span class="newimportform" style="margin-left:30px; margin-bottom:20px; position:absolute">
 	<form  id="import_group_form" action="<?php echo OCP\Util::linkTo('user_group_admin', 'ajax/import.php'); ?>"  method="post" enctype="multipart/form-data">
