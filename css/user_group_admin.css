@@ -52,6 +52,11 @@ li
 	display:none
 }
 
+.spanpanel {
+        margin-left:55px;
+        padding-top:15px;
+}
+
 table  td.groupsname span.name span.nametext {font-weight:bold; }
 table td.filename input.filename {
 	width: 70%;
