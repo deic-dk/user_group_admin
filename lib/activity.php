@@ -28,9 +28,7 @@ use OCP\IURLGenerator;
 use \OCP\User;
 
 class Activity implements IExtension {
-	const TYPE_SHARE_CREATED = 'group_created';
 	const TYPE_GROUP = 'group';
-	const TYPE_SHARE_DELETED = 'group_deleted';
 
 	protected $l;
 	protected $languageFactory;
@@ -246,52 +244,17 @@ class Activity implements IExtension {
 	 * @return string
 	 */
 	protected function prepareFileParam($app, $param, $stripPath, $highlightParams) {
-		$param = $this->fixLegacyFilename($param);
-		$parent_dir = (substr_count($param, '/') == 1) ? '/' : dirname($param);
-		$param = trim($param, '/');
                 
-			list($path, $name) = $this->splitPathFromFilename($param);
-			if (!$stripPath || $path === '') {
-				if (!$highlightParams) {
-					return $param;
-				}
-				if ($app === 'user_group_admin') {
-					return '<a class="filename" href="/index.php/apps/user_group_admin">' . \OCP\Util::sanitizeHTML($param) . '</a>';
-				}
-			}
-			if (!$highlightParams) {
-				return $name;
-			}
+	 	if (!$highlightParams) {
+			return $param;
+		}
+		if ($app === 'user_group_admin') {
+			return '<a class="filename" href="/index.php/apps/user_group_admin">' . \OCP\Util::sanitizeHTML($param) . '</a>';
+		}
 		$title = ' title="' . $this->l->t('in %s', array(\OCP\Util::sanitizeHTML($path))) . '"';
 		return '<a class="filename tooltip" href="/index.php/apps/user_group_admin"' . $title . '>' . \OCP\Util::sanitizeHTML($name) . '</a>';
 	}
 
-	/**
-	 * Prepend leading slash to filenames of legacy activities
-	 * @param string $filename
-	 * @return string
-	 */
-	protected function fixLegacyFilename($filename) {
-		if (strpos($filename, '/') !== 0) {
-			return '/' . $filename;
-		}
-		return $filename;
-	}
-	/**
-	 * Split the path from the filename string
-	 *
-	 * @param string $filename
-	 * @return array Array with path and filename
-	 */
-	protected function splitPathFromFilename($filename) {
-		if (strrpos($filename, '/') !== false) {
-			return array(
-				trim(substr($filename, 0, strrpos($filename, '/')), '/'),
-				substr($filename, strrpos($filename, '/') + 1),
-			);
-		}
-		return array('', $filename);
-	}
 
 	/**
 	 * Returns a list of grouped parameters
@@ -349,7 +312,8 @@ class Activity implements IExtension {
 	 * @return string|false
 	 */
 	public function getTypeIcon($type) {
-		return 'icon-users';
+		if ($type == self::TYPE_GROUP) {
+			return 'icon-users';}
 	}
 	/**
 	 * The extension can define the parameter grouping by returning the index as integer.
@@ -408,3 +372,4 @@ class Activity implements IExtension {
 		return false;
 	}
 }
+
