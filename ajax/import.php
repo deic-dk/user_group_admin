@@ -34,6 +34,7 @@ if (isset ( $_FILES ['import_group_file'] ['tmp_name'] )) {
 		$group = $members [0];
 		array_shift ( $members );
 		$result = OC_User_Group_Admin_Util::createGroup ( $group );
+		$activity = OC_User_Group_Hooks::groupCreate($group);
 		if ($result) {
 			foreach ( $members as $member ) {
 				if (OCP\User::userExists ( $member ) and OCP\User::getUser () != $member) {
@@ -57,3 +58,4 @@ if ($import) {
 						}
                           </script>";
 }
+
