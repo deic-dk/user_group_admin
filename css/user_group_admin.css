@@ -2,14 +2,6 @@ table th .columntitle {
 		display: inline-block !important;
 }
 
-/* Commented out by Christian (4/3-2015) 
-span.tagtext {
-		line-height: 1.5;
-		height: 33px;
-		padding: 5px 0 8px 0;
-		display: inline-block;
-}
-*/
 li
 {
   list-style-type: none;
@@ -21,11 +13,6 @@ li
 	position:absolute
 }
 
-.newimportform {
-	margin-left:35px; 
-	margin-bottom:20px; 
-	position:absolute
-}
 
 .normaltext {
 	font-size:80%
@@ -45,7 +32,7 @@ li
 } 
 
 .apanel {
-	width:60%;
+	width:100%;
 	border:solid 1px #e4e4e4;
 	margin-bottom:20px;
 	height:55px; 
@@ -53,10 +40,31 @@ li
 }
 
 .spanpanel {
-        margin-left:55px;
-        padding-top:15px;
+	padding-bottom:3px;
+	margin-left: 30px;
+	line-height:50px;
 }
 
+.newimportform {
+	float:right;
+}
+
+#import_group_form {
+    position: relative;
+    overflow: hidden;
+    margin: 10px;
+}
+#import_group_file {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
 table  td.groupsname span.name span.nametext {font-weight:bold; }
 table td.filename input.filename {
 	width: 70%;
@@ -107,12 +115,12 @@ table td.groupsname .nametext {
 	padding-top:3px;
 }
 
-input.edittag {
-		line-height: 1.5;
-		padding: 2px 0px 4px 5px;;
-		position: relative;
-		top: -5px;
-
+input.editgroup {
+	line-height: 1.5;
+	padding: 2px 0px 4px 5px;
+	margin-top:10px;
+	position: relative;
+	width: 400px;
 }
 
 #dropdownmembers {
@@ -128,8 +136,6 @@ input.edittag {
 	float:right;
 }
 
-.left {
-}
 
 .border {
 		border-style: solid;
@@ -149,10 +155,10 @@ input.edittag {
 	border-radius: 25px;
 }
 
-
-#meta_data_tags_container {
-		float: left;
-		width: 220px;
+.newgroup-span {
+	float: right;
+	margin-right: 10px;
+	line-height: 50px;
 }
 
 table.hidden {
@@ -194,50 +200,6 @@ div.scrollable::-webkit-scrollbar{
 }
 
 
-
-div#emptysearch {
-		font-size: x-large;
-		color: #ddd;
-		text-align: center;
-		margin-top: 40px;
-		margin-bottom: 20px;
-}
-
-
-#addNewTag #test {
-		display: none;
-		position:fixed;
-		opacity: .9;
-		width: 160px;
-		z-index: 10;
-		padding: .5em;
-		padding-bottom: 0;
-		text-align:left;
-		background: #555;
-		border: 1px solid #444;
-		border-radius: 5px;
-		box-shadow:0 2px 7px rgba(170,170,170,.4);
-}
-
-
-#addNewTag ul>li#newTag { 
-		padding: 0 0 0 0;
-}
-
-#addNewTag span {
-		cursor: pointer;
-}
-
-#addNewTag ul>li>input { 
-		margin: 0;
-		padding: 3px;
-		width: 95%;
-		align: center;
-}
-
-#addNewTag li:hover {
-		background: #555;
-}
 
 
 

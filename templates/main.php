@@ -16,13 +16,13 @@
     </div>
       </div>
   </div>
-  <div id="newgroup" class="panel-heading apanel">
-     <span class="spanpanel">
+  <div id="newgroup" class="apanel">
+     <span class="spanpanel" >
 	  <input class="editgroup" id="newgroup" type="text" placeholder="New group name..."> 
 	  
-	    <span class="newgroupform">	
+	    <span class="newgroup-span">	
 		  <div id="ok" class="btn-group" original-title="">
-		    <a class="btn btn-default btn-flat" href="#">Ok</a>
+		    <a class="btn btn-default btn-flat" href="#">Add</a>
           </div>
           <div id="cancel" class="btn-group" original-title="">
 		    <a class="btn btn-default btn-flat" href="#">Cancel</a>
@@ -30,14 +30,14 @@
 	    </span>
       </span>
   </div>
- <div id="importnew" class="panel-heading apanel">
-    <span class="spanpanel">
+ <div id="importnew" class="apanel">
+    <div class="spanpanel">
 	Import group from text file:
-	<span class="newimportform" style="margin-left:30px; margin-bottom:20px; position:absolute">
-	<form  id="import_group_form" action="<?php echo OCP\Util::linkTo('user_group_admin', 'ajax/import.php'); ?>"  method="post" enctype="multipart/form-data">
-	<input id="import_group_file" type="file" name="import_group_file"> 
+	<span class="newimportform">
+	<form  id="import_group_form" class= "btn btn-default btn-flat" action="<?php echo OCP\Util::linkTo('user_group_admin', 'ajax/import.php'); ?>"  method="post" enctype="multipart/form-data">
+	<span>Choose File</span><input id="import_group_file" type="file" name="import_group_file" /> 
         </form></span>
-    </span>
+    </div>
 </div>
 
  </div> 
@@ -176,6 +176,4 @@ if (isset($_GET ['code']))  {
 }
 echo "<div id='dialogalert' title='Delete Confirmation' style='display:none;' ><p>Are you sure you want to delete this group?</p></div>";
 ?>
-
-
 
