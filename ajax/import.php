@@ -39,6 +39,7 @@ if (isset ( $_FILES ['import_group_file'] ['tmp_name'] )) {
 			foreach ( $members as $member ) {
 				if (OCP\User::userExists ( $member ) and OCP\User::getUser () != $member) {
 					OC_User_Group_Admin_Util::addToGroup ( $member, $group, OCP\USER::getUser () );
+					OC_User_Group_Hooks::groupShare($member, $group);
 				} elseif (OCP\User::userExists ( $member ) == false) {
 					$import = false;
 				}
