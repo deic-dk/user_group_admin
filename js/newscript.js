@@ -1,7 +1,3 @@
-/**
- * This applies to the new version of My Groups
- */
-
 OC.UserGroup = {
         groupSelected : '' ,
         groupMember : [] ,
@@ -54,7 +50,7 @@ OC.UserGroup = {
                         }else{
                                 OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
                         }
-                });	
+                });
                             OC.UserGroup.initDropDown() ;
               }else{
                 OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
@@ -78,7 +74,7 @@ $(document).ready(function() {
 
 	$('#ok').on('click', function() {
 		if( $('.editgroup').val() != "") {
-                		
+
 			$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : $('.editgroup').val(), action: "addgroup" } , function ( jsondata ){
 				if(jsondata.status == 'success' ) {
 					$('#newgroup').slideToggle();
@@ -148,7 +144,7 @@ $(document).ready(function() {
 		document.location.href = OC.linkTo('user_group_admin', 'ajax/export.php') + '?group=' + groupSelected;
 	});
 	$("#invite").live('click', function(event) {
-		OC.UserGroup.groupSelected = $(this).parents('div').prev().attr('id'); 
+		OC.UserGroup.groupSelected = $(this).parents('div').prev().attr('id');
 		$(".userselect").css("display", "block");
 		OC.UserGroup.initDropDown() ;
 		event.stopPropagation();
@@ -162,14 +158,15 @@ $(document).ready(function() {
 	 $(document).click(function(e){
           if (!$(e.target).parents().filter('.oc-dialog').length && !$(e.target).parents().filter('.name').length ) {
                         $(".oc-dialog").hide();
+						$('.modalOverlay').remove();
            }
         });
 
-	$(" .name").live('click', function() {
+	$("#groupstable .name").live('click', function() {
 		var group = $(this).closest('td').attr('id') ;
 		var number = $("td[class='"+group+"']").find("span#nomembers").html();
-		var html = '<div><span id="tagid" class=""><h3 class="oc-dialog-title" style="padding-left:25px;">Team <span>\''+ group+'\'</span></h3></span><a class="oc-dialog-close close svg"></a><div id="meta_data_container" class=\''+ group+'\'>\
-				<span class="memberscount" style="padding-left:25px;" >'+number+'</span> members<div id="emptysearch"></div><ul id="meta_data_keys"></ul></div><div class="dropmembers" id=\''+ group+'\' style="width:60%; margin: 0 auto;"></div>\
+		var html = '<div><span><h3 class="oc-dialog-title" style="padding-left:25px;">Team <span>\''+ group+'\'</span></h3></span><a class="oc-dialog-close close svg"></a><div id="meta_data_container" class=\''+ group+'\'>\
+				<span class="memberscount" style="padding-left:25px;" >'+number+'</span> members <p></p><div class="dropmembers" id=\''+ group+'\' style="width:60%; margin: 0 auto;"></div>\
           <div style="position:absolute; bottom:50px; left:40px;" ><button id="invite" class="invite btn btn-primary btn-flat"><i class="icon-user"></i>Invite user</button></div><div class="userselect" style="width:60%; padding-left:170px; display:none;"><input id="mkgroup" type="text" placeholder="Invite user ..." class="ui-autocomplete-input" autocomplete="off">\
                         <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span></div>\
                         </div>';
@@ -179,15 +176,18 @@ $(document).ready(function() {
 			  resizeable: false,
 			  draggable: false,
 			  height: 600,
-			  width: 720 
+			  width: 720
 			});
+
+		$('body').append('<div class="modalOverlay">');
 
 		$('.oc-dialog-close').live('click', function() {
 			$(".oc-dialog").hide();
-        	});
+			$('.modalOverlay').remove();
+        });
 
 		$('.ui-helper-clearfix').css("display", "none");
-	    if ($(this).closest('tr').attr('id')=='owner'){ 
+	    if ($(this).closest('tr').attr('id')=='owner'){
 		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmembers"} ,
                 function ( jsondata ){
                         if(jsondata.status == 'success' ) {
@@ -216,9 +216,9 @@ $(document).ready(function() {
                         }
                 });
 		$('.invite').hide();
-	
+
 	}
-	});	
+	});
 
 
 	$(' .removemember').live('click', function() {
@@ -235,10 +235,10 @@ $(document).ready(function() {
                             	int2--;
                             	$("td[class='"+group+"']").find("span#nomembers").text(int2);
 			//	var index = OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].indexOf(member);
-				//OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].splice(index, 1);				
+				//OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].splice(index, 1);
 			}else{
 				OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
-			} 
+			}
 		});
 
 		$('.tipsy').remove();
