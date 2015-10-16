@@ -144,15 +144,15 @@ class OC_User_Group_Admin_Util {
 		if (! OC_User_Group_Admin_Util::inGroup ( $uid, $gid )) {
 			$accept = md5 ( $uid . time () );
 			$decline = $uid . time ();
-			$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `owner`, `verified`, `accept`, `decline` ) VALUES( ?, ?, ?, ?, ?, ?)" );
+			$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `owner`, `verified`, `accept`, `decline`) VALUES( ?, ?, ?, ?, ?, ?)" );
 			if (OC_User_Group_Admin_Util::hiddenGroupExists ( $gid )) {
 				$stmt->execute ( array (
 						$gid,
 						$uid,
-						OCP\USER::getUser (),
+						OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER,
 						'1',
-						$accept,
-						$decline 
+						'',
+						''	
 				) );
 			} else {
 				$stmt->execute ( array (
@@ -161,7 +161,7 @@ class OC_User_Group_Admin_Util {
 						OCP\USER::getUser (),
 						'0',
 						$accept,
-						$decline 
+						$decline
 				) );
 				OC_User_Group_Admin_Util::sendVerification ( $uid, $accept, $decline, $gid, OCP\USER::getDisplayName () );
 			}
@@ -190,7 +190,7 @@ class OC_User_Group_Admin_Util {
 	}
 	
 	/**
-	 * Updates the database if the user accepts the invitation.
+	 * Update the database if the user accepts the invitation.
 	 */
 	public static function acceptInvitation($gid, $uid) {
 		$query = OC_DB::prepare ( "UPDATE `*PREFIX*user_group_admin_group_user` SET `verified` = true WHERE `gid` = ? AND `uid` = ? " );
@@ -202,7 +202,7 @@ class OC_User_Group_Admin_Util {
 	}
 	
 	/**
-	 * Updates the database if the user declines the invitation.
+	 * Update the database if the user declines the invitation.
 	 */
 	public static function declineInvitation($uid, $gid) {
 		$query = OC_DB::prepare ( "UPDATE `*PREFIX*user_group_admin_group_user` SET `verified` = '2' WHERE `uid` = ? AND `gid` = ? " );
@@ -215,7 +215,7 @@ class OC_User_Group_Admin_Util {
 	}
 	
 	/**
-	 * Checks whether a user has accepted the invitation or not.
+	 * Check whether a user has accepted the invitation or not.
 	 */
 	public static function searchUser($gid, $uid, $verified) {
 		$stmt = OC_DB::prepare ( "SELECT `verified` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ?  " );
@@ -229,7 +229,7 @@ class OC_User_Group_Admin_Util {
 	}
 	
 	/**
-	 * Checks if a user has accepted the invitation via mail.
+	 * Check if a user has accepted the invitation via mail.
 	 */
 	public static function acceptedUser($gid, $uid, $verified, $accept) {
 		$stmt = OC_DB::prepare ( "SELECT `accept` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ? AND `accept` = ? " );
@@ -244,7 +244,7 @@ class OC_User_Group_Admin_Util {
 	}
 	
 	/**
-	 * Checks if a user has declined the invitation via email.
+	 * Check if a user has declined the invitation via email.
 	 */
 	public static function declinedUser($gid, $uid, $verified, $decline) {
 		$stmt = OC_DB::prepare ( "SELECT `decline` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ? AND `decline` = ? " );
@@ -299,7 +299,7 @@ class OC_User_Group_Admin_Util {
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `owner` != ?" );
 		$result = $stmt->execute ( array (
 				$uid,
-				$uid 
+				OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER
 		) );
 		
 		$groups = array ();
@@ -396,3 +396,4 @@ class OC_User_Group_Admin_Util {
 		return '<div class="avatar" data-user="' . $param . '"></div>'. '<strong style="font-size:92%">' . $displayName . '</strong>';
 	}
 }
+
