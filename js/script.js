@@ -72,7 +72,7 @@ $(document).ready(function() {
 		$('#importnew').slideToggle();
 	});
 
-	$('#ok').on('click', function() {
+	$('#newgroup #ok').on('click', function() {
 		if( $('.editgroup').val() != "") {
 
 			$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : $('.editgroup').val(), action: "addgroup" } , function ( jsondata ){
@@ -90,30 +90,15 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#cancel').click(function() {
+	$('#newgroup #cancel').click(function() {
 		$('#newgroup').slideToggle();
 	});
 
-
-
-	$(".dropdown-toggle").live('click', function() {
-		var groupSelected = $(this).closest('td').attr('id') ;
-		$("[id='"+groupSelected+"']").find(" div.fileactions").find("ul").toggle();
-		$("[id='"+groupSelected+"']").find(' div.fileactions').find("ul").hover(
-				function () {
-					$(this).show();
-				},
-				function () {
-					$(this).hide();
-				}
-		);
-	});
-
-	$("#groupstable td #removegroup").live('click', function() {
+	$("#groupstable td #delete-group").live('click', function() {
 		var status = $(this).closest('tr').attr('id') ;
-		var groupSelected = $(this).closest('td').attr('id') ;
-		$( '#dialogalert' ).dialog({ buttons: [ { id:'test','data-test':'data test', text: 'Delete', click: function() {
-					if (status == 'owner') {
+                var groupSelected = $(this).closest('tr').attr('class') ;
+                $( '#dialogalert' ).dialog({ buttons: [ { id:'test','data-test':'data test', text: 'Delete', click: function() {
+                    if (status == 'owner') {
                         $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : groupSelected , action : "delgroup"} , function ( jsondata){
                                 if(jsondata.status == 'success' ) {
                                         location.reload();
@@ -133,16 +118,18 @@ $(document).ready(function() {
                         });
                 }
 
-                                         $(this).dialog( 'close' ); } },
-                                        { id:'test2','data-test':'data test', text: 'Cancel', click: function() {
-                                        $(this).dialog( 'close' ); } } ] });
+                $(this).dialog( 'close' ); } },
+                { id:'test2','data-test':'data test', text: 'Cancel', click: function() {
+                $(this).dialog( 'close' ); } } ] });
 
-	});
+        });	
 
-	$("#groupstable td #exportgroup").live('click', function() {
-		var groupSelected = $(this).closest('td').attr('id') ;
+
+	$("#export-group").live('click', function() {
+		var groupSelected = $(this).parents('div').prev().attr('id');
 		document.location.href = OC.linkTo('user_group_admin', 'ajax/export.php') + '?group=' + groupSelected;
 	});
+
 	$("#invite").live('click', function(event) {
 		OC.UserGroup.groupSelected = $(this).parents('div').prev().attr('id');
 		$(".userselect").css("display", "block");
@@ -155,10 +142,10 @@ $(document).ready(function() {
 		});
 	});
 
-	 $(document).click(function(e){
+	$(document).click(function(e){
           if (!$(e.target).parents().filter('.oc-dialog').length && !$(e.target).parents().filter('.name').length ) {
-                        $(".oc-dialog").hide();
-						$('.modalOverlay').remove();
+                $(".oc-dialog").hide();
+		$('.modalOverlay').remove();
            }
         });
 
@@ -167,7 +154,7 @@ $(document).ready(function() {
 		var number = $("td[class='"+group+"']").find("span#nomembers").html();
 		var html = '<div><span><h3 class="oc-dialog-title" style="padding-left:25px;">Team <span>\''+ group+'\'</span></h3></span><a class="oc-dialog-close close svg"></a><div id="meta_data_container" class=\''+ group+'\'>\
 				<span class="memberscount" style="padding-left:25px;" >'+number+'</span> members <p></p><div class="dropmembers" id=\''+ group+'\' style="width:60%; margin: 0 auto;"></div>\
-          <div style="position:absolute; bottom:50px; left:40px;" ><button id="invite" class="invite btn btn-primary btn-flat"><i class="icon-user"></i>Invite user</button></div><div class="userselect" style="width:60%; padding-left:170px; display:none;"><input id="mkgroup" type="text" placeholder="Invite user ..." class="ui-autocomplete-input" autocomplete="off">\
+          <div style="position:absolute; bottom:50px; left:40px;" ><button id="invite" class="invite btn btn-primary btn-flat"><i class="icon-user"></i>Invite user</button>&nbsp<button id="export-group" class="btn btn-default btn-flat"><i class="icon-export-alt"></i>Export</button></div><div class="userselect" style="width:60%; padding-left:170px; display:none;"><input id="mkgroup" type="text" placeholder="Invite user ..." class="ui-autocomplete-input" autocomplete="off">\
                         <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span></div>\
                         </div>';
 
@@ -184,40 +171,40 @@ $(document).ready(function() {
 		$('.oc-dialog-close').live('click', function() {
 			$(".oc-dialog").hide();
 			$('.modalOverlay').remove();
-        });
+        	});
 
 		$('.ui-helper-clearfix').css("display", "none");
-	    if ($(this).closest('tr').attr('id')=='owner'){
-		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmembers"} ,
-                function ( jsondata ){
-                        if(jsondata.status == 'success' ) {
-				$('.dropmembers').html(jsondata.data.page);
-				$('.avatar').each(function() {
-                                	var element = $(this);
-                                	element.avatar(element.data('user'), 28);
-                        	});
+	    	if ($(this).closest('tr').attr('id')=='owner'){
+			$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmembers"} ,
+                	function ( jsondata ){
+                        	if(jsondata.status == 'success' ) {
+					$('.dropmembers').html(jsondata.data.page);
+					$('.avatar').each(function() {
+                                		var element = $(this);
+                                		element.avatar(element.data('user'), 28);
+                        		});
 
-                        }else{
-                                OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
-                        }
-		});
-	}
-	else if ($(this).closest('tr').attr('id')=='member') {
-		 $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmemberships"} ,
-                function ( jsondata ){
-                        if(jsondata.status == 'success' ) {
-                                $('.dropmembers').html(jsondata.data.page);
-				$('.avatar').each(function() {
-                                        var element = $(this);
-                                        element.avatar(element.data('user'), 28);
-                                });
-                        }else{
-                                OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
-                        }
-                });
-		$('.invite').hide();
+                        	}else{
+                                	OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
+                        	}
+			});
+		}
+		else if ($(this).closest('tr').attr('id')=='member') {
+		 	$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmemberships"} ,
+                	function ( jsondata ){
+                        	if(jsondata.status == 'success' ) {
+                                	$('.dropmembers').html(jsondata.data.page);
+					$('.avatar').each(function() {
+                                        	var element = $(this);
+                                        	element.avatar(element.data('user'), 28);
+                                	});
+                        	}else{
+                                	OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
+                        	}
+                	});
+			$('.invite').hide();
 
-	}
+		}
 	});
 
 
@@ -234,8 +221,6 @@ $(document).ready(function() {
 				var int2 = parseInt($("td[class='"+group+"']").find("span#nomembers").html(),10)
                             	int2--;
                             	$("td[class='"+group+"']").find("span#nomembers").text(int2);
-			//	var index = OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].indexOf(member);
-				//OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER].splice(index, 1);
 			}else{
 				OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
 			}
@@ -244,7 +229,8 @@ $(document).ready(function() {
 		$('.tipsy').remove();
 
 	});
-	$('#import_group_file').change(function() {
+
+	$('#importnew #import_group_file').change(function() {
 		$('#import_group_form').submit();
 	});
 

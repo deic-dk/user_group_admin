@@ -32,7 +32,7 @@ OCP\App::setActiveNavigationEntry( 'user_group_admin' );
 OCP\Util::addStyle('user_group_admin', 'user_group_admin');
 OCP\Util::addStyle('files', 'files');
 
-OCP\Util::addScript('user_group_admin','newscript');
+OCP\Util::addScript('user_group_admin','script');
 OCP\Util::addScript('user_group_admin','user_group_notification');
 
 $tmpl = new OCP\Template('user_group_admin', 'main', 'user');

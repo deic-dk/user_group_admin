@@ -32,13 +32,11 @@ OCP\JSON::callCheck();
 if ( isset($_POST['group']) ) {
   switch ($_POST['action']) {
     case "addgroup":
-      $result = OC_User_Group_Admin_Util::createGroup( $_POST['group'], OC_User::getUser() ) ;
-	$activity = OC_User_Group_Hooks::groupCreate($_POST['group']);
+      $result = OC_User_Group_Admin_Util::createGroup( $_POST['group'] ) ;
       break;
     case "addmember":
       if ( isset($_POST['member'])) {
 	$result = OC_User_Group_Admin_Util::addToGroup( $_POST['member'] , $_POST['group'] );
-	$activity = OC_User_Group_Hooks::groupShare($_POST['group'], $_POST['member']);
 	}
       break;
     case "leavegroup":
@@ -64,7 +62,12 @@ if ( isset($_POST['group']) ) {
   		
   if ($result) {
     switch ($_POST['action']) {
+	case "addgroup":
+		$activity = OC_User_Group_Hooks::groupCreate($_POST['group']);
+		OCP\JSON::success();
+	break;
   	  case "addmember":  
+	$activity = OC_User_Group_Hooks::groupShare($_POST['group'], $_POST['member']);
         $tmpl = new OCP\Template("user_group_admin", "members");
         $tmpl->assign( 'group' , $_POST['group'] , false );
         $tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $_POST['group'] ) , false );
@@ -101,3 +104,4 @@ if ( isset($_POST['group']) ) {
 	}
   }
 }
+
