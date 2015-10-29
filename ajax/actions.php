@@ -32,7 +32,7 @@ OCP\JSON::callCheck();
 if ( isset($_POST['group']) ) {
   switch ($_POST['action']) {
     case "addgroup":
-      $result = OC_User_Group_Admin_Util::createGroup( $_POST['group'] ) ;
+      $result = OC_User_Group_Admin_Util::createGroup( $_POST['group'], OCP\USER::getUser () ) ;
       break;
     case "addmember":
       if ( isset($_POST['member'])) {
@@ -45,7 +45,7 @@ if ( isset($_POST['group']) ) {
 	$activity = OC_User_Group_Hooks::groupLeave($_POST['group'], $groupOwner);
       break;
     case "delgroup":
-      $result = OC_User_Group_Admin_Util::deleteGroup( $_POST['group'] ) ;
+      $result = OC_User_Group_Admin_Util::deleteGroup($_POST['group'], OCP\User::getUser()) ;
 	$activity = OC_User_Group_Hooks::groupDelete($_POST['group']);
       break;
     case "delmember":
