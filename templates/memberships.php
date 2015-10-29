@@ -1,26 +1,17 @@
 <?php
 $groupmembership=$_['group'];
 $members = OC_User_Group_Admin_Util::usersInGroup( $groupmembership ) ;
-$size = count($members);
-                $stmt = OC_DB::prepare( "SELECT `owner` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?" );
-                $result = $stmt->execute( array($groupmembership));
-                $owners = array();
-                while ($row = $result->fetchRow()) {
-                        $owners[] = $row['owner'];
-
-                }
-                foreach ($owners as $member) {
-			$name = OC_User_Group_Admin_Util::prepareUser($member);
-                echo "<li data-member=$member><i class=\"fa fa-user\"></i><span class='left'> $name </span>
-                        <span class='normaltext'><i>($member) </i></span><span class='ownertext' >Owner</span>
-                </li>" ;
-                }
-                ////////////////////////
-                foreach ($members as $member) {
-			$name = OC_User_Group_Admin_Util::prepareUser($member);
-                        echo "<br><li data-member=$member title=\"".OC_User::getDisplayName($member)."\"><i class=\"fa fa-user\"></i><span
+$owner = OC_User_Group_Admin_Util::groupOwner($groupmembership);
+$name = OC_User_Group_Admin_Util::prepareUser($owner);
+echo "<li data-member=$owner><i class=\"fa fa-user\"></i><span class='left'> $name </span>
+      <span class='normaltext'><i>($owner) </i></span><span class='ownertext' >Owner</span>
+      </li>" ;
+foreach ($members as $member) {
+	$uid = $member["uid"];
+	$name = OC_User_Group_Admin_Util::prepareUser($uid);
+        echo "<br><li data-member=$uid title=\"".OC_User::getDisplayName($uid)."\"><i class=\"fa fa-user\"></i><span
 class='left'>$name </span>
-                        <span class='normaltext'><i>($member)</i></span>
-                        </li>" ;
-                }
+               <span class='normaltext'><i>($uid)</i></span>
+               </li>" ;
+}
 

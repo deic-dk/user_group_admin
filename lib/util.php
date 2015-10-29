@@ -456,20 +456,32 @@ class OC_User_Group_Admin_Util {
 	 * @param int $offset        	
 	 * @return array with user ids
 	 */
-	public static function usersInGroup($gid, $search = '', $limit = null, $offset = null) {
-		$stmt = OC_DB::prepare ( 'SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` LIKE ? AND `owner` != ?', $limit, $offset );
-		$result = $stmt->execute ( array (
-				$gid,
-				$search . '%',
-				OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER 
-		) );
-		$users = array ();
-		while ( $row = $result->fetchRow () ) {
-			$users [] = $row ['uid'];
-		}
-		
-		return $users;
-	}
+	public static function dbUsersInGroup($gid, $search = '', $limit = null, $offset = null) {
+                $stmt = OC_DB::prepare ( 'SELECT `uid`, `verified` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` LIKE ? AND `owner` != ?', $limit, $offset );
+                $result = $stmt->execute ( array (
+                                $gid,
+                                $search . '%',
+                                OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER
+                ) );
+                $users = array ();
+                while ( $row = $result->fetchRow () ) {
+                        $users [] = array('uid' => $row ["uid"], 'status' => $row["verified"]);
+                }
+                return $users;
+        }
+
+        public static function usersInGroup($gid, $search = '', $limit = null, $offset = null) {
+                if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+                        $result = self::dbUsersInGroup($gid, $search, $limit, $offset);
+                        \OCP\Util::writeLog('user_group_admin', 'not enable ', 2);
+                }
+                else{
+                        $result = \OCA\FilesSharding\Lib::ws('getGroupUsers', array('gid'=>$gid),
+                                 false, true, null, 'user_group_admin');
+                        \OCP\Util::writeLog('user_group_admin', 'enable ', 2);
+                }
+                return $result;
+        }
 
 	public static function prepareUser($user) {
 		$displayName = \OCP\User::getDisplayName($user);
