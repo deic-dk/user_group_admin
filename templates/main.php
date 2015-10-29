@@ -69,7 +69,7 @@
 </thead>
 <tbody id='fileList'>
 <?php
-	$groups = OC_User_Group_Admin_Util::getOwnerGroups ( OC_User::getUser () ) ;	
+	$groups = OC_User_Group_Admin_Util::getOwnerGroups(OC_User::getUser () ) ;	
 	$groupmemberships = OC_User_Group_Admin_Util::getUserGroups ( OC_User::getUser () );
 	foreach ($groups as $group) {
 		echo "<tr id='owner' class=\"$group\"><td id=\"$group\" class='groupsname' name=\"$group\" data-group=\"$group\" style='height:34px' ><div class='row'><div class='col-xs-1 text-right '></div>
@@ -84,17 +84,21 @@
                 </div></td>";
             	echo "<td>Owner</td><td><a href='#' original-title='Delete' id='delete-group' class='action icon icon-trash-empty' style='text-decoration:none;color:#c5c5c5;font-size:16px;background-image:none'></a></td></tr>";
 	}
+
+	$count = 0;
 	foreach ($groupmemberships as $groupmembership) {
-	         $ingroup = OC_User_Group_Admin_Util::searchUser ( $groupmembership, OC_User::getUser (), '1' );	
-		if ($ingroup) {
-	         echo "<tr id='member' class=\"$groupmembership\"><td  id=\"$groupmembership\" class='groupsname' data-group=\"$groupmembership\" style='height:34px;' ><div class='row'><div class='col-xs-4 col-sm-1'></div>
+	       //  $ingroup = OC_User_Group_Admin_Util::searchUser ( $groupmembership, OC_User::getUser (), '1' );	
+		if ($groupmembership["status"] == 1) {
+	         $group = (string)$groupmembership["group"];
+		 $count++;
+	         echo "<tr id='member' class=\"$group\"><td  id=\"$group\" class='groupsname' data-group=\"$group\" style='height:34px;' ><div class='row'><div class='col-xs-4 col-sm-1'></div>
 		<div class='col-xs-8 filelink-wrap' style='padding-left:4px;'><a class='name'><i class='icon-users     deic_green icon'></i> 
-                <span class='nametext'>	$groupmembership</span></a></div>
+                <span class='nametext'>	$group</span></a></div>
 		</div></div>	
 		</td>";
-		$members = OC_User_Group_Admin_Util::usersInGroup( $groupmembership ) ;
+		$members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
 	        $size = count($members) + 1;	
-		echo "<td id='memberships' class=\"$groupmembership\"><div class='nomemberships'><span id='nomembers' >$size</span>
+		echo "<td id='memberships' class=\"$group\"><div class='nomemberships'><span id='nomembers' >$size</span>
  	        </div></td>";
 	
 		echo "<td>Member</td><td><a href='#' original-title='Delete' id='delete-group' class='action icon icon-trash-empty' style='text-decoration:none;color:#c5c5c5;font-size:16px;background-image:none'></a></td></tr>";
@@ -107,14 +111,7 @@
 		<td>
 			
 		       <span class="info"><?php
-			$memberships=array();
-		        foreach ($groupmemberships as $groupmembership) {
-				$ingroup = OC_User_Group_Admin_Util::searchUser ( $groupmembership, OC_User::getUser (), '1' );
-				if ($ingroup) {
-					array_push($memberships, $groupmembership);
-				}
-			}	
- 			echo count($groups)+count($memberships)." groups"; ?></span>
+ 			echo count($groups)+$count." groups"; ?></span>
 		</td>
 	</tr>
     
