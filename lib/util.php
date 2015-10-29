@@ -33,7 +33,7 @@ class OC_User_Group_Admin_Util {
 	 * @return bool Tries to create a new group. If the group name already exists, false will
 	 *         be returned.
 	 */
-	public static function createGroup($gid) {
+	public static function dbCreateGroup($gid, $uid) {
 		
 		// Check for existence
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?" );
@@ -55,10 +55,26 @@ class OC_User_Group_Admin_Util {
 		$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` ) VALUES( ? , ? )" );
 		$result = $stmt->execute ( array (
 				$gid,
-				OCP\USER::getUser ()
+				$uid	
 		) );
+		return $result;
+	}
+
+	public static function createGroup($gid, $uid) {
+
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			$result = OC_User_Group_Admin_Util::dbCreateGroup($gid, $uid );
+			\OCP\Util::writeLog('user_group_admin', 'notenable ', \OC_Log::WARN);
+		}
+		else{
+			$result = \OCA\FilesSharding\Lib::ws('newGroup', array('userid'=>$uid,
+					'name'=>$gid), false, true,
+					null, 'user_group_admin');
+			\OCP\Util::writeLog('user_group_admin', 'enable create group', \OC_Log::WARN);
+		}
 		return $result ? true : false;
 	}
+
 	public static function createHiddenGroup($gid) {
 		
 		// Check for existence
@@ -94,21 +110,32 @@ class OC_User_Group_Admin_Util {
 	 *        	gid of the group to delete
 	 * @return bool Deletes a group and removes it from the group_user-table
 	 */
-	public static function deleteGroup($gid) {
+	public static function dbDeleteGroup($gid, $uid) {
 		// Delete the group
 		$stmt = OC_DB::prepare ( "DELETE FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ? AND `owner` = ?" );
 		$stmt->execute ( array (
 				$gid,
-				OCP\USER::getUser () 
+				$uid 
 		) );
 		// Delete the group-user relation
 		$stmt = OC_DB::prepare ( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `owner` = ?" );
 		$stmt->execute ( array (
 				$gid,
-				OCP\USER::getUser () 
+				$uid 
 		) );
 		
 		return true;
+	}
+
+	public static function deleteGroup($gid, $uid) {
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			$result = self::dbDeleteGroup($gid, $uid);
+		}
+		else{
+			$result = \OCA\FilesSharding\Lib::ws('deleteGroup', array(
+					'name'=>$gid, 'userid'=>$uid),false, true, null, 'user_group_admin');
+		}
+		return $result;	
 	}
 	
 	/**
@@ -276,7 +303,7 @@ class OC_User_Group_Admin_Util {
 	 *        	Name of the group from which remove the user
 	 * @return bool removes the user from a group.
 	 */
-	public static function removeFromGroup($uid, $gid) {
+	public static function dbRemoveFromGroup($uid, $gid) {
 		$stmt = OC_DB::prepare ( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `gid` = ?" );
 		$stmt->execute ( array (
 				$uid,
@@ -284,6 +311,18 @@ class OC_User_Group_Admin_Util {
 		) );
 		
 		return true;
+	}
+
+	public static function removeFromGroup($uid, $gid) {
+		 if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+                        $result = self::dbDeleteGroup($gid, $uid);
+                }
+                else{
+                        $result = \OCA\FilesSharding\Lib::ws('leaveGroup', array(
+                                        'name'=>$gid, 'userid'=>$uid),false, true, null, 'user_group_admin');
+                }
+                return $result;
+
 	}
 	
 	/**
@@ -295,7 +334,7 @@ class OC_User_Group_Admin_Util {
 	 *         This function fetches all groups a user belongs to. It does not check
 	 *         if the user exists at all.
 	 */
-	public static function getUserGroups($uid) {
+	public static function dbGetUserGroups($name,$uid) {
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `owner` != ?" );
 		$result = $stmt->execute ( array (
 				$uid,
@@ -308,6 +347,19 @@ class OC_User_Group_Admin_Util {
 		}
 		
 		return $groups;
+	}
+
+	public static function getUserGroups($name,$userid) {
+		//if(!\OCP\App::isEnabled('files_sharding') ){
+			$result = self::dbGetUserGroups($name,$userid);
+	//		\OCP\Util::writeLog('user_group_admin', 'not enable ', 2);
+		//}
+		//else{
+			//$result = \OCA\FilesSharding\Lib::ws('searchGroups', array('name'=>urlencode($name),
+				//'userid'=>$userid), false, true, null, 'user_group_admin');
+			//\OCP\Util::writeLog('user_group_admin', 'enable ', 2);
+		//}
+		return $result;
 	}
 	
 	/**
