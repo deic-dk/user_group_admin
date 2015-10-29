@@ -315,7 +315,7 @@ class OC_User_Group_Admin_Util {
 
 	public static function removeFromGroup($uid, $gid) {
 		 if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-                        $result = self::dbDeleteGroup($gid, $uid);
+                        $result = self::dbRemoveFromGroup($uid,$gid);
                 }
                 else{
                         $result = \OCA\FilesSharding\Lib::ws('leaveGroup', array(
