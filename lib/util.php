@@ -324,7 +324,36 @@ class OC_User_Group_Admin_Util {
                 return $result;
 
 	}
-	
+        
+	public static function dbGetOwnerGroups($owner) {
+		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE  `owner` = ?" );
+                $result = $stmt->execute ( array (
+                               	$owner 
+                	) );
+
+                $groups = array ();
+                while ( $row = $result->fetchRow () ) {
+                        $groups [] = $row ["gid"];
+                }
+
+                return $groups;
+
+	}
+
+	public static function getOwnerGroups($owner) {
+		if (!\OCP\App::isEnabled('files_sharding')){
+			$result = self::dbGetOwnerGroups($owner);
+			\OCP\Util::writeLog('user_group_admin', 'not enable ', \OC_Log::WARN);
+		}else{
+			$server = \OCA\FilesSharding\Lib::getServerForUser($owner, true);
+		 	$result = \OCA\FilesSharding\Lib::ws('getOwnerGroups', Array('owner'=>$owner),
+				false, true, $server, 'user_group_admin');
+			\OCP\Util::writeLog('user_group_admin', 'WS groups:' , \OC_Log::WARN);
+		//	$result = array_unique(array_merge($result, $groups));
+		}
+		return $result;		
+	}	
+
 	/**
 	 * @brief Get all groups a user belongs to
 	 * 

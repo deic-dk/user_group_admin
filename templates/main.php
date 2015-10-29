@@ -69,7 +69,7 @@
 </thead>
 <tbody id='fileList'>
 <?php
-	$groups = $_['groups'] ;	
+	$groups = OC_User_Group_Admin_Util::getOwnerGroups ( OC_User::getUser () ) ;	
 	$groupmemberships = OC_User_Group_Admin_Util::getUserGroups ( OC_User::getUser () );
 	foreach ($groups as $group) {
 		echo "<tr id='owner' class=\"$group\"><td id=\"$group\" class='groupsname' name=\"$group\" data-group=\"$group\" style='height:34px' ><div class='row'><div class='col-xs-1 text-right '></div>
