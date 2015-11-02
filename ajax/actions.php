@@ -36,7 +36,7 @@ if ( isset($_POST['group']) ) {
       break;
     case "addmember":
       if ( isset($_POST['member'])) {
-	$result = OC_User_Group_Admin_Util::addToGroup( $_POST['member'] , $_POST['group'] );
+	$result = OC_User_Group_Admin_Util::addToGroup( $_POST['member'] , $_POST['group'], OCP\USER::getUser () );
 	}
       break;
     case "leavegroup":

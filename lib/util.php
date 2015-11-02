@@ -68,9 +68,9 @@ class OC_User_Group_Admin_Util {
 		}
 		else{
 			$result = \OCA\FilesSharding\Lib::ws('newGroup', array('userid'=>$uid,
-					'name'=>$gid), false, true,
+					'name'=>urlencode($gid)), false, true,
 					null, 'user_group_admin');
-			\OCP\Util::writeLog('user_group_admin', 'enable create group', \OC_Log::WARN);
+			\OCP\Util::writeLog('user_group_admin', 'ENABLE CREATE GROUP', \OC_Log::WARN);
 		}
 		return $result ? true : false;
 	}
@@ -133,7 +133,7 @@ class OC_User_Group_Admin_Util {
 		}
 		else{
 			$result = \OCA\FilesSharding\Lib::ws('deleteGroup', array(
-					'name'=>$gid, 'userid'=>$uid),false, true, null, 'user_group_admin');
+					'name'=>urlencode($gid), 'userid'=>$uid),false, true, null, 'user_group_admin');
 		}
 		return $result;	
 	}
@@ -166,9 +166,18 @@ class OC_User_Group_Admin_Util {
 	 *        	Name of the group in which add the user
 	 * @return bool Adds a user to a group.
 	 */
-	public static function addToGroup($uid, $gid) {
+	public static function dbAddToGroup($uid, $gid, $owner) {
+		$users = self::usersInGroup($gid);
+		$inGroup = false;	
+		foreach($users as $user) {
+			\OCP\Util::writeLog('user_group_admin', $user, \OC_Log::WARN);
+			if ($user["uid"]== $uid) {
+				$inGroup = true;
+				break;
+			}
+		}  
 		// No duplicate entries!
-		if (! OC_User_Group_Admin_Util::inGroup ( $uid, $gid )) {
+		if (!$inGroup) {
 			$accept = md5 ( $uid . time () );
 			$decline = $uid . time ();
 			$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `owner`, `verified`, `accept`, `decline`) VALUES( ?, ?, ?, ?, ?, ?)" );
@@ -176,7 +185,7 @@ class OC_User_Group_Admin_Util {
 				$stmt->execute ( array (
 						$gid,
 						$uid,
-						OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER,
+						$owner,
 						'1',
 						'',
 						''	
@@ -185,18 +194,29 @@ class OC_User_Group_Admin_Util {
 				$stmt->execute ( array (
 						$gid,
 						$uid,
-						OCP\USER::getUser (),
+						$owner,
 						'0',
 						$accept,
 						$decline
 				) );
-				OC_User_Group_Admin_Util::sendVerification ( $uid, $accept, $decline, $gid, OCP\USER::getDisplayName () );
+				OC_User_Group_Admin_Util::sendVerification ( $uid, $accept, $decline, $gid, $owner );
 			}
 			
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	public static function addToGroup($uid, $gid, $owner) {
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+                        $result = self::dbAddToGroup($uid, $gid, $owner);
+                }
+                else{
+                        $result = \OCA\FilesSharding\Lib::ws('newMember', array(
+                                        'name'=>urlencode($gid), 'userid'=>$uid, 'owner'=>$owner),false, true, null, 'user_group_admin');
+                }
+                return true;	
 	}
 	
 	/**
@@ -231,7 +251,7 @@ class OC_User_Group_Admin_Util {
 	/**
 	 * Update the database if the user declines the invitation.
 	 */
-	public static function declineInvitation($uid, $gid) {
+	public static function declineInvitation($gid, $uid) {
 		$query = OC_DB::prepare ( "UPDATE `*PREFIX*user_group_admin_group_user` SET `verified` = '2' WHERE `uid` = ? AND `gid` = ? " );
 		$result = $query->execute ( array (
 				$uid,
@@ -239,50 +259,6 @@ class OC_User_Group_Admin_Util {
 		) );
 		
 		return $result;
-	}
-	
-	/**
-	 * Check whether a user has accepted the invitation or not.
-	 */
-	public static function searchUser($gid, $uid, $verified) {
-		$stmt = OC_DB::prepare ( "SELECT `verified` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ?  " );
-		$result = $stmt->execute ( array (
-				$gid,
-				$uid,
-				$verified 
-		) );
-		
-		return $result->fetchRow () ? true : false;
-	}
-	
-	/**
-	 * Check if a user has accepted the invitation via mail.
-	 */
-	public static function acceptedUser($gid, $uid, $verified, $accept) {
-		$stmt = OC_DB::prepare ( "SELECT `accept` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ? AND `accept` = ? " );
-		$result = $stmt->execute ( array (
-				$gid,
-				$uid,
-				$verified,
-				$accept
-		) );
-		
-		return $result->fetchRow () ? true : false;
-	}
-	
-	/**
-	 * Check if a user has declined the invitation via email.
-	 */
-	public static function declinedUser($gid, $uid, $verified, $decline) {
-		$stmt = OC_DB::prepare ( "SELECT `decline` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` = ? AND `decline` = ? " );
-		$result = $stmt->execute ( array (
-				$gid,
-				$uid,
-				$verified,
-				$decline
-		) );
-		
-		return $result->fetchRow () ? true : false;
 	}
 	
  	public static function groupOwner($gid) {
@@ -319,7 +295,7 @@ class OC_User_Group_Admin_Util {
                 }
                 else{
                         $result = \OCA\FilesSharding\Lib::ws('leaveGroup', array(
-                                        'name'=>$gid, 'userid'=>$uid),false, true, null, 'user_group_admin');
+                                        'name'=>urlencode($gid), 'userid'=>$uid),false, true, null, 'user_group_admin');
                 }
                 return $result;
 
@@ -343,13 +319,11 @@ class OC_User_Group_Admin_Util {
 	public static function getOwnerGroups($owner) {
 		if (!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
 			$result = self::dbGetOwnerGroups($owner);
-			\OCP\Util::writeLog('user_group_admin', 'not enable ', \OC_Log::WARN);
 		}else{
 			//TODO
 			$server = \OCA\FilesSharding\Lib::getServerForUser($owner, true);
 		 	$result = \OCA\FilesSharding\Lib::ws('getOwnerGroups', Array('owner'=>$owner),
 				false, true, null, 'user_group_admin');
-			\OCP\Util::writeLog('user_group_admin', 'WS groups:' , \OC_Log::WARN);
 		//	$result = array_unique(array_merge($result, $groups));
 		}
 		return $result;		
@@ -365,7 +339,7 @@ class OC_User_Group_Admin_Util {
 	 *         if the user exists at all.
 	 */
 	public static function dbGetUserGroups($uid) {
-		$stmt = OC_DB::prepare ( "SELECT `gid`, `verified` FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `owner` != ? " );
+		$stmt = OC_DB::prepare ( "SELECT `gid`, `verified`, `accept`, `decline` FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `owner` != ? " );
 		$result = $stmt->execute ( array (
 				$uid,
 				OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER
@@ -373,7 +347,7 @@ class OC_User_Group_Admin_Util {
 		
 		$groups = array ();
 		while ( $row = $result->fetchRow () ) {
-			$groups [] = array('group' => $row ["gid"], 'status' => $row["verified"]);
+			$groups [] = array('group' => $row ["gid"], 'status' => $row["verified"], 'accept' => $row["accept"], 'decline' => $row["decline"]);
 		}
 		
 		return $groups;
@@ -382,12 +356,10 @@ class OC_User_Group_Admin_Util {
 	public static function getUserGroups($userid) {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
 			$result = self::dbGetUserGroups($userid);
-			\OCP\Util::writeLog('user_group_admin', 'not enable ', 2);
 		}
 		else{
 			$result = \OCA\FilesSharding\Lib::ws('getUserGroups', array('userid'=>$userid),
 				 false, true, null, 'user_group_admin');
-			\OCP\Util::writeLog('user_group_admin', 'enable ', 2);
 		}
 		return $result;
 	}
@@ -457,7 +429,8 @@ class OC_User_Group_Admin_Util {
 	 * @return array with user ids
 	 */
 	public static function dbUsersInGroup($gid, $search = '', $limit = null, $offset = null) {
-                $stmt = OC_DB::prepare ( 'SELECT `uid`, `verified` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` LIKE ? AND `owner` != ?', $limit, $offset );
+		\OCP\Util::writeLog('USER_GROUP_ADMIN', 'group: '.$gid, 2);
+                $stmt = OC_DB::prepare ( 'SELECT `uid`, `verified`, `owner` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` LIKE ? AND `owner` != ?', $limit, $offset );
                 $result = $stmt->execute ( array (
                                 $gid,
                                 $search . '%',
@@ -465,7 +438,7 @@ class OC_User_Group_Admin_Util {
                 ) );
                 $users = array ();
                 while ( $row = $result->fetchRow () ) {
-                        $users [] = array('uid' => $row ["uid"], 'status' => $row["verified"]);
+                        $users [] = array('uid' => $row ["uid"], 'status' => $row["verified"], 'owner' => $row["owner"]);
                 }
                 return $users;
         }
@@ -473,21 +446,32 @@ class OC_User_Group_Admin_Util {
         public static function usersInGroup($gid, $search = '', $limit = null, $offset = null) {
                 if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
                         $result = self::dbUsersInGroup($gid, $search, $limit, $offset);
-                        \OCP\Util::writeLog('user_group_admin', 'not enable ', 2);
                 }
                 else{
-                        $result = \OCA\FilesSharding\Lib::ws('getGroupUsers', array('gid'=>$gid),
+                        $result = \OCA\FilesSharding\Lib::ws('getGroupUsers', array('gid'=>urlencode($gid)),
                                  false, true, null, 'user_group_admin');
-                        \OCP\Util::writeLog('user_group_admin', 'enable ', 2);
                 }
                 return $result;
         }
 
 	public static function prepareUser($user) {
-		$displayName = \OCP\User::getDisplayName($user);
-		$param = \OCP\Util::sanitizeHTML($user);
-		$displayName = \OCP\Util::sanitizeHTML($displayName);
-		return '<div class="avatar" data-user="' . $param . '"></div>'. '<strong style="font-size:92%">' . $displayName . '</strong>';
-	}
+                $param = \OCP\Util::sanitizeHTML($user);
+                if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+                        $displayName = \OCP\User::getDisplayName($user);
+                        $name = \OCP\Util::sanitizeHTML($displayName);
+                }
+                else{
+                        $displayName = \OCA\FilesSharding\Lib::ws('getDisplayNames', array('search'=>$user),
+                                 false, true, null, 'files_sharding');
+
+                        foreach ($displayName as $name) {
+                                $name = \OCP\Util::sanitizeHTML($name);
+                        }
+                        
+                }
+
+                return '<div class="avatar" data-user="' . $param . '"></div>'. '<strong style="font-size:92%">' . $name . '</strong>';
+        }
+
 }
 

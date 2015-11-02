@@ -92,42 +92,51 @@ class Activity implements IExtension {
 	 * @return string|false
 	 */
 	public function translate($app, $text, $params, $stripPath, $highlightParams, $languageCode) {
-		if ($app !== 'user_group_admin') {
-			return false;
-		}
-		$preparedParams = $this->prepareParameters('user_group_admin',
+                if ($app !== 'user_group_admin') {
+                        return false;
+                }
+                $preparedParams = $this->prepareParameters('user_group_admin',
                                 $params, $this->getSpecialParameterList('user_group_admin', $text),
                                 $stripPath, $highlightParams
                         );
+                        $groups = OC_User_Group_Admin_Util::getUserGroups ( OC_User::getUser () );
+                        foreach ( $groups as $group ) {
+                                $groupname = $group["group"];
+                                if ($groupname == $params[0]) {
+                                        $status = $group["status"];
+                                        break;
+                                }
+                        }
+                        //$isNotified =  OC_User_Group_Admin_Util::searchUser($params[0], \OCP\User::getUser(), '0');
+                        //$hasAccepted = OC_User_Group_Admin_Util::searchUser($params[0], \OCP\User::getUser(), '1');
+                        //$hasDeclined = OC_User_Group_Admin_Util::searchUser($params[0], \OCP\User::getUser(), '2');
 
-			$isNotified =  OC_User_Group_Admin_Util::searchUser($params[0], \OCP\User::getUser(), '0');
-			$hasAccepted = OC_User_Group_Admin_Util::searchUser($params[0], \OCP\User::getUser(), '1');
-			$hasDeclined = OC_User_Group_Admin_Util::searchUser($params[0], \OCP\User::getUser(), '2');
+                switch ($text) {
+                        case 'created_self':
+                                return (string) $this->l->t('You created group %1$s', $preparedParams);
+                        case 'deleted_self':
+                                return (string) $this->l->t('You deleted group %1$s', $preparedParams);
+                        case 'shared_user_self':
+                                return (string) $this->l->t('You invited %2$s to group %1$s', $preparedParams);
+                        case 'shared_with_by':
+                                if ($status == 0) {
+                                        //array_push($preparedParams, $params[0]);
+                                        return (string) $this->l->t('You have been invited to group %1$s by %2$s<div id="invite_div" style="display:none"><a href="#" id="accept" class="btn btn-default btn-
+flat" value =\'%1$s\'  >Accept</a>&nbsp<a href="#" class="btn btn-default btn-flat" id="decline" value = \'%1$s\'>Decline</a></div>', $preparedParams );
+                                }else if ($status == 1) {
+                                        return (string) $this->l->t('You joined group %1$s', $preparedParams);
+                                }else if ($status == 2) {
+                                        return (string) $this->l->t('You rejected an invitation to group %1$s', $preparedParams);
+                                }else {
+                                        return (string) $this->l->t('Group invitation to %1$s', $preparedParams);
+                                }
+                        case 'deleted_by':
+                                return (string) $this->l->t('%2$s left group %1$s', $preparedParams);
+                        default:
+                                return false;
+                }
+        }
 
-		switch ($text) {
-			case 'created_self':
-				return (string) $this->l->t('You created group %1$s', $preparedParams);
-			case 'deleted_self':
-				return (string) $this->l->t('You deleted group %1$s', $preparedParams);
-			case 'shared_user_self':
-				return (string) $this->l->t('You invited %2$s to group %1$s', $preparedParams);
-			case 'shared_with_by':
-				if ($isNotified) {
-					//array_push($preparedParams, $params[0]);
-					return (string) $this->l->t('You have been invited to group %1$s by %2$s<div id="invite_div" style="display:none"><a href="#" id="accept" class="btn btn-default btn-flat" value =\'%1$s\'  >Accept</a>&nbsp<a href="#" class="btn btn-default btn-flat" id="decline" value = \'%1$s\'>Decline</a></div>', $preparedParams );
-				}else if ($hasAccepted) {
-					return (string) $this->l->t('You joined group %1$s', $preparedParams);
-				}else if ($hasDeclined) {
-					return (string) $this->l->t('You rejected an invitation to group %1$s', $preparedParams);
-				}else {
-					return (string) $this->l->t('Group invitation to %1$s', $preparedParams);
-				}
-		        case 'deleted_by':
-				return (string) $this->l->t('%2$s left group %1$s', $preparedParams);	
-			default:
-				return false;
-		}
-	}
 	/**
 	 * The extension can define the type of parameters for translation
 	 *

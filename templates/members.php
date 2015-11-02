@@ -17,7 +17,7 @@ echo "<li data-member=$owner title=\"".OC_User::getDisplayName($owner)."\" ><i c
                         $status = '<i style ="color:#F44336">Member declined the invitation';
                 }
                 $name = OC_User_Group_Admin_Util::prepareUser($uid);
-                echo "<li data-member=$uid title=\"".OC_User::getDisplayName($uid)."\" ><span class='left'>$name </span>
+                echo "<li data-member=$uid title=\"".\OCP\User::getDisplayName($uid)."\" ><span class='left'>$name </span>
 		<span class='normaltext'><i>($uid)</i></span>
                 <span class=\"member-actions\" id='spanaction'>
                     <a href=# class='removemember' original-title=" . $l->t('Remove') . "><i class=\"icon icon-cancel-circled\" style='color:#006b93; display:inline'></i></a>

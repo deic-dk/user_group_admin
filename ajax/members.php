@@ -37,7 +37,14 @@ if (isset($_GET['search'])) {
     $offset = 0;
     while ($count < 4 && count($users) == $limit) {
         $limit = 4 - $count;
-        $users = OC_User::getDisplayNames($_GET['search'], $limit, $offset);
+	if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+                        $users = OC_User::getDisplayNames($_GET['search'], $limit, $offset);
+                }
+                else{
+                        $users = \OCA\FilesSharding\Lib::ws('getDisplayNames', array('search'=>$_GET['search'], 'limit'=>$limit, 'offset'=>$offset),
+                                 false, true, null, 'files_sharding');
+                }
+
         $offset += $limit;
         foreach ($users as $user => $name) {
             if ((!isset($_GET['itemShares']) || !is_array($_GET['itemShares'][OCP\Share::SHARE_TYPE_USER]) || !in_array($user, $_GET['itemShares'][OCP\Share::SHARE_TYPE_USER])) && $user != OC_User::getUser()) {
@@ -49,3 +56,4 @@ if (isset($_GET['search'])) {
 
     OC_JSON::success(array('data' => $shareWith));
 }
+
