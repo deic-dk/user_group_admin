@@ -7,12 +7,11 @@ OCP\JSON::callCheck();
 
 
 $group = $_POST['group'];
-   //ioanna
 
 if($_POST['action'] == "acceptinvitation") {
-        $result = OC_User_Group_Admin_Util::acceptInvitation($group, OCP\USER::getUser());
+        $result = OC_User_Group_Admin_Util::updateStatus($group, OCP\USER::getUser(), 1);
 } elseif($_POST['action'] == "declineinvitation") {
-        $result = OC_User_Group_Admin_Util::declineInvitation($group, OCP\USER::getUser());
+        $result = OC_User_Group_Admin_Util::updateStatus($group, OCP\USER::getUser(), 2);
 }
 ?>
 
