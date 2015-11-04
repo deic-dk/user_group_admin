@@ -1,6 +1,6 @@
 <?php
 
-OCP\JSON::checkAppEnabled('files_accounting');
+OCP\JSON::checkAppEnabled('user_group_admin');
 OCP\JSON::checkAppEnabled('files_sharding');
 
 if(!OCA\FilesSharding\Lib::checkIP()){

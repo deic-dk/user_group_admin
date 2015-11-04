@@ -1,24 +1,5 @@
 <?php
-/**
- * @author Joas Schilling <nickvergessen@owncloud.com>
- * @author Morris Jobke <hey@morrisjobke.de>
- *
- * @copyright Copyright (c) 2015, ownCloud, Inc.
- * @license AGPL-3.0
- *
- * This code is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License, version 3,
- * as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License, version 3,
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
- *
- */
+
 use OC\L10N\Factory;
 use OCP\Activity\IExtension;
 use OCP\Activity\IManager;
@@ -92,56 +73,47 @@ class Activity implements IExtension {
 	 * @return string|false
 	 */
 	public function translate($app, $text, $params, $stripPath, $highlightParams, $languageCode) {
-                if ($app !== 'user_group_admin') {
-                        return false;
-                }
-                $preparedParams = $this->prepareParameters('user_group_admin',
+		if ($app !== 'user_group_admin') {
+			return false;
+		}
+		$preparedParams = $this->prepareParameters('user_group_admin',
                                 $params, $this->getSpecialParameterList('user_group_admin', $text),
                                 $stripPath, $highlightParams
                         );
-                        $groups = OC_User_Group_Admin_Util::getUserGroups ( OC_User::getUser () );
-                        foreach ( $groups as $group ) {
-                                $groupname = $group["group"];
-                                if ($groupname == $params[0]) {
-                                        $status = $group["status"];
-                                        break;
-                                }
-                        }
-                        //$isNotified =  OC_User_Group_Admin_Util::searchUser($params[0], \OCP\User::getUser(), '0');
-                        //$hasAccepted = OC_User_Group_Admin_Util::searchUser($params[0], \OCP\User::getUser(), '1');
-                        //$hasDeclined = OC_User_Group_Admin_Util::searchUser($params[0], \OCP\User::getUser(), '2');
-
-                switch ($text) {
-                        case 'created_self':
-                                return (string) $this->l->t('You created group %1$s', $preparedParams);
-                        case 'deleted_self':
-                                return (string) $this->l->t('You deleted group %1$s', $preparedParams);
-                        case 'shared_user_self':
-                                return (string) $this->l->t('You invited %2$s to group %1$s', $preparedParams);
-                        case 'shared_with_by':
-                                if ($status == 0) {
-                                        //array_push($preparedParams, $params[0]);
-                                        return (string) $this->l->t('You have been invited to group %1$s by %2$s<div id="invite_div" style="display:none"><a href="#" id="accept" class="btn btn-default btn-
-flat" value =\'%1$s\'  >Accept</a>&nbsp<a href="#" class="btn btn-default btn-flat" id="decline" value = \'%1$s\'>Decline</a></div>', $preparedParams );
-                                }else if ($status == 1) {
-                                        return (string) $this->l->t('You joined group %1$s', $preparedParams);
-                                }else if ($status == 2) {
-                                        return (string) $this->l->t('You rejected an invitation to group %1$s', $preparedParams);
-                                }else {
-                                        return (string) $this->l->t('Group invitation to %1$s', $preparedParams);
-                                }
-                        case 'deleted_by':
-                                return (string) $this->l->t('%2$s left group %1$s', $preparedParams);
-                        default:
-                                return false;
-                }
-        }
-
+		$groupInfo = OC_User_Group_Admin_Util::searchGroup($params[0], OC_User::getUser ());
+		if (isset($groupInfo)) {
+			$groupStatus = $groupInfo["status"];
+		}else {
+			$groupStatus = 3;
+		}
+		switch ($text) {
+			case 'created_self':
+				return (string) $this->l->t('You created group %1$s', $preparedParams);
+			case 'deleted_self':
+				return (string) $this->l->t('You deleted group %1$s', $preparedParams);
+			case 'shared_user_self':
+				return (string) $this->l->t('You invited %2$s to group %1$s', $preparedParams);
+			case 'shared_with_by':
+				if ($groupStatus == 0) {
+					return (string) $this->l->t('You have been invited to group %1$s by %2$s<div id="invite_div" style="display:none"><a href="#" id="accept" class="btn btn-default btn-flat" value =\'%1$s\'  >Accept</a>&nbsp<a href="#" class="btn btn-default btn-flat" id="decline" value = \'%1$s\'>Decline</a></div>', $preparedParams );
+				}else if ($groupStatus == 1) {
+					return (string) $this->l->t('You joined group %1$s', $preparedParams);
+				}else if ($groupStatus == 2) {
+					return (string) $this->l->t('You rejected an invitation to group %1$s', $preparedParams);
+				}else {
+					return (string) $this->l->t('Group invitation to %1$s', $preparedParams);
+				}
+		        case 'deleted_by':
+				return (string) $this->l->t('%2$s left group %1$s', $preparedParams);	
+			default:
+				return false;
+		}
+	}
 	/**
 	 * The extension can define the type of parameters for translation
 	 *
 	 * Currently known types are:
-	 * * file		=> will strip away the path of the file and add a tooltip with it
+	 * * file		=> will add a tooltip with group name 
 	 * * username	=> will add the avatar of the user
 	 *
 	 * @param string $app
@@ -199,14 +171,14 @@ flat" value =\'%1$s\'  >Accept</a>&nbsp<a href="#" class="btn btn-default btn-fl
 		$parameterList = $plainParameterList = array();
 		foreach ($params as $parameter) {
 			if ($paramType === 'file') {
-				$parameterList[] = (string) $this->prepareFileParam($app, $parameter, $stripPath, $highlightParams);
-				$plainParameterList[] = (string) $this->prepareFileParam($app, $parameter, false, false);
+				$parameterList[] =  $this->prepareFileParam($app, $parameter, $stripPath, $highlightParams);
+				$plainParameterList[] =  $this->prepareFileParam($app, $parameter, false, false);
 			} else {
-				$parameterList[] = (string) $this->prepareParam($app, $parameter, $highlightParams);
-				$plainParameterList[] = (string) $this->prepareParam($app, $parameter, false);
+				$parameterList[] =  $this->prepareParam($app, $parameter, $highlightParams);
+				$plainParameterList[] =  $this->prepareParam($app, $parameter, false);
 			}
 		}
-		return (string) $this->joinParameterList($parameterList, $plainParameterList, $highlightParams);
+		return $this->joinParameterList($parameterList, $plainParameterList, $highlightParams);
 	}
 	/**
 	 * Prepares a parameter for usage by adding highlights
@@ -243,12 +215,12 @@ flat" value =\'%1$s\'  >Accept</a>&nbsp<a href="#" class="btn btn-default btn-fl
 		}
 	}
 	/**
-	 * Prepares a file parameter for usage
+	 * Prepares group parameter for usage
 	 *
-	 * Removes the path from filenames and adds highlights
+	 * Adds highlights to groupname
 	 *
 	 * @param string $param
-	 * @param bool $stripPath Shall we remove the path from the filename
+	 * @param bool $stripPath Shall we remove the path from the groupname
 	 * @param bool $highlightParams
 	 * @return string
 	 */
@@ -315,7 +287,6 @@ flat" value =\'%1$s\'  >Accept</a>&nbsp<a href="#" class="btn btn-default btn-fl
 
 	/**
 	 * A string naming the css class for the icon to be used can be returned.
-	 * If no icon is known for the given type false is to be returned.
 	 *
 	 * @param string $type
 	 * @return string|false
