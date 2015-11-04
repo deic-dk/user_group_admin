@@ -1,10 +1,7 @@
-<?php
-use \OCP\Util;
-//OC::$CLASSPATH['UserSettings'] = OC::$SERVERROOT.'/apps/activity/lib/usersettings.php';
-//OC::$CLASSPATH['Data']    = OC::$SERVERROOT.'/apps/activity/lib/data.php';
+e \OCP\Util;
 
 class OC_User_Group_Hooks {
-		public static function register() {
+	public static function register() {
 		\OCP\Util::connectHook('OC_Activity', 'post_create', 'OC_User_Group_Hooks', 'groupCreate');
 		\OCP\Util::connectHook('OC_Activity', 'delete', 'OC_User_Group_Hooks', 'groupDelete');
 		\OCP\Util::connectHook('OC_Activity', 'post_shared', 'OC_User_Group_Hooks', 'groupShare');
@@ -61,20 +58,20 @@ class OC_User_Group_Hooks {
 	}
 
 	protected static function addNotificationsForUser($user, $auser, $subject, $path, $isFile, $streamSetting, $emailSetting, $priority , $type ) {
-		$link = ''; 
+		$link = "/index.php/apps/user_group_admin"; 
 	        $app = 'user_group_admin';	
 		if ($streamSetting) {
 			if ($subject == 'shared_user_self') {
-				\OCA\Activity\Data::send($app, $subject, $path, '', array(), '', '', $user, $type, 40);
-				\OCA\Activity\Data::send($app, 'shared_with_by', array($path[0],$user), '', array(), '', '', $auser, $type, 40); 
+				\OCA\Activity\Data::send($app, $subject, $path, '', array(), '', $link, $user, $type, 40);
+				\OCA\Activity\Data::send($app, 'shared_with_by', array($path[0],$user), '', array(), '', $link, $auser, $type, 40); 
 
 			}else if ($subject == 'deleted_self') {
-				\OCA\Activity\Data::send($app, $subject, array($path), '', array(), '', '', $auser,$type, 40); 
+				\OCA\Activity\Data::send($app, $subject, array($path), '', array(), '', $link, $auser,$type, 40); 
         	 	}else if ($subject == 'deleted_by'){
-				\OCA\Activity\Data::send($app, 'deleted_self', $path, '', array(), '', '', $user, $type, 40);
-				\OCA\Activity\Data::send($app, $subject, array($path[0],$user), '', array(), '', '', $auser, $type, 40);   
+				\OCA\Activity\Data::send($app, 'deleted_self', $path, '', array(), '', $link, $user, $type, 40);
+				\OCA\Activity\Data::send($app, $subject, array($path[0],$user), '', array(), '', $link, $auser, $type, 40);   
 			}else {
-				\OCA\Activity\Data::send($app, $subject, array($path), '', array(), '', '', $auser, $type, 40);
+				\OCA\Activity\Data::send($app, $subject, array($path), '', array(), '', $link, $auser, $type, 40);
 			}
 		}
 		if ($emailSetting) {
@@ -95,4 +92,5 @@ class OC_User_Group_Hooks {
 
 
 }
+
 
