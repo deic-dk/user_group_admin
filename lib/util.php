@@ -167,15 +167,12 @@ class OC_User_Group_Admin_Util {
 	 * @return bool Adds a user to a group.
 	 */
 	public static function dbAddToGroup($uid, $gid, $owner) {
-		$users = self::usersInGroup($gid);
-		$inGroup = false;	
-		foreach($users as $user) {
-			\OCP\Util::writeLog('user_group_admin', $user, \OC_Log::WARN);
-			if ($user["uid"]== $uid) {
-				$inGroup = true;
-				break;
-			}
-		}  
+		$group = self::searchGroup($gid, $uid);
+		if (isset($group)) {
+			$inGroup = true;
+		}else {
+			$inGroup = false;
+		}
 		// No duplicate entries!
 		if (!$inGroup) {
 			$accept = md5 ( $uid . time () );
@@ -223,6 +220,17 @@ class OC_User_Group_Admin_Util {
 	 * Send invitation mail to a user.
 	 */
 	public static function sendVerification($uid, $accept, $decline, $gid, $owner) {
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+                        $owner = \OCP\User::getDisplayName($owner);
+                }
+                else{
+                        $displayName = \OCA\FilesSharding\Lib::ws('getDisplayNames', array('search'=>$owner),
+                                 false, true, null, 'files_sharding');
+
+                        foreach ($displayName as $name) {
+                                $owner = $name;
+                        }
+                }
 		$to = $uid;
 		$name = OCP\User::getDisplayName($uid);
 	        $url = 	OCP\Config::getAppValue('user_group_admin', 'appurl', '');
@@ -237,21 +245,21 @@ class OC_User_Group_Admin_Util {
 	}
 
 	public static function dbSearchGroup($gid, $uid){
-		$stmt = OC_DB::prepare ( "SELECT `owner`, `verified`  FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? " );
-		$result = $stmt->execute ( array (
-				$gid,
-				$uid
-		) );
+                $stmt = OC_DB::prepare ( "SELECT `owner`, `verified`  FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? " );
+                $result = $stmt->execute ( array (
+                                $gid,
+                                $uid
+                ) );
                 while ( $row = $result->fetchRow () ) {
                         $groupInfo =  array('owner' => $row ["owner"], 'status' => $row["verified"]);
                 }
-		if (!isset($groupInfo)) {
-			return null;
-		}else {
-			return $groupInfo;
-		}
+                if (!isset($groupInfo)) {
+                        return null;
+                }else {
+                        return $groupInfo;
+                }
 
-	}
+        }
 
 	public static function searchGroup($gid, $uid) {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){

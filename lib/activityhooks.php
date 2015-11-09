@@ -1,4 +1,5 @@
-e \OCP\Util;
+<?php
+use \OCP\Util;
 
 class OC_User_Group_Hooks {
 	public static function register() {

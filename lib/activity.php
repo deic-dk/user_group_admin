@@ -344,11 +344,6 @@ class Activity implements IExtension {
 	 * @return array|false
 	 */
 	public function getQueryForFilter($filter) {
-		$user = $this->activityManager->getCurrentUserId();
-		return ['`app` = ?', ['user_group_admin']];
-		if (!$user) {
-			return false;
-		}
 		return false;
 	}
 }
