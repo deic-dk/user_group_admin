@@ -6,8 +6,8 @@
  * @author Christian Brinch
  * @copyright 2014 Christian Brinch, DeIC, <christian.brinch@deic.dk>
  *
- * @author Jorge Rafael García Ramos
- * @copyright 2012 Jorge Rafael García Ramos <kadukeitor@gmail.com>
+ * @author Jorge Rafael Garc\xc3\xada Ramos
+ * @copyright 2012 Jorge Rafael Garc\xc3\xada Ramos <kadukeitor@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -30,11 +30,12 @@ OCP\App::checkAppEnabled('user_group_admin');
 $group = isset($_GET['group']) ? $_GET['group'] : null;
 
 if ( isset($group) ) {
-    
+   
     header('Content-Type: application/octet-stream');
     header('Content-Disposition: inline; filename=' . str_replace(' ', '_', $group) . '.ocg');
 
     $members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
+    $members = array_column($members, 'uid');
     $data    = array_merge( array($group) , $members ) ;
 
     echo serialize($data) ;
