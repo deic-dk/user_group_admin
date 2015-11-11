@@ -14,31 +14,53 @@ class OC_User_Group_Hooks {
 		});
 	}
 
-	public static function groupCreate($params) {
+	public static function groupCreate($group, $uid) {
+		$params = array($group, $uid);
 		OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'created_self', 'created_by');		
 	}
-	public static function groupDelete($params) {
+	public static function groupDelete($group, $uid) {
+		$params = array($group, $uid);
 		OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'deleted_self', 'deleted_by');
 	}
-	public static function groupShare($group, $uid) {
-		$params = array($group, $uid);
-	 	OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'shared_user_self', 'shared_with_by');	
+	public static function dbGroupShare($group, $uid, $owner) {
+		$params = array($group, $uid, $owner);
+                OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'shared_user_self', 'shared_with_by');
 	}
-	public static function groupLeave($group, $uid) {
-		$params = array($group, $uid);
-		OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'deleted_by', 'deleted_by');
+	public static function groupShare($group, $uid, $owner) {
+                if(!\OCP\App::isEnabled('files_sharding')){
+                        $result = self::dbGroupShare($group, $uid, $owner);
+                }else {
+                	$server = \OCA\FilesSharding\Lib::getServerForUser($uid, true);
+                	$result = \OCA\FilesSharding\Lib::ws('groupShare', array('group'=>urlencode($group), 'userid'=>$uid, 'owner'=>$owner),
+                                 false, true, $server, 'user_group_admin');
+		}
+                return $result;
+        }
+	public static function dbGroupLeave($group, $uid, $owner){
+		$params = array($group, $uid, $owner);
+                OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'deleted_by', 'deleted_by');
+	}
+	public static function groupLeave($group, $uid, $owner) {
+		//if(!\OCP\App::isEnabled('files_sharding')){
+                        $result = self::dbGroupLeave($group, $uid, $owner);
+                //}else {
+                  //      $server = \OCA\FilesSharding\Lib::getServerForUser($uid, true);
+                    //    $result = \OCA\FilesSharding\Lib::ws('groupLeave', array('group'=>urlencode($group), 'userid'=>$uid, 'owner'=>$owner),
+                      //           false, true, $server, 'user_group_admin');
+                //}
+                return $result;
 	}
 	public static function addNotificationsForGroupAction( $group, $activityType, $subject, $subjectBy) {
 		if ($subject == 'shared_user_self') {
 			$auser = $group[1];
-			$user = OCP\USER::getUser ();
+			$user = $group[2];
 		}else {	
 			if ($subject == 'deleted_by') {
-				$auser = $group[1];
-				$user = OCP\USER::getUser ();
+				$auser = $group[2];
+				$user = $group[1];
 			}else {
-				$user = OCP\USER::getUser ();
-				$auser = OCP\USER::getUser ();
+				$user = $group[1];
+				$auser = $group[1];
 			}
 		}
 		$userSubject = $subject;
@@ -63,16 +85,16 @@ class OC_User_Group_Hooks {
 	        $app = 'user_group_admin';	
 		if ($streamSetting) {
 			if ($subject == 'shared_user_self') {
-				\OCA\Activity\Data::send($app, $subject, $path, '', array(), '', $link, $user, $type, 40);
-				\OCA\Activity\Data::send($app, 'shared_with_by', array($path[0],$user), '', array(), '', $link, $auser, $type, 40); 
+				self::send($app, $subject, $path, '', array(), '', $link, $user, $user, $type, 40);
+				self::send($app, 'shared_with_by', array($path[0],$user), '', array(), '', $link, $user, $auser, $type, 40); 
 
 			}else if ($subject == 'deleted_self') {
-				\OCA\Activity\Data::send($app, $subject, array($path), '', array(), '', $link, $auser,$type, 40); 
+				self::send($app, $subject, array($path[0]), '', array(), '', $link, $user, $auser,$type, 40); 
         	 	}else if ($subject == 'deleted_by'){
-				\OCA\Activity\Data::send($app, 'deleted_self', $path, '', array(), '', $link, $user, $type, 40);
-				\OCA\Activity\Data::send($app, $subject, array($path[0],$user), '', array(), '', $link, $auser, $type, 40);   
+				self::send($app, 'deleted_self', array($path[0]), '', array(), '', $link, $user, $user, $type, 40);
+				//self::send($app, $subject, array($path[0],$user), '', array(), '', $link, $user, $auser, $type, 40);   
 			}else {
-				\OCA\Activity\Data::send($app, $subject, array($path), '', array(), '', $link, $auser, $type, 40);
+				self::send($app, $subject, array($path[0]), '', array(), '', $link, $user, $auser, $type, 40);
 			}
 		}
 		if ($emailSetting) {
@@ -90,6 +112,21 @@ class OC_User_Group_Hooks {
 			}
 		}		 
 	}
+
+	public static function send($app, $subject, $subjectparams = array(), $message = '', $messageparams = array(), $file = '', $link = '', $user = '', $affecteduser = '', $type = '', $prio = Data::PRIORITY_MEDIUM) {
+		$timestamp = time();
+
+		// store in DB
+		$query = \OCP\DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`)' . ' VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
+		$query->execute(array($app, $subject, serialize($subjectparams), $message, serialize($messageparams), $file, $link, $user, $affecteduser, $timestamp, $prio, $type));
+
+		// fire a hook so that other apps like notification systems can connect
+		\OCP\Util::emitHook('OC_Activity', 'post_event', array('app' => $app, 'subject' => $subject, 'user' => $user, 'affecteduser' => $affecteduser, 'message' => $message, 'file' => $file, 'link'=> $link, 'prio' => $prio, 'type' => $type));
+
+		return true;
+	}
+
+
 
 
 }

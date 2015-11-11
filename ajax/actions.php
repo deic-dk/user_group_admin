@@ -41,12 +41,13 @@ if ( isset($_POST['group']) ) {
       break;
     case "leavegroup":
       $result = OC_User_Group_Admin_Util::removeFromGroup( OCP\User::getUser() , $_POST['group'] ) ;
-	$groupOwner = OC_User_Group_Admin_Util::groupOwner($_POST['group']);
-	$activity = OC_User_Group_Hooks::groupLeave($_POST['group'], $groupOwner);
+      $groupInfo = OC_User_Group_Admin_Util::searchGroup($_POST['group'], OCP\User::getUser());
+	$groupOwner = $groupInfo["owner"];
+	$activity = OC_User_Group_Hooks::groupLeave($_POST['group'], OCP\User::getUser(), $groupOwner);
       break;
     case "delgroup":
       $result = OC_User_Group_Admin_Util::deleteGroup($_POST['group'], OCP\User::getUser()) ;
-	$activity = OC_User_Group_Hooks::groupDelete($_POST['group']);
+	$activity = OC_User_Group_Hooks::groupDelete($_POST['group'], OCP\User::getUser());
       break;
     case "delmember":
       if ( isset($_POST['member'])) $result = OC_User_Group_Admin_Util::removeFromGroup( $_POST['member'] , $_POST['group'] ) ;
@@ -63,11 +64,11 @@ if ( isset($_POST['group']) ) {
   if ($result) {
     switch ($_POST['action']) {
 	case "addgroup":
-		$activity = OC_User_Group_Hooks::groupCreate($_POST['group']);
+		$activity = OC_User_Group_Hooks::groupCreate($_POST['group'], OCP\USER::getUser ());
 		OCP\JSON::success();
 	break;
   	  case "addmember":  
-	$activity = OC_User_Group_Hooks::groupShare($_POST['group'], $_POST['member']);
+	$activity = OC_User_Group_Hooks::groupShare($_POST['group'], $_POST['member'], OCP\USER::getUser ());
         $tmpl = new OCP\Template("user_group_admin", "members");
         $tmpl->assign( 'group' , $_POST['group'] , false );
         $tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $_POST['group'] ) , false );
