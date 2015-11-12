@@ -77,6 +77,7 @@ class OC_User_Group_Hooks {
 				self::send($app, $subject, array($path[0]), '', array(), '', $link, $user, $auser,$type, 40); 
         	 	}else if ($subject == 'deleted_by'){
 				self::send($app, 'deleted_self', array($path[0]), '', array(), '', $link, $user, $user, $type, 40);
+				//TODO in case we want to notify the other user
 				//self::send($app, $subject, array($path[0],$user), '', array(), '', $link, $user, $auser, $type, 40);   
 			}else {
 				self::send($app, $subject, array($path[0]), '', array(), '', $link, $user, $auser, $type, 40);
@@ -88,12 +89,12 @@ class OC_User_Group_Hooks {
 				\OCA\Activity\Data::storeMail($app, $subject, $path, $user, 'group', $latestSend);
 				\OCA\Activity\Data::storeMail($app, 'shared_with_by', array($path[0],$user), $auser, 'group', $latestSend);
 			}else if ($subject == 'deleted_self'){
-				\OCA\Activity\Data::storeMail($app, $subject, array($path), $auser, 'group', $latestSend);	
+				\OCA\Activity\Data::storeMail($app, $subject, array($path[0]), $auser, 'group', $latestSend);	
 			}else if ($subject == 'deleted_by'){
-				\OCA\Activity\Data::storeMail($app, 'deleted_self', array($path), $user, 'group', $latestSend);
-				\OCA\Activity\Data::storeMail($app, $subject, array($path[0],$user), $auser, 'group', $latestSend);
+				\OCA\Activity\Data::storeMail($app, 'deleted_self', array($path[0]), $user, 'group', $latestSend);
+				//\OCA\Activity\Data::storeMail($app, $subject, array($path[0],$user), $auser, 'group', $latestSend);
 			}else {
-				\OCA\Activity\Data::storeMail($app, $subject, array($path), $user, 'group', $latestSend);
+				\OCA\Activity\Data::storeMail($app, $subject, array($path[0]), $user, 'group', $latestSend);
 			}
 		}		 
 	}
@@ -103,7 +104,7 @@ class OC_User_Group_Hooks {
 
 		// store in DB
 		$query = \OCP\DB::prepare('INSERT INTO `*PREFIX*activity`(`app`, `subject`, `subjectparams`, `message`, `messageparams`, `file`, `link`, `user`, `affecteduser`, `timestamp`, `priority`, `type`)' . ' VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )');
-		$query->execute(array($app, $subject, serialize($subjectparams), $message, serialize($messageparams), $file, $link, $user, $affecteduser, $timestamp, $prio, $type));
+		$query->execute(array($app, $subject, serialize($subjectparams), $message, serialize($messageparams), $file, '', $user, $affecteduser, $timestamp, $prio, $type));
 
 		// fire a hook so that other apps like notification systems can connect
 		\OCP\Util::emitHook('OC_Activity', 'post_event', array('app' => $app, 'subject' => $subject, 'user' => $user, 'affecteduser' => $affecteduser, 'message' => $message, 'file' => $file, 'link'=> $link, 'prio' => $prio, 'type' => $type));
