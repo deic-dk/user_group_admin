@@ -34,13 +34,20 @@ if (isset ( $_FILES ['import_group_file'] ['tmp_name'] )) {
 		$group = $members [0];
 		array_shift ( $members );
 		$result = OC_User_Group_Admin_Util::createGroup ( $group, OCP\USER::getUser () );
-		$activity = OC_User_Group_Hooks::groupCreate($group);
+		$activity = OC_User_Group_Hooks::groupCreate($group, OCP\USER::getUser ());
 		if ($result) {
 			foreach ( $members as $member ) {
-				if (OCP\User::userExists ( $member ) and OCP\User::getUser () != $member) {
+				if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+                        		$userExists = \OCP\User::userExists($member);
+                		}
+                		else{
+                        		$userExists = \OCA\FilesSharding\Lib::ws('userExists', array('user_id'=>$member),
+                                 		false, true, null, 'files_sharding');
+                		}
+				if ($userExists and OCP\User::getUser () != $member) {
 					OC_User_Group_Admin_Util::addToGroup ( $member, $group, OCP\USER::getUser () );
-					OC_User_Group_Hooks::groupShare($member, $group);
-				} elseif (OCP\User::userExists ( $member ) == false) {
+					OC_User_Group_Hooks::groupShare($group, $member, OCP\USER::getUser ());
+				} elseif ($userExists == false) {
 					$import = false;
 				}
 			}
