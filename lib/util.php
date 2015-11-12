@@ -50,7 +50,6 @@ class OC_User_Group_Admin_Util {
 		if ($result->fetchRow ()) {
 			return false;
 		}
-		
 		// Add group and exit
 		$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` ) VALUES( ? , ? )" );
 		$result = $stmt->execute ( array (
@@ -295,15 +294,6 @@ class OC_User_Group_Admin_Util {
                 return $result;
 	}
 
- 	public static function groupOwner($gid) {
-		$stmt = OC_DB::prepare ( "SELECT `owner` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = :name " );
-		$params = array(
-		    'name' => $gid);
-		$stmt->execute($params);
-                $row = $stmt->fetch (); 
-                $owner  = $row["owner"];
-		return $owner; 
-	}
 	/**
 	 * @brief Removes a user from a group
 	 * 
@@ -463,7 +453,6 @@ class OC_User_Group_Admin_Util {
 	 * @return array with user ids
 	 */
 	public static function dbUsersInGroup($gid, $search = '', $limit = null, $offset = null) {
-		\OCP\Util::writeLog('USER_GROUP_ADMIN', 'group: '.$gid, 2);
                 $stmt = OC_DB::prepare ( 'SELECT `uid`, `verified`, `owner` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` LIKE ? AND `owner` != ?', $limit, $offset );
                 $result = $stmt->execute ( array (
                                 $gid,

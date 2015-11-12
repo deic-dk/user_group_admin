@@ -36,32 +36,17 @@ class OC_User_Group_Hooks {
 		}
                 return $result;
         }
-	public static function dbGroupLeave($group, $uid, $owner){
+	public static function groupLeave($group, $uid, $owner) {
 		$params = array($group, $uid, $owner);
                 OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'deleted_by', 'deleted_by');
-	}
-	public static function groupLeave($group, $uid, $owner) {
-		//if(!\OCP\App::isEnabled('files_sharding')){
-                        $result = self::dbGroupLeave($group, $uid, $owner);
-                //}else {
-                  //      $server = \OCA\FilesSharding\Lib::getServerForUser($uid, true);
-                    //    $result = \OCA\FilesSharding\Lib::ws('groupLeave', array('group'=>urlencode($group), 'userid'=>$uid, 'owner'=>$owner),
-                      //           false, true, $server, 'user_group_admin');
-                //}
-                return $result;
 	}
 	public static function addNotificationsForGroupAction( $group, $activityType, $subject, $subjectBy) {
 		if ($subject == 'shared_user_self') {
 			$auser = $group[1];
 			$user = $group[2];
 		}else {	
-			if ($subject == 'deleted_by') {
-				$auser = $group[2];
-				$user = $group[1];
-			}else {
-				$user = $group[1];
-				$auser = $group[1];
-			}
+			$user = $group[1];
+			$auser = $group[1];
 		}
 		$userSubject = $subject;
 		$filteredStreamUsers = \OCA\Activity\UserSettings::filterUsersBySetting(array($user), 'stream', 'group');
