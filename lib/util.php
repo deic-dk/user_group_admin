@@ -50,6 +50,7 @@ class OC_User_Group_Admin_Util {
 		if ($result->fetchRow ()) {
 			return false;
 		}
+		
 		// Add group and exit
 		$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` ) VALUES( ? , ? )" );
 		$result = $stmt->execute ( array (
@@ -167,11 +168,11 @@ class OC_User_Group_Admin_Util {
 	 */
 	public static function dbAddToGroup($uid, $gid, $owner) {
 		$group = self::searchGroup($gid, $uid);
-		if (isset($group)) {
-			$inGroup = true;
-		}else {
-			$inGroup = false;
-		}
+                if (isset($group)) {
+                        $inGroup = true;
+                }else {
+        		$inGroup = false;
+		}          
 		// No duplicate entries!
 		if (!$inGroup) {
 			$accept = md5 ( $uid . time () );
@@ -181,7 +182,7 @@ class OC_User_Group_Admin_Util {
 				$stmt->execute ( array (
 						$gid,
 						$uid,
-						$owner,
+						OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER,
 						'1',
 						'',
 						''	
@@ -230,35 +231,45 @@ class OC_User_Group_Admin_Util {
                                 $owner = $name;
                         }
                 }
-		$to = $uid;
+
+                $senderAddress = \OCP\Util::getDefaultEmailAddress('no-reply');
+                $defaults = new \OCP\Defaults();
+                $senderName = $defaults->getName();
 		$name = OCP\User::getDisplayName($uid);
-	        $url = 	OCP\Config::getAppValue('user_group_admin', 'appurl', '');
-		$sender = OCP\Config::getAppValue('user_group_admin', 'sender', '');
+		$url = \OC_Helper::makeURLAbsolute('/index.php/apps/user_group_admin?code=');
 		$subject = OCP\Config::getAppValue('user_group_admin', 'subject', '');
 		$message = 'Dear '.$name.','."\n \n".'You have been added to the group "' . $gid . '" by ' . $owner . '. Click here to accept the invitation:'."\n".
 		$url . $accept ."\n \n".'or click here to decline:'."\n".
 		$url . $decline;
 		
-		$headers = 'From: '.$sender . "\r\n" . 'Reply-To: ' .$sender. "\r\n" . 'X-Mailer: PHP/' . phpversion ();
-		mail ( $to, $subject, $message, $headers, "-r " . $to );
+		try {
+                        \OCP\Util::sendMail(
+                                $uid, $name,
+                                $subject, $message,
+                                $senderAddress, $senderName
+                        );
+                } catch (\Exception $e) {
+                        \OCP\Util::writeLog('User_Group_Admin', 'A problem occurred while sending the e-mail. Please revisit your settings.', \OCP\Util::ERROR);
+                }
+
 	}
 
 	public static function dbSearchGroup($gid, $uid){
-                $stmt = OC_DB::prepare ( "SELECT `owner`, `verified`  FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? " );
-                $result = $stmt->execute ( array (
-                                $gid,
-                                $uid
-                ) );
+		$stmt = OC_DB::prepare ( "SELECT `owner`, `verified`  FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? " );
+		$result = $stmt->execute ( array (
+				$gid,
+				$uid
+		) );
                 while ( $row = $result->fetchRow () ) {
                         $groupInfo =  array('owner' => $row ["owner"], 'status' => $row["verified"]);
                 }
-                if (!isset($groupInfo)) {
-                        return null;
-                }else {
-                        return $groupInfo;
-                }
+		if (!isset($groupInfo)) {
+			return null;
+		}else {
+			return $groupInfo;
+		}
 
-        }
+	}
 
 	public static function searchGroup($gid, $uid) {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
