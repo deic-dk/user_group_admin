@@ -175,8 +175,8 @@ class OC_User_Group_Admin_Util {
 		}          
 		// No duplicate entries!
 		if (!$inGroup) {
-			$accept = md5 ( $uid . time () );
-			$decline = $uid . time ();
+			$accept = md5 ( $uid . time (). 1 );
+                        $decline = md5 ($uid . time () . 0);
 			$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `owner`, `verified`, `accept`, `decline`) VALUES( ?, ?, ?, ?, ?, ?)" );
 			if (OC_User_Group_Admin_Util::hiddenGroupExists ( $gid )) {
 				$stmt->execute ( array (
