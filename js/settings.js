@@ -1,8 +1,8 @@
-function add_settings(subject){
+function add_settings(subject, sender, url){
 	$.ajax(OC.linkTo('user_group_admin','ajax/settingactions.php'), {
 		 type:'POST',
 		  data:{
-			 'action': 'addsubject', 'mailsubject': subject
+			 'action': 'addsubject', 'mailsubject': subject, 'mailsender': sender, 'accepturl': url
 		 },
 		 dataType:'json',
 		 success: function(data){
@@ -19,6 +19,9 @@ function add_settings(subject){
 $(document).ready(function() {
  	$('#mailsubmit').click(function() {
 		subject = $('#mailsubject').val();
-		add_settings(subject);
+		ender = $('#mailsender').val(); 
+		url = $('#accepturl').val();
+		add_settings(subject, sender, url );
 	});
-});	
+});		
+

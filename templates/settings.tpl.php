@@ -2,14 +2,21 @@
 
   <h2><?php p($l->t('User Group Admin'));?></h2>
   <?php  
-	$subject = OCP\Config::getAppValue('user_group_admin', 'subject', '');
- 	echo "     
+	    	$url =	OCP\Config::getAppValue('user_group_admin', 'appurl', '');
+		$sender = OCP\Config::getAppValue('user_group_admin', 'sender', '');
+		$subject = OCP\Config::getAppValue('user_group_admin', 'subject', '');
+		echo "     
+	  	<label for='mailSender'>Mail Sender </label>
+  		<input type='text' name='mailsender' id = 'mailsender' value= $sender original-title=''>
+  		<br>
   		<label for='mailSubject'>Mail Subject </label>
   		<input type='text' name='mailsubject' id = 'mailsubject'  value=\"".$subject."\"  >
+  		<br>
+  		<label for='inviteUrl'>Link to accept or decline *</label>
+  		<input type='text' name='accepturl' id = 'accepturl' value=$url original-title=''>
   		<br>
 
   		<input type='submit' value='Save' id = 'mailsubmit' original-title=''>";
   ?>
 	
 </fieldset>
-
