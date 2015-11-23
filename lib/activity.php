@@ -113,7 +113,7 @@ class Activity implements IExtension {
 	 * The extension can define the type of parameters for translation
 	 *
 	 * Currently known types are:
-	 * * file		=> will add a tooltip with group name 
+	 * * file		=> will strip away the path of the file and add a tooltip with it
 	 * * username	=> will add the avatar of the user
 	 *
 	 * @param string $app
@@ -171,14 +171,14 @@ class Activity implements IExtension {
 		$parameterList = $plainParameterList = array();
 		foreach ($params as $parameter) {
 			if ($paramType === 'file') {
-				$parameterList[] =  $this->prepareFileParam($app, $parameter, $stripPath, $highlightParams);
-				$plainParameterList[] =  $this->prepareFileParam($app, $parameter, false, false);
+				$parameterList[] = (string) $this->prepareFileParam($app, $parameter, $stripPath, $highlightParams);
+				$plainParameterList[] = (string) $this->prepareFileParam($app, $parameter, false, false);
 			} else {
-				$parameterList[] =  $this->prepareParam($app, $parameter, $highlightParams);
-				$plainParameterList[] =  $this->prepareParam($app, $parameter, false);
+				$parameterList[] = (string) $this->prepareParam($app, $parameter, $highlightParams);
+				$plainParameterList[] = (string) $this->prepareParam($app, $parameter, false);
 			}
 		}
-		return $this->joinParameterList($parameterList, $plainParameterList, $highlightParams);
+		return (string) $this->joinParameterList($parameterList, $plainParameterList, $highlightParams);
 	}
 	/**
 	 * Prepares a parameter for usage by adding highlights
@@ -215,12 +215,12 @@ class Activity implements IExtension {
 		}
 	}
 	/**
-	 * Prepares group parameter for usage
+	 * Prepares a file parameter for usage
 	 *
-	 * Adds highlights to groupname
+	 * Removes the path from filenames and adds highlights
 	 *
 	 * @param string $param
-	 * @param bool $stripPath Shall we remove the path from the groupname
+	 * @param bool $stripPath Shall we remove the path from the filename
 	 * @param bool $highlightParams
 	 * @return string
 	 */
@@ -287,6 +287,7 @@ class Activity implements IExtension {
 
 	/**
 	 * A string naming the css class for the icon to be used can be returned.
+	 * If no icon is known for the given type false is to be returned.
 	 *
 	 * @param string $type
 	 * @return string|false

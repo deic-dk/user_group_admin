@@ -135,12 +135,12 @@ if (isset($_GET ['code']))  {
                                 echo "<script type='text/javascript'>
                                         location.reload();
                                         </script>";
-                                $result = OC_User_Group_Admin_Util::acceptInvitation ( $groupname, OCP\USER::getUser () );
+                                $result = OC_User_Group_Admin_Util::updateStatus ( $groupname, OCP\USER::getUser (), 1 );
                         } elseif ($status == '0' && $declinedUser == $_GET['code']) {
                                 echo "<script type='text/javascript'>
                                         location.reload();
                                         </script>";
-                                $result = OC_User_Group_Admin_Util::declineInvitation ($groupname, OCP\USER::getUser () );
+                                $result = OC_User_Group_Admin_Util::updateStatus ($groupname, OCP\USER::getUser (), 2 );
                         }
                 }
         }

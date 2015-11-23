@@ -168,15 +168,15 @@ class OC_User_Group_Admin_Util {
 	 */
 	public static function dbAddToGroup($uid, $gid, $owner) {
 		$group = self::searchGroup($gid, $uid);
-                if (isset($group)) {
-                        $inGroup = true;
-                }else {
-        		$inGroup = false;
-		}          
+		if (isset($group)) {
+			$inGroup = true;
+		}else {
+			$inGroup = false;
+		}
 		// No duplicate entries!
 		if (!$inGroup) {
 			$accept = md5 ( $uid . time (). 1 );
-                        $decline = md5 ($uid . time () . 0);
+			$decline = md5 ($uid . time () . 0);
 			$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `owner`, `verified`, `accept`, `decline`) VALUES( ?, ?, ?, ?, ?, ?)" );
 			if (OC_User_Group_Admin_Util::hiddenGroupExists ( $gid )) {
 				$stmt->execute ( array (
@@ -224,18 +224,18 @@ class OC_User_Group_Admin_Util {
                 $senderAddress = OCP\Config::getAppValue('user_group_admin', 'sender', '');
                 $defaults = new \OCP\Defaults();
                 $senderName = $defaults->getName();
-		$name = OCP\User::getDisplayName($uid);
-		$url = OCP\Config::getAppValue('user_group_admin', 'appurl', ''); 
-		$subject = OCP\Config::getAppValue('user_group_admin', 'subject', '');
-		$message = 'Dear '.$name.','."\n \n".'You have been added to the group "' . $gid . '" by ' . $owner . '. Click here to accept the invitation:'."\n".
-		$url . $accept ."\n \n".'or click here to decline:'."\n".
-		$url . $decline;
-		
-		try {
+                $name = OCP\User::getDisplayName($uid);
+                $url = OCP\Config::getAppValue('user_group_admin', 'appurl', '');
+                $subject = OCP\Config::getAppValue('user_group_admin', 'subject', '');
+                $message = 'Dear '.$name.','."\n \n".'You have been invited to join the group "' . $gid . '" by ' . $owner . '. Click here to accept the invitation:'."\n".
+                $url . $accept ."\n \n".'or click here to decline:'."\n".
+                $url . $decline;
+
+                try {
                         \OCP\Util::sendMail(
                                 $uid, $name,
                                 $subject, $message,
-                                $senderAddress, $senderName 
+                                $senderAddress, $senderName
                         );
                 } catch (\Exception $e) {
                         \OCP\Util::writeLog('User_Group_Admin', 'A problem occurred while sending the e-mail. Please revisit your settings.', \OCP\Util::ERROR);

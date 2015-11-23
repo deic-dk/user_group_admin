@@ -9,7 +9,7 @@ if(!OCA\FilesSharding\Lib::checkIP()){
 }
 
 $userid = isset($_GET['userid'])?$_GET['userid']:'';
-$name = isset($_GET['name'])?$_GET['name']:'';
+$name = isset($_GET['name'])?$_GET['name']:null;
 $group = OC_User_Group_Admin_Util::dbCreateGroup($name, $userid);
 
 \OCP\Util::writeLog('user_group_admin', 'New group '.$group, \OC_Log::WARN);

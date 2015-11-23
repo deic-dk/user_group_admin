@@ -19,7 +19,7 @@ function add_settings(subject, sender, url){
 $(document).ready(function() {
  	$('#mailsubmit').click(function() {
 		subject = $('#mailsubject').val();
-		ender = $('#mailsender').val(); 
+		sender = $('#mailsender').val(); 
 		url = $('#accepturl').val();
 		add_settings(subject, sender, url );
 	});

@@ -6,8 +6,8 @@
  * @author Christian Brinch
  * @copyright 2014 Christian Brinch, DeIC, <christian.brinch@deic.dk>
  *
- * @author Jorge Rafael Garc\xc3\xada Ramos
- * @copyright 2012 Jorge Rafael Garc\xc3\xada Ramos <kadukeitor@gmail.com>
+ * @author Jorge Rafael Garcia Ramos
+ * @copyright 2012 Jorge Rafael Garcia Ramos <kadukeitor@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
