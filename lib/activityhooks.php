@@ -107,7 +107,7 @@ class OC_User_Group_Hooks {
 		$query->execute(array($app, $subject, serialize($subjectparams), $message, serialize($messageparams), $file, '', $user, $affecteduser, $timestamp, $prio, $type));
 
 		// fire a hook so that other apps like notification systems can connect
-		\OCP\Util::emitHook('OC_Activity', 'post_event', array('app' => $app, 'subject' => $subject, 'user' => $user, 'affecteduser' => $affecteduser, 'message' => $message, 'file' => $file, 'link'=> $link, 'prio' => $prio, 'type' => $type));
+		\OCP\Util::emitHook('OC_Activity', 'post_event', array('app' => $app, 'subject' => $subject, 'user' => $user, 'affecteduser' => $affecteduser, 'message' => $message, 'file' => $file, 'link'=> '', 'prio' => $prio, 'type' => $type));
 
 		return true;
 	}
