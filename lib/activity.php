@@ -5,6 +5,7 @@ use OCP\Activity\IExtension;
 use OCP\Activity\IManager;
 use OCP\IConfig;
 use OCP\IL10N;
+use OCP\Util;
 use OCP\IURLGenerator;
 use \OCP\User;
 
