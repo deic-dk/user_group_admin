@@ -11,6 +11,6 @@ if(!OCA\FilesSharding\Lib::checkIP()){
 $name = isset($_GET['name'])?$_GET['name']:'%';
 $user = isset($_GET['userid'])?$_GET['userid']:\OCP\User::getUser();
 $groupInfo = OC_User_Group_Admin_Util::dbSearchGroup($name,$user);
-\OCP\Util::writeLog('user_group_admin', 'Returning group info '.$groupInfo, \OC_Log::DEBUG);
+\OCP\Util::writeLog('user_group_admin', 'Returning group info '.serialize($groupInfo), \OC_Log::DEBUG);
 OCP\JSON::encodedPrint($groupInfo);
 
