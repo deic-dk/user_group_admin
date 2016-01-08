@@ -98,7 +98,7 @@ $(document).ready(function() {
 		var status = $(this).closest('tr').attr('id') ;
                 var groupSelected = $(this).closest('tr').attr('class') ;
                 $( '#dialogalert' ).dialog({ buttons: [ { id:'test','data-test':'data test', text: 'Delete', click: function() {
-                    if (status == 'owner') {
+                    if (status == 'owner' || status == 'admin') {
                         $.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : groupSelected , action : "delgroup"} , function ( jsondata){
                                 if(jsondata.status == 'success' ) {
                                         location.reload();
@@ -149,8 +149,9 @@ $(document).ready(function() {
            }
         });
 
-	$("#groupstable .name").live('click', function() {
+	$("#groupstable .nametext").live('click', function() {
 		var group = $(this).closest('td').attr('id') ;
+		var status = $(this).closest('tr').attr('id');
 		var number = $("td[class='"+group+"']").find("span#nomembers").html();
 		var html = '<div><span><h3 class="oc-dialog-title" style="padding-left:25px;">Team <span>\''+ group+'\'</span></h3></span><a class="oc-dialog-close close svg"></a><div id="meta_data_container" class=\''+ group+'\'>\
 				<span class="memberscount" style="padding-left:25px;" >'+number+'</span> members <p></p><div class="dropmembers" id=\''+ group+'\' style="width:60%; margin: 0 auto;"></div>\
@@ -174,7 +175,7 @@ $(document).ready(function() {
         	});
 
 		$('.ui-helper-clearfix').css("display", "none");
-	    	if ($(this).closest('tr').attr('id')=='owner'){
+	    	if (status=='owner' || status=='admin'){
 			$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmembers"} ,
                 	function ( jsondata ){
                         	if(jsondata.status == 'success' ) {
@@ -189,7 +190,7 @@ $(document).ready(function() {
                         	}
 			});
 		}
-		else if ($(this).closest('tr').attr('id')=='member') {
+		else if (status=='member') {
 		 	$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmemberships"} ,
                 	function ( jsondata ){
                         	if(jsondata.status == 'success' ) {

@@ -24,38 +24,38 @@
  */
 class OC_User_Group_Admin_Util {
 	private static $HIDDEN_GROUP_OWNER = 'hidden_group_owner';
-	
+
 	/**
 	 * @brief Try to create a new group
-	 * 
+	 *
 	 * @param string $gid
 	 *        	The name of the group to create
 	 * @return bool Tries to create a new group. If the group name already exists, false will
 	 *         be returned.
 	 */
 	public static function dbCreateGroup($gid, $uid) {
-		
+
 		// Check for existence
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?" );
 		$result = $stmt->execute ( array (
-				$gid 
+				$gid
 		) );
 		if ($result->fetchRow ()) {
 			return false;
 		}
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*groups` WHERE `gid` = ?" );
 		$result = $stmt->execute ( array (
-				$gid 
+				$gid
 		) );
 		if ($result->fetchRow ()) {
 			return false;
 		}
-		
+
 		// Add group and exit
 		$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` ) VALUES( ? , ? )" );
 		$result = $stmt->execute ( array (
 				$gid,
-				$uid	
+				$uid
 		) );
 		return $result;
 	}
@@ -76,54 +76,61 @@ class OC_User_Group_Admin_Util {
 	}
 
 	public static function createHiddenGroup($gid) {
-		
+
 		// Check for existence
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?" );
 		$result = $stmt->execute ( array (
-				$gid 
+				$gid
 		) );
 		if ($result->fetchRow ()) {
 			return false;
 		}
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*groups` WHERE `gid` = ?" );
 		$result = $stmt->execute ( array (
-			$gid 
+			$gid
 		) );
 		if ($result->fetchRow ()) {
 			return false;
 		}
-		
+
 		// Add group and exit
 		$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` ) VALUES( ? , ? )" );
 		$result = $stmt->execute ( array (
 				$gid,
-				OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER 
+				OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER
 		) );
-		
+
 		return $result ? true : false;
 	}
-	
+
 	/**
 	 * @brief delete a group
-	 * 
+	 *
 	 * @param string $gid
 	 *        	gid of the group to delete
 	 * @return bool Deletes a group and removes it from the group_user-table
 	 */
 	public static function dbDeleteGroup($gid, $uid) {
-		// Delete the group
-		$stmt = OC_DB::prepare ( "DELETE FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ? AND `owner` = ?" );
-		$stmt->execute ( array (
-				$gid,
-				$uid 
-		) );
-		// Delete the group-user relation
-		$stmt = OC_DB::prepare ( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `owner` = ?" );
-		$stmt->execute ( array (
-				$gid,
-				$uid 
-		) );
-		
+		if (\OC_User::isAdminUser($uid)) {
+			// Delete the group
+			$stmt = OC_DB::prepare ( "DELETE FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?" );
+			$stmt->execute ( array (
+                                $gid
+                	) );
+		}else {
+			$stmt = OC_DB::prepare ( "DELETE FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ? AND `owner` = ?" );
+			$stmt->execute ( array (
+					$gid,
+					$uid
+			) );
+			
+		}
+		 // Delete the group-user relation
+                $stmt = OC_DB::prepare ( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ?" );
+                $stmt->execute ( array (
+                                $gid
+                ) );
+
 		return true;
 	}
 
@@ -135,12 +142,12 @@ class OC_User_Group_Admin_Util {
 			$result = \OCA\FilesSharding\Lib::ws('deleteGroup', array(
 					'name'=>urlencode($gid), 'userid'=>$uid),false, true, null, 'user_group_admin');
 		}
-		return $result;	
+		return $result;
 	}
-	
+
 	/**
 	 * @brief is user in group?
-	 * 
+	 *
 	 * @param string $uid
 	 *        	uid of the user
 	 * @param string $gid
@@ -151,15 +158,15 @@ class OC_User_Group_Admin_Util {
 		$stmt = OC_DB::prepare ( "SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? " );
 		$result = $stmt->execute ( array (
 				$gid,
-				$uid 
+				$uid
 		) );
-		
+
 		return $result->fetchRow () ? true : false;
 	}
-	
+
 	/**
 	 * @brief Add a user to a group
-	 * 
+	 *
 	 * @param string $uid
 	 *        	Name of the user to add to group
 	 * @param string $gid
@@ -185,7 +192,7 @@ class OC_User_Group_Admin_Util {
 						OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER,
 						'1',
 						'',
-						''	
+						''
 				) );
 			} else {
 				$stmt->execute ( array (
@@ -198,7 +205,7 @@ class OC_User_Group_Admin_Util {
 				) );
 				OC_User_Group_Admin_Util::sendVerification ( $uid, $accept, $decline, $gid, $owner );
 			}
-			
+
 			return true;
 		} else {
 			return false;
@@ -213,33 +220,33 @@ class OC_User_Group_Admin_Util {
                         $result = \OCA\FilesSharding\Lib::ws('newMember', array(
                                         'name'=>urlencode($gid), 'userid'=>$uid, 'owner'=>$owner),false, true, null, 'user_group_admin');
                 }
-                return true;	
+                return true;
 	}
-	
+
 	/**
 	 * Send invitation mail to a user.
 	 */
 	public static function sendVerification($uid, $accept, $decline, $gid, $owner) {
 		$owner = \OCP\User::getDisplayName($owner);
-                $senderAddress = OCP\Config::getAppValue('user_group_admin', 'sender', '');
-                $defaults = new \OCP\Defaults();
-                $senderName = $defaults->getName();
-                $name = OCP\User::getDisplayName($uid);
-                $url = OCP\Config::getAppValue('user_group_admin', 'appurl', '');
-                $subject = OCP\Config::getAppValue('user_group_admin', 'subject', '');
-                $message = 'Dear '.$name.','."\n \n".'You have been invited to join the group "' . $gid . '" by ' . $owner . '. Click here to accept the invitation:'."\n".
-                $url . $accept ."\n \n".'or click here to decline:'."\n".
-                $url . $decline;
+        $senderAddress = OCP\Config::getAppValue('user_group_admin', 'sender', '');
+        $defaults = new \OCP\Defaults();
+        $senderName = $defaults->getName();
+        $name = OCP\User::getDisplayName($uid);
+        $url = OCP\Config::getAppValue('user_group_admin', 'appurl', '');
+        $subject = OCP\Config::getAppValue('user_group_admin', 'subject', '');
+        $message = 'Dear '.$name.','."\n \n".'You have been invited to join the group "' . $gid . '" by ' . $owner . '. Click here to accept the invitation:'."\n".
+        $url . $accept ."\n \n".'or click here to decline:'."\n".
+        $url . $decline;
 
-                try {
-                        \OCP\Util::sendMail(
-                                $uid, $name,
-                                $subject, $message,
-                                $senderAddress, $senderName
-                        );
-                } catch (\Exception $e) {
-                        \OCP\Util::writeLog('User_Group_Admin', 'A problem occurred while sending the e-mail. Please revisit your settings.', \OCP\Util::ERROR);
-                }
+        try {
+                \OCP\Util::sendMail(
+                        $uid, $name,
+                        $subject, $message,
+                        $senderAddress, $senderName
+                );
+        } catch (\Exception $e) {
+                \OCP\Util::writeLog('User_Group_Admin', 'A problem occurred while sending the e-mail. Please revisit your settings.', \OCP\Util::ERROR);
+        }
 
 	}
 
@@ -268,9 +275,9 @@ class OC_User_Group_Admin_Util {
                         $result = \OCA\FilesSharding\Lib::ws('searchGroup', array(
                                         'name'=>urlencode($gid), 'userid'=>$uid),false, true, null, 'user_group_admin');
                 }
-                return $result;	
+                return $result;
 	}
-	
+
 	public static function dbUpdateStatus($gid, $uid, $status) {
 		$query = OC_DB::prepare ("UPDATE `*PREFIX*user_group_admin_group_user` SET `verified` = '$status' WHERE `uid` = ? AND `gid` = ? " );
 		$result = $query->execute( array (
@@ -279,10 +286,10 @@ class OC_User_Group_Admin_Util {
 		));
 		return $result;
 	}
-	
+
 	/**
-	* Update user status 
-	*/		
+	* Update user status
+	*/
 	public static function updateStatus($gid, $uid, $status) {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
                         $result = self::dbUpdateStatus($gid, $uid, $status);
@@ -296,7 +303,7 @@ class OC_User_Group_Admin_Util {
 
 	/**
 	 * @brief Removes a user from a group
-	 * 
+	 *
 	 * @param string $uid
 	 *        	Name of the user to remove from group
 	 * @param string $gid
@@ -307,9 +314,9 @@ class OC_User_Group_Admin_Util {
 		$stmt = OC_DB::prepare ( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `gid` = ?" );
 		$stmt->execute ( array (
 				$uid,
-				$gid 
+				$gid
 		) );
-		
+
 		return true;
 	}
 
@@ -324,12 +331,11 @@ class OC_User_Group_Admin_Util {
                 return $result;
 
 	}
-        
+
 	public static function dbGetOwnerGroups($owner) {
-		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE  `owner` = ?" );
-                $result = $stmt->execute ( array (
-                               	$owner 
-                	) );
+		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `owner` = ?" );
+	    // $stmt = OC_DB::prepare ( "SELECT gid FROM `*PREFIX*user_group_admin_groups` WHERE owner = ? AND owner in (SELECT uid from `*PREFIX*group_user` WHERE uid = ?)");
+                $result = $stmt->execute ( array ($owner) );
 
                 $groups = array ();
                 while ( $row = $result->fetchRow () ) {
@@ -350,15 +356,15 @@ class OC_User_Group_Admin_Util {
 				false, true, null, 'user_group_admin');
 		//	$result = array_unique(array_merge($result, $groups));
 		}
-		return $result;		
-	}	
+		return $result;
+	}
 
 	/**
 	 * @brief Get all groups a user belongs to
-	 * 
+	 *
 	 * @param string $uid
 	 * @return array with group names
-	 *        
+	 *
 	 *         This function fetches all groups a user belongs to. It does not check
 	 *         if the user exists at all.
 	 */
@@ -368,12 +374,12 @@ class OC_User_Group_Admin_Util {
 				$uid,
 				OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER
 		) );
-		
+
 		$groups = array ();
 		while ( $row = $result->fetchRow () ) {
 			$groups [] = array('group' => $row ["gid"], 'status' => $row["verified"], 'accept' => $row["accept"], 'decline' => $row["decline"]);
 		}
-		
+
 		return $groups;
 	}
 
@@ -387,69 +393,69 @@ class OC_User_Group_Admin_Util {
 		}
 		return $result;
 	}
-	
+
 	/**
 	 * @brief get a list of all groups
-	 * 
-	 * @param string $search        	
-	 * @param int $limit        	
-	 * @param int $offset        	
+	 *
+	 * @param string $search
+	 * @param int $limit
+	 * @param int $offset
 	 * @return array with group names
-	 *        
+	 *
 	 *         Returns a list with all groups
 	 */
 	public static function getGroups($search = '', $limit = null, $offset = null) {
 		$stmt = OC_DB::prepare ( 'SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` LIKE ? AND `owner` = ?', $limit, $offset );
 		$result = $stmt->execute ( array (
 				$search . '%',
-				OCP\USER::getUser () 
+				OCP\USER::getUser ()
 		) );
 		$groups = array ();
 		while ( $row = $result->fetchRow () ) {
 			$groups [] = $row ['gid'];
 		}
-		
+
 		return $groups;
 	}
 	public static function hiddenGroupExists($gid) {
 		$query = OC_DB::prepare ( 'SELECT `gid` FROM `*PREFIX*groups` WHERE `gid` = ?' );
 		$result = $query->execute ( array (
 				$gid
-				 
+
 		) )->fetchOne ();
 		if ($result) {
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * check if a group exists
-	 * 
-	 * @param string $gid        	
+	 *
+	 * @param string $gid
 	 * @return bool
 	 */
 	public static function groupExists($gid) {
 		$query = OC_DB::prepare ( 'SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ? AND `owner` = ?' );
 		$result = $query->execute ( array (
 				$gid,
-				OCP\USER::getUser () 
+				OCP\USER::getUser ()
 		) )->fetchOne ();
 		if ($result) {
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * @brief get a list of all users in a group
-	 * 
-	 * @param string $gid        	
-	 * @param string $search        	
-	 * @param int $limit        	
-	 * @param int $offset        	
+	 *
+	 * @param string $gid
+	 * @param string $search
+	 * @param int $limit
+	 * @param int $offset
 	 * @return array with user ids
 	 */
 	public static function dbUsersInGroup($gid, $search = '', $limit = null, $offset = null) {
@@ -490,11 +496,22 @@ class OC_User_Group_Admin_Util {
                         foreach ($displayName as $name) {
                                 $name = \OCP\Util::sanitizeHTML($name);
                         }
-                        
+
                 }
 
                 return '<div class="avatar" data-user="' . $param . '"></div>'. '<strong style="font-size:92%">' . $name . '</strong>';
         }
+
+	public static function getGroupsForAdmin($limit = null, $offset = null ) {
+		$query = OC_DB::prepare('SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `owner`!= ? AND  `gid` LIKE ?', $limit, $offset );
+		$result = $query->execute (array (\OCP\User::getUser(), '%'));
+		$groups = array ();
+		while ( $row = $result->fetchRow () ) {
+			$groups [] = $row ['gid'];
+		}
+		return $groups;
+		
+	}
 
 }
 

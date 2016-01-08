@@ -7,7 +7,6 @@ OC::$CLASSPATH['OC_User_Group_Hooks']   ='apps/user_group_admin/lib/activityhook
 OC::$CLASSPATH['Hooks'] = 'apps/activity/lib/hooks.php';
 OC::$CLASSPATH['Data'] = 'apps/activity/lib/data.php';
 OC::$CLASSPATH['Activity']   ='apps/user_group_admin/lib/activity.php';
-//OC::$CLASSPATH['ParameterHelper']   ='/usr/local/www/owncloud/themes/deic_theme_oc7/apps/activity/lib/parameterhelper.php';
 
 OCP\Util::connectHook('OC_User', 'post_deleteUser', 'OC_User_Group_Admin_Hooks', 'post_deleteUser');
 OC_Group::useBackend( new OC_User_Group_Admin_Backend() );
