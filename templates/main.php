@@ -91,7 +91,7 @@
 		if ($groupmembership["status"] == 1) {
 	         $group = (string)$groupmembership["group"];
 		 $count++;
-	         echo "<tr id='member' class=\"$group\"><td  id=\"$group\" class='groupsname' data-group=\"$group\" style='height:34px;' ><div class='row'><div class='col-xs-4 col-sm-1'></div>
+	         echo "<tr id='member' class=\"$group\"><td  id=\"$group\" class='groupsname' data-group=\"$group\" style='height:34px;' ><div class='row'><div class='col-xs-1 text-right '></div>
 		<div class='col-xs-8 filelink-wrap' style='padding-left:4px;'><a class='name'><i class='icon-users     deic_green icon'></i>
                 <span class='nametext'>	$group</span></a></div>
 		</div></div>
