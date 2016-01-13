@@ -1,11 +1,7 @@
 <?php
         $group=$_['group'];
+	$owner = OC_User_Group_Admin_Util::getGroupOwner($group);
         $members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
-	foreach ($members as $member) {
-        	$owner = $member["owner"];
-        	break;
-	}
-
 	$ownerAvatar = OC_User_Group_Admin_Util::prepareUser($owner);
 echo "<li data-member=$owner title=\"".OC_User::getDisplayName($owner)."\" ><i class=\"fa fa-user\"></i><span class='left'
 >$ownerAvatar &nbsp</span><span class='normaltext'><i>($owner) &nbsp</i></span><span class='ownertext'>Owner</span><br>

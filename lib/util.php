@@ -513,5 +513,15 @@ class OC_User_Group_Admin_Util {
 		
 	}
 
+	public static function getGroupOwner($group) {
+		$stmt = OC_DB::prepare ( 'SELECT `owner` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?');
+        	$result = $stmt->execute ( array (
+                                  	$group
+        			) );
+        	$row = $result->fetchRow () ;
+        	$owner = $row ['owner'];
+		return $owner;
+	}
+
 }
 
