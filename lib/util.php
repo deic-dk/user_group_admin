@@ -64,13 +64,11 @@ class OC_User_Group_Admin_Util {
 
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
 			$result = OC_User_Group_Admin_Util::dbCreateGroup($gid, $uid );
-			\OCP\Util::writeLog('user_group_admin', 'notenable ', \OC_Log::WARN);
 		}
 		else{
-			$result = \OCA\FilesSharding\Lib::ws('newGroup', array('userid'=>$uid,
-					'name'=>urlencode($gid)), false, true,
+			$result = \OCA\FilesSharding\Lib::ws('groupActions', array('userid'=>$uid,
+					'name'=>urlencode($gid), 'action'=>'newGroup'), false, true,
 					null, 'user_group_admin');
-			\OCP\Util::writeLog('user_group_admin', 'ENABLE CREATE GROUP', \OC_Log::WARN);
 		}
 		return $result ? true : false;
 	}
@@ -139,8 +137,8 @@ class OC_User_Group_Admin_Util {
 			$result = self::dbDeleteGroup($gid, $uid);
 		}
 		else{
-			$result = \OCA\FilesSharding\Lib::ws('deleteGroup', array(
-					'name'=>urlencode($gid), 'userid'=>$uid),false, true, null, 'user_group_admin');
+			$result = \OCA\FilesSharding\Lib::ws('groupActions', array(
+					'name'=>urlencode($gid), 'userid'=>$uid, 'action'=>'deleteGroup'),false, true, null, 'user_group_admin');
 		}
 		return $result;
 	}
@@ -217,8 +215,8 @@ class OC_User_Group_Admin_Util {
                         $result = self::dbAddToGroup($uid, $gid, $owner);
                 }
                 else{
-                        $result = \OCA\FilesSharding\Lib::ws('newMember', array(
-                                        'name'=>urlencode($gid), 'userid'=>$uid, 'owner'=>$owner),false, true, null, 'user_group_admin');
+                        $result = \OCA\FilesSharding\Lib::ws('groupActions', array(
+                                        'name'=>urlencode($gid), 'userid'=>$uid, 'owner'=>$owner, 'action'=>'newMember'),false, true, null, 'user_group_admin');
                 }
                 return true;
 	}
@@ -295,8 +293,8 @@ class OC_User_Group_Admin_Util {
                         $result = self::dbUpdateStatus($gid, $uid, $status);
                 }
                 else{
-                        $result = \OCA\FilesSharding\Lib::ws('updateStatus', array(
-                                        'name'=>urlencode($gid), 'userid'=>$uid, 'status' => $status),false, true, null, 'user_group_admin');
+                        $result = \OCA\FilesSharding\Lib::ws('groupActions', array(
+                                        'name'=>urlencode($gid), 'userid'=>$uid, 'status' => $status, 'action'=>'updateStatus'),false, true, null, 'user_group_admin');
                 }
                 return $result;
 	}
@@ -325,8 +323,8 @@ class OC_User_Group_Admin_Util {
                         $result = self::dbRemoveFromGroup($uid,$gid);
                 }
                 else{
-                        $result = \OCA\FilesSharding\Lib::ws('leaveGroup', array(
-                                        'name'=>urlencode($gid), 'userid'=>$uid),false, true, null, 'user_group_admin');
+                        $result = \OCA\FilesSharding\Lib::ws('groupActions', array(
+                                        'name'=>urlencode($gid), 'userid'=>$uid, 'action'=>'leaveGroup'),false, true, null, 'user_group_admin');
                 }
                 return $result;
 
@@ -513,15 +511,25 @@ class OC_User_Group_Admin_Util {
 		
 	}
 
-	public static function getGroupOwner($group) {
-		$stmt = OC_DB::prepare ( 'SELECT `owner` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?');
-        	$result = $stmt->execute ( array (
-                                  	$group
-        			) );
-        	$row = $result->fetchRow () ;
-        	$owner = $row ['owner'];
-		return $owner;
-	}
+	public static function dbGetGroupOwner($group) {
+                $stmt = OC_DB::prepare ( 'SELECT `owner` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?');
+                $result = $stmt->execute ( array (
+                                        $group
+                                ) );
+                $row = $result->fetchRow () ;
+                $owner = $row ['owner'];
+                return $owner;
+        }
 
+        public static function getGroupOwner($group) {
+                if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+                        $result = self::dbGetGroupOwner($group);
+                }
+                else{
+                        $result = \OCA\FilesSharding\Lib::ws('getGroupOwner', array('gid'=>urlencode($group)),
+                                 false, true, null, 'user_group_admin');
+                }
+                return $result;
+        }	
 }
 

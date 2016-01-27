@@ -13,16 +13,16 @@ class OC_User_Group_Hooks {
 	}
 	public static function groupCreate($group, $uid) {
 		$params = array($group, $uid);
-		OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'created_self', 'created_by');		
+		OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'created_self');		
 	}
 	public static function groupDelete($group, $uid) {
 		$params = array($group, $uid);
-		OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'deleted_self', 'deleted_by');
+		OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'deleted_self');
 	}
 	public static function dbGroupShare($group, $uid, $owner) {
 		$params = array($group, $uid, $owner);
-                OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'shared_user_self', 'shared_user_self');
-		OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'shared_with_by', 'shared_with_by');
+                OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'shared_user_self');
+		OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'shared_with_by');
 	}
 	public static function groupShare($group, $uid, $owner) {
                 if(!\OCP\App::isEnabled('files_sharding')){
@@ -36,9 +36,9 @@ class OC_User_Group_Hooks {
         }
 	public static function groupLeave($group, $uid, $owner) {
 		$params = array($group, $uid, $owner);
-                OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'deleted_by', 'deleted_by');
+                OC_User_Group_Hooks::addNotificationsForGroupAction($params, 'group', 'deleted_by');
 	}
-	public static function addNotificationsForGroupAction( $group, $activityType, $subject, $subjectBy) {
+	public static function addNotificationsForGroupAction( $group, $activityType, $subject) {
 		if ($subject == 'shared_user_self') {
 			$auser = $group[1];
 			$user = $group[2];
@@ -46,23 +46,21 @@ class OC_User_Group_Hooks {
 			$user = $group[1];
 			$auser = $group[1];
 		}
-		$userSubject = $subject;
+
 		$filteredStreamUsers = \OCA\Activity\UserSettings::filterUsersBySetting(array($user, $auser), 'stream', 'group');
                 $filteredEmailUsers = \OCA\Activity\UserSettings::filterUsersBySetting(array($user, $auser), 'email', 'group');
-//		foreach (array($user) as $user) {
-		//if (!empty($filteredStreamUsers) && !empty($filteredEmailUsers)) {
-		if ($userSubject == "shared_with_by") {
+
+		if ($subject == "shared_with_by") {
 			 OC_User_Group_Hooks::addNotificationsForUser(
-                                $user, $auser, $userSubject,
+                                $user, $auser, $subject,
                                 $group, true,
 				!empty($filteredStreamUsers[$auser]),
 				!empty($filteredEmailUsers[$auser]) ? $filteredEmailUsers[$auser] : 0,
                                 40, $activityType
                         );
-	//	} 	
 		} else {
 			OC_User_Group_Hooks::addNotificationsForUser(
-                                $user, $auser, $userSubject,
+                                $user, $auser, $subject,
                                 $group, true,
                                 !empty($filteredStreamUsers[$user]),
                                 !empty($filteredEmailUsers[$user]) ? $filteredEmailUsers[$user] : 0,

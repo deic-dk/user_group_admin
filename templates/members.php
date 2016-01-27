@@ -1,6 +1,10 @@
 <?php
         $group=$_['group'];
-	$owner = OC_User_Group_Admin_Util::getGroupOwner($group);
+	if(\OC_User::isAdminUser(\OC_User::getUser())){
+                $owner = OC_User_Group_Admin_Util::getGroupOwner($group);
+        }else {
+                $owner = \OC_User::getUser();
+        }
         $members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
 	$ownerAvatar = OC_User_Group_Admin_Util::prepareUser($owner);
 echo "<li data-member=$owner title=\"".OC_User::getDisplayName($owner)."\" ><i class=\"fa fa-user\"></i><span class='left'
