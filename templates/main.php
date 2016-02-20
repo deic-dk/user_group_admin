@@ -64,7 +64,7 @@
       <span>Status</span>
     </div>
   </th>
-
+  <th></th>
 </tr>
 </thead>
 <tbody id='fileList'>
