@@ -284,6 +284,15 @@ class OC_User_Group_Admin_Util {
 		));
 		return $result;
 	}
+	
+	public static function dbSetUserFreeQuota($gid, $quota) {
+		$query = OC_DB::prepare ("UPDATE `*PREFIX*user_group_admin_groups` SET `user_freequota` = '$quota' WHERE `gid` = ? " );
+		$result = $query->execute( array (
+				$quota,
+				$gid
+		));
+		return $result;
+	}
 
 	/**
 	* Update user status

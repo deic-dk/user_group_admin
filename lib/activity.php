@@ -43,7 +43,7 @@ class Activity implements IExtension {
 	public function getNotificationTypes($languageCode) {
 		$l = $this->getL10N($languageCode);
 		return [
-			self::TYPE_GROUP => (string) $l->t('Notifications from <strong>Teams</strong> app'),
+			self::TYPE_GROUP => (string) $l->t('A team membership has <strong>changed</strong>'),
 		];
 	}
 	/**
