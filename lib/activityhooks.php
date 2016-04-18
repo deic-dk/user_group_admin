@@ -56,7 +56,7 @@ class OC_User_Group_Hooks {
                                 $group, true,
 				!empty($filteredStreamUsers[$auser]),
 				!empty($filteredEmailUsers[$auser]) ? $filteredEmailUsers[$auser] : 0,
-                                40, $activityType
+                                Data::PRIORITY_MEDIUM, $activityType
                         );
 		} else {
 			OC_User_Group_Hooks::addNotificationsForUser(
@@ -64,7 +64,7 @@ class OC_User_Group_Hooks {
                                 $group, true,
                                 !empty($filteredStreamUsers[$user]),
                                 !empty($filteredEmailUsers[$user]) ? $filteredEmailUsers[$user] : 0,
-                                40, $activityType
+                                Data::PRIORITY_MEDIUM, $activityType
                         );
 		}
 	}
