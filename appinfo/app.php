@@ -20,6 +20,7 @@ OCP\App::addNavigationEntry(
 //           'icon'  => OCP\Util::imagePath( 'user_group_admin', 'nav-icon.png' ),
            'name'  => 'Teams' )
          );
+
 \OC::$server->getActivityManager()->registerExtension(function() {
 	return new Activity(
 		\OC::$server->query('L10NFactory'),
@@ -28,3 +29,24 @@ OCP\App::addNavigationEntry(
 		\OC::$server->getConfig()
 	);
 });
+
+$user = \OCP\User::getUser();
+$groups = OC_User_Group_Admin_Util::getUserGroups($user); 
+foreach ($groups as $group){
+	if(empty($group['user_freequota'])){
+		continue;
+	}
+	$order+=1./100;
+	\OCA\Files\App::getNavigationManager()->add(
+			array(
+					"id" => 'group-'.$group['gid'],
+					"appname" => 'user_group_admin',
+					"script" => 'list.php',
+					"order" =>  $order,
+					"name" => $group['gid']
+			)
+	);
+}
+
+OCP\Util::addScript('user_group_admin','user_group_notification');
+

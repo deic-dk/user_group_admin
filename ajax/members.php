@@ -29,31 +29,31 @@ OCP\JSON::checkAppEnabled('user_group_admin');
 OCP\JSON::callCheck();
 
 if (isset($_GET['search'])) {
-
-    $shareWith = array();
-    $count = 0;
-    $users = array();
-    $limit = 0;
-    $offset = 0;
-    while ($count < 4 && count($users) == $limit) {
-        $limit = 4 - $count;
-	if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-                        $users = OC_User::getDisplayNames($_GET['search'], $limit, $offset);
-                }
-                else{
-                        $users = \OCA\FilesSharding\Lib::ws('getDisplayNames', array('search'=>$_GET['search'], 'limit'=>$limit, 'offset'=>$offset),
-                                 false, true, null, 'files_sharding');
-                }
-
-        $offset += $limit;
-        foreach ($users as $user => $name) {
-            if ((!isset($_GET['itemShares']) || !is_array($_GET['itemShares'][OCP\Share::SHARE_TYPE_USER]) || !in_array($user, $_GET['itemShares'][OCP\Share::SHARE_TYPE_USER])) && $user != OC_User::getUser()) {
-                $shareWith[] = array('label' => $user.' ('.$name.')', 'value' => array('shareType' => OCP\Share::SHARE_TYPE_USER, 'shareWith' => $user));
-                $count++;
-            }
-        }
-    }
-
-    OC_JSON::success(array('data' => $shareWith));
+	$shareWith = array();
+	$count = 0;
+	$users = array();
+	$limit = 0;
+	$offset = 0;
+	while ($count < 4 && count($users) == $limit) {
+		$limit = 4 - $count;
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			$users = OC_User::getDisplayNames($_GET['search'], $limit, $offset);
+		}
+		else{
+			$users = \OCA\FilesSharding\Lib::ws('getDisplayNames', array('search'=>$_GET['search'],
+					'limit'=>$limit, 'offset'=>$offset),
+					false, true, null, 'files_sharding');
+		}
+		$offset += $limit;
+		foreach($users as $user => $name) {
+			if((!isset($_GET['itemShares']) ||
+					!is_array($_GET['itemShares'][OCP\Share::SHARE_TYPE_USER]) ||
+					!in_array($user, $_GET['itemShares'][OCP\Share::SHARE_TYPE_USER]))) {
+				$shareWith[] = array('label' => $user.' ('.$name.')', 'value' => array('shareType' => OCP\Share::SHARE_TYPE_USER, 'shareWith' => $user));
+				$count++;
+			}
+		}
+	}
+	OC_JSON::success(array('data' => $shareWith));
 }
 

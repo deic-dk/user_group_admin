@@ -33,7 +33,6 @@ OCP\Util::addStyle('user_group_admin', 'user_group_admin');
 OCP\Util::addStyle('files', 'files');
 
 OCP\Util::addScript('user_group_admin','script');
-OCP\Util::addScript('user_group_admin','user_group_notification');
 
 $tmpl = new OCP\Template('user_group_admin', 'main', 'user');
 $tmpl->assign( 'groups' , OC_User_Group_Admin_Util::getOwnerGroups(OC_User::getUser ()), true );

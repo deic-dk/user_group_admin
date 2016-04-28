@@ -14,10 +14,9 @@ $name = isset($_GET['name'])?$_GET['name']:null;
 switch ($action) {
 	case "newGroup":
 		$result = OC_User_Group_Admin_Util::dbCreateGroup($name, $userid);
-        	break;
-        case "newMember":
-		$owner = isset($_GET['owner'])?$_GET['owner']:OCP\USER::getUser ();
-		$result = OC_User_Group_Admin_Util::dbAddToGroup($userid,$name,$owner);
+		break;
+	case "newMember":
+		$result = OC_User_Group_Admin_Util::dbAddToGroup($userid, $name);
 		break;
 	case "deleteGroup":
 		$result = OC_User_Group_Admin_Util::dbDeleteGroup($name, $userid);
@@ -27,7 +26,8 @@ switch ($action) {
 		break;
 	case "updateStatus":
 		$status = isset($_GET['status'])?$_GET['status']:null;
-		$result = OC_User_Group_Admin_Util::dbUpdateStatus($name, $userid, $status);
+		$checkOpen = isset($_GET['check_open'])?$_GET['check_open']==='yes':false;
+		$result = OC_User_Group_Admin_Util::dbUpdateStatus($name, $userid, $status, $checkOpen);
 		break;
 }
 OCP\JSON::encodedPrint($result);

@@ -38,8 +38,7 @@ class OC_User_Group_Admin_Hooks
         // Delete the group-user relation
         $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ?" );
         $stmt->execute( array($uid) );
-        $stmt = OC_DB::prepare( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `owner` = ?" );
-        $stmt->execute( array($uid) );
+        // TODO: If user owns groups, change ownership.
 
         return true ;
 

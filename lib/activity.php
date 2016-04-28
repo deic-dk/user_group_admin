@@ -43,7 +43,7 @@ class Activity implements IExtension {
 	public function getNotificationTypes($languageCode) {
 		$l = $this->getL10N($languageCode);
 		return [
-			self::TYPE_GROUP => (string) $l->t('A team membership has <strong>changed</strong>'),
+			self::TYPE_GROUP => (string) $l->t('A group membership has <strong>changed</strong>'),
 		];
 	}
 	/**
@@ -74,20 +74,14 @@ class Activity implements IExtension {
 	 * @return string|false
 	 */
 	public function translate($app, $text, $params, $stripPath, $highlightParams, $languageCode) {
-		if ($app !== 'user_group_admin') {
+		if($app !== 'user_group_admin') {
 			return false;
 		}
 		$preparedParams = $this->prepareParameters('user_group_admin',
-                                $params, $this->getSpecialParameterList('user_group_admin', $text),
-                                $stripPath, $highlightParams
-                        );
-		$groupInfo = OC_User_Group_Admin_Util::searchGroup($params[0], OC_User::getUser ());
-		if (isset($groupInfo)) {
-			$groupStatus = $groupInfo["status"];
-		}else {
-			$groupStatus = 3;
-		}
-		switch ($text) {
+			$params, $this->getSpecialParameterList('user_group_admin', $text),
+			$stripPath, $highlightParams);
+		$owner = $preparedParams[2];
+		switch($text){
 			case 'created_self':
 				return (string) $this->l->t('You created group %1$s', $preparedParams);
 			case 'deleted_self':
@@ -95,16 +89,19 @@ class Activity implements IExtension {
 			case 'shared_user_self':
 				return (string) $this->l->t('You invited %2$s to group %1$s', $preparedParams);
 			case 'shared_with_by':
-				if ($groupStatus == 0) {
-					return (string) $this->l->t('You have been invited to group %1$s by %2$s<div id="invite_div" style="display:none"><a href="#" id="accept" class="btn btn-default btn-flat" value =\'%1$s\'  >Accept</a>&nbsp<a href="#" class="btn btn-default btn-flat" id="decline" value = \'%1$s\'>Decline</a></div>', $preparedParams );
-				}else if ($groupStatus == 1) {
-					return (string) $this->l->t('You joined group %1$s', $preparedParams);
-				}else if ($groupStatus == 2) {
-					return (string) $this->l->t('You rejected an invitation to group %1$s', $preparedParams);
-				}else {
-					return (string) $this->l->t('Group invitation to %1$s', $preparedParams);
+				\OCP\Util::writeLog('User_Group_Admin', 'params: '.serialize($params), \OCP\Util::WARN);
+				if($owner==OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER){
+					return (string) $this->l->t('You\'ve been added to group %1$s', $preparedParams);
 				}
-		        case 'deleted_by':
+				else {
+					return (string) $this->l->
+					t('You have been invited by %3$s to join group %1$s
+						<div class="invite_div" style="display:none">
+							<a href="#" class="accept btn btn-default btn-flat" group=\'%1$s\'>Accept</a>&nbsp
+							<a href="#" class="decline btn btn-default btn-flat" group=\'%1$s\'>Decline</a>
+						</div>', $preparedParams);
+				}
+			case 'deleted_by':
 				return (string) $this->l->t('%2$s left group %1$s', $preparedParams);	
 			default:
 				return false;
@@ -226,9 +223,9 @@ class Activity implements IExtension {
 	 * @return string
 	 */
 	protected function prepareFileParam($app, $param, $stripPath, $highlightParams) {
-                
-	 	if (!$highlightParams) {
-			return $param;
+		if (!$highlightParams) {
+			// Don't show name in bell-dropdown. It's anyway shown with icon.
+			return "";//$param;
 		}
 		if ($app === 'user_group_admin') {
 			return '<a class="filename" href="/index.php/apps/user_group_admin">' . \OCP\Util::sanitizeHTML($param) . '</a>';

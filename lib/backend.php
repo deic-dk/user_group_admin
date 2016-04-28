@@ -39,9 +39,8 @@ class OC_User_Group_Admin_Backend extends OC_Group_Backend
      */
     public function inGroup( $uid, $gid )
     {
-        // check
-        $stmt = OC_DB::prepare( "SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `owner` = ?" );
-        $result = $stmt->execute( array( $gid, $uid , OCP\USER::getUser() ));
+        $stmt = OC_DB::prepare( "SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ?" );
+        $result = $stmt->execute( array( $gid, $uid ));
         
         return $result->fetchRow() ? true : false ;
     }
@@ -56,7 +55,6 @@ class OC_User_Group_Admin_Backend extends OC_Group_Backend
      */
     public function getUserGroups( $uid )
     {
-        // No magic!
         $stmt = OC_DB::prepare( "SELECT `gid` FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ?" );
         $result = $stmt->execute( array( $uid ));
 
@@ -73,22 +71,23 @@ class OC_User_Group_Admin_Backend extends OC_Group_Backend
      * @param  string $search
      * @param  int    $limit
      * @param  int    $offset
-     * @return array  with group names
+     * @return array  with group names. NOTICE: only groups the current user is a member or owner of are returned
      *
      * Returns a list with all groups
      */
     public function getGroups($search = '', $limit = null, $offset = null)
     {
-        $stmt = OC_DB::prepare('SELECT `gid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` LIKE ? AND (`owner` = ? OR `uid` = ? AND `owner` != ?)  GROUP BY `gid`', $limit, $offset);
+        $stmt = OC_DB::prepare('SELECT `gid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` LIKE ? AND `uid` = ? GROUP BY `gid`', $limit, $offset);
         $user = OCP\USER::getUser();
-        $result = $stmt->execute(array($search.'%', $user, $user, self::$HIDDEN_GROUP_OWNER));
+        $result = $stmt->execute(array($search.'%', $user));
         $groups = array();
         while ($row = $result->fetchRow()) {
-					if(!in_array($row['gid'], $groups)){
-						$groups[] = $row['gid'];
+        	$group = $row['gid'];
+        	$owner = OC_User_Group_Admin_Util::getGroupOwner($group);
+        	if(!in_array($group, $groups) && $owner!=self::$HIDDEN_GROUP_OWNER){
+						$groups[] = $group;
 					}
         }
-
         return $groups;
     }
 
@@ -99,8 +98,8 @@ class OC_User_Group_Admin_Backend extends OC_Group_Backend
      */
     public function groupExists($gid)
     {
-        $query = OC_DB::prepare('SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ? AND `owner` = ?' );
-        $result = $query->execute(array($gid,OCP\USER::getUser()))->fetchOne();
+        $query = OC_DB::prepare('SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?' );
+        $result = $query->execute(array($gid, ))->fetchOne();
         if ($result) {
             return true;
         }
@@ -118,13 +117,13 @@ class OC_User_Group_Admin_Backend extends OC_Group_Backend
      */
     public function usersInGroup($gid, $search = '', $limit = null, $offset = null)
     {
-        $stmt = OC_DB::prepare('SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` LIKE ?', $limit, $offset);
+    		$stmt = OC_DB::prepare('SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` LIKE ?', $limit, $offset );
         $result = $stmt->execute(array($gid, $search.'%'));
+        $owner = 
         $users = array();
         while ($row = $result->fetchRow()) {
             $users[] = $row['uid'];
         }
-
         return $users;
     }
 

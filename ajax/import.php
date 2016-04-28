@@ -26,44 +26,49 @@ OCP\User::checkLoggedIn ();
 OCP\App::checkAppEnabled ( 'user_group_admin' );
 
 $import = true;
-if (isset ( $_FILES ['import_group_file'] ['tmp_name'] )) {
+$failed = array();
+if (isset($_FILES ['import_group_file'] ['tmp_name'])) {
 	$from = $_FILES ['import_group_file'] ['tmp_name'];
 	$content = file_get_contents ( $from );
-	$members = file ( $from, FILE_IGNORE_NEW_LINES );
-	if (is_array ( $members )) {
-		$group = $members [0];
-		array_shift ( $members );
-		$result = OC_User_Group_Admin_Util::createGroup ( $group, OCP\USER::getUser () );
-		$activity = OC_User_Group_Hooks::groupCreate($group, OCP\USER::getUser ());
-		if ($result) {
-			foreach ( $members as $member ) {
-				if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-                        		$userExists = \OCP\User::userExists($member);
-                		}
-                		else{
-                        		$userExists = \OCA\FilesSharding\Lib::ws('userExists', array('user_id'=>$member),
-                                 		false, true, null, 'files_sharding');
-                		}
-				if ($userExists and OCP\User::getUser () != $member) {
-					OC_User_Group_Admin_Util::addToGroup ( $member, $group, OCP\USER::getUser () );
-					OC_User_Group_Hooks::groupShare($group, $member, OCP\USER::getUser ());
-				} elseif ($userExists == false) {
-					$import = false;
-				}
+	$data = json_decode($content, true);
+	$group = $data['group'];
+	if (!empty($group) && is_array ($data['members'])){
+		// Create group if it doesn't exist
+		$result = OC_User_Group_Admin_Util::createGroup ($group, OCP\USER::getUser());
+		if($result){
+			$activity = OC_User_Group_Hooks::groupCreate($group, OCP\USER::getUser());
+		}
+		foreach($members as $member){
+			if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+				$userExists = \OCP\User::userExists($member);
+			}
+			else{
+				$userExists = \OCA\FilesSharding\Lib::ws('userExists', array('user_id'=>$member),
+					false, true, null, 'files_sharding');
+			}
+			if($userExists){
+				OC_User_Group_Admin_Util::addToGroup($member, $group, OCP\USER::getUser());
+				OC_User_Group_Hooks::groupShare($group, $member, OCP\USER::getUser());
+			}
+			else{
+				$failed[] = $member;
 			}
 		}
 	}
 }
-if ($import) {
-	header ( 'Location: ' . OCP\Util::linkToAbsolute ( 'user_group_admin', 'index.php' ) );
-} else {
+if(empty($failed)){
+	header('Location: ' . OCP\Util::linkToAbsolute('user_group_admin', 'index.php'));
+}
+else{
+	$n = count($failed);
 	echo "<script type='text/javascript'>
-                          var r = confirm('Some of the users were not added to the group because they do not have an account in Data Deic.');
-                        if (r == true) {
-                          window.location.href='https://test.data.deic.dk/index.php/apps/user_group_admin';
-						} else {
-       					  window.location.href='https://test.data.deic.dk/index.php/apps/user_group_admin';
-						}
-                          </script>";
+			var r = confirm('".$n." user".($n===1?"":"s")." not added to the group because adding requires existence.');
+			if(r==true){
+				window.location.href='https://test.data.deic.dk/index.php/apps/user_group_admin';
+			}
+			else{
+				window.location.href='https://test.data.deic.dk/index.php/apps/user_group_admin';
+			}
+			</script>";
 }
 

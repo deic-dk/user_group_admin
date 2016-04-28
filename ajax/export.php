@@ -32,13 +32,14 @@ $group = isset($_GET['group']) ? $_GET['group'] : null;
 if ( isset($group) ) {
    
     header('Content-Type: application/octet-stream');
-    header('Content-Disposition: inline; filename=' . str_replace(' ', '_', $group) . '.ocg');
+    header('Content-Disposition: attachment; filename=' . str_replace(' ', '_', $group) . '.json');
 
-    $members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
-    $members = array_column($members, 'uid');
-    $data    = array_merge( array($group) , $members ) ;
-
-    echo serialize($data) ;
+    $groupData = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
+    $members = array_column($groupData, 'uid');
+    $ownerArr = array_column($groupData, 'owner');
+    $data    = array('group'=>$group, 'owner'=>$ownerArr[0], 'members'=>$members);
+    
+    OCP\JSON::encodedPrint($data);
 
 }
 

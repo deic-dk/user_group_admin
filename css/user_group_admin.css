@@ -21,7 +21,8 @@ li
 .ownertext {
 	position:relative; 
 	font-size:80%; 
-	color:#FF8C00
+	color:#FF8C00;
+	padding-left: 12px;
 } 
 
 #spanaction {
@@ -69,16 +70,18 @@ li
     opacity: 0;
     filter: alpha(opacity=0);
 }
-table  td.groupsname span.name span.nametext {font-weight:bold; }
+table  td.groupname span.name span.nametext {font-weight:bold; }
+
 table td.filename input.filename {
 	width: 70%;
 	margin-top: 1px;
 	margin-left: 48px;
 	cursor: text;
 }
-table td.groupsname .nametext {
-        position: absolute;
-        left: 29px;
+
+table td.groupname .nametext {
+        /*position: absolute;*/
+        left: 68px;
         padding: 0;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -86,6 +89,9 @@ table td.groupsname .nametext {
         height: 100%;
 }
 
+table td.groupname a:hover {
+	text-decoration: none;
+}
 
 #actionbtnBrowse, #actionbtnSave {
     margin:0 !important;
@@ -105,11 +111,6 @@ table td.groupsname .nametext {
 
 #memberships {
 	text-align: center;
-}
-
-.groupname {
-	text-align:center;
-	font-size:120%;
 }
 
 .itext {
@@ -191,9 +192,6 @@ a.action > img {
 		vertical-align: text-bottom;
 }
 
-
-
-
 div.scrollable {
 		width: 100%;
 		height: 348px;
@@ -210,7 +208,93 @@ div.scrollable2 {
 		white-space: nowrap;
 }
 
-div.scrollable::-webkit-scrollbar{
+div.scrollable::-webkit-scrollbar {
 		width: 12px;
 }
 
+.oc-dialog-title, .memberscount, .owner {
+	padding: 10px 3px 10px 0;
+}
+
+.dropmembers li {
+	width:80%;
+	margin: 0 auto;
+}
+
+.invitemembers {
+	position:absolute;
+	bottom:50px;
+	left:40px;
+}
+
+.userselect {
+	width:80%;
+	padding-left:0;
+	margin: 32px auto 0 auto;
+	display:none;
+}
+
+.filelink-wrap {
+	padding-left:4px;
+}
+
+.icon-trash-empty {
+	text-decoration:none;
+	color:#c5c5c5;
+	font-size:16px;
+	background-image:none;
+}
+
+td.groupname {
+	height:34px;
+}
+
+table#groupstable th .columntitle.name {
+    margin: 0;
+    padding: 15px 43px;
+}
+
+.groupname .icon-users {
+	margin-left: 10px;
+	margin-right: 6px;
+}
+
+.oc-dialog .grouptitle {
+	margin-bottom: 12px;
+	text-left;
+	font-size:110%;
+	width: 90%;
+	font-weight:bold;
+}
+
+.oc-dialog .oc-dialog-close {
+    height: 10px;
+    right: 0;
+    top: 0;
+    width: 10px;
+}
+
+.oc-dialog .group_pending {
+	color:#CDDC39;
+	font-weight:bold;
+	font-size:80%;
+}
+
+.group_declined {
+	color:#F44336;
+	font-weight:bold;
+	font-size:80%;
+}
+
+.oc-dialog .icon-cancel-circled {
+	color:#006b93;
+	display:inline;
+}
+
+.oc-dialog .group_status {
+	padding-left: 12px;
+}
+
+.dropmembers li {
+	padding-bottom: 12px;
+}

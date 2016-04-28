@@ -1,6 +1,6 @@
 <?php
-$groupmembership=$_['group'];
-$members = OC_User_Group_Admin_Util::usersInGroup( $groupmembership ) ;
+$group = $_['group'];
+$members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
 foreach ($members as $member) {
         $owner = $member["owner"];
         break;

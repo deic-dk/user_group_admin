@@ -30,79 +30,81 @@ OCP\JSON::checkAppEnabled('user_group_admin');
 OCP\JSON::callCheck();
 
 if ( isset($_POST['group']) ) {
-  switch ($_POST['action']) {
-    case "addgroup":
-      $result = OC_User_Group_Admin_Util::createGroup( $_POST['group'], OCP\USER::getUser () ) ;
-      break;
-    case "addmember":
-      if ( isset($_POST['member'])) {
-	$result = OC_User_Group_Admin_Util::addToGroup( $_POST['member'] , $_POST['group'], OCP\USER::getUser () );
-	}
-      break;
-    case "leavegroup":
-      $result = OC_User_Group_Admin_Util::removeFromGroup( OCP\User::getUser() , $_POST['group'] ) ;
-      $groupInfo = OC_User_Group_Admin_Util::searchGroup($_POST['group'], OCP\User::getUser());
-	$groupOwner = $groupInfo["owner"];
-	$activity = OC_User_Group_Hooks::groupLeave($_POST['group'], OCP\User::getUser(), $groupOwner);
-      break;
-    case "delgroup":
-      $result = OC_User_Group_Admin_Util::deleteGroup($_POST['group'], OCP\User::getUser()) ;
-	$activity = OC_User_Group_Hooks::groupDelete($_POST['group'], OCP\User::getUser());
-      break;
-    case "delmember":
-      if ( isset($_POST['member'])) $result = OC_User_Group_Admin_Util::removeFromGroup( $_POST['member'] , $_POST['group'] ) ;
-      break;
-    case "showmembers":
-      $result = true;
-      break;
-    case "showmemberships":
-      $result = true;
-      break;
+	doAction();
+}
+
+function doAction(){
 	
-  }
-  		
-  if ($result) {
-    switch ($_POST['action']) {
-	case "addgroup":
-		$activity = OC_User_Group_Hooks::groupCreate($_POST['group'], OCP\USER::getUser ());
-		OCP\JSON::success();
-	break;
-  	  case "addmember":  
-	$activity = OC_User_Group_Hooks::groupShare($_POST['group'], $_POST['member'], OCP\USER::getUser ());
-        $tmpl = new OCP\Template("user_group_admin", "members");
-        $tmpl->assign( 'group' , $_POST['group'] , false );
-        $tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $_POST['group'] ) , false );
-        $page = $tmpl->fetchPage();
-        OCP\JSON::success(array('data' => array('page'=>$page)));
-  	    break;
-	case "showmembers":
-	$tmpl = new OCP\Template("user_group_admin", "members");
-        $tmpl->assign( 'group' , $_POST['group'] , false );
-        $tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $_POST['group'] ) , false );
-        $page = $tmpl->fetchPage();
-        OCP\JSON::success(array('data' => array('page'=>$page)));
-            break;
-	case "showmemberships":
-        $tmpl = new OCP\Template("user_group_admin", "memberships");
-        $tmpl->assign( 'group' , $_POST['group'] , false );
-        $tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $_POST['group'] ) , false );
-        $page = $tmpl->fetchPage();
-        OCP\JSON::success(array('data' => array('page'=>$page)));
-            break;
-
-  	  default:
-  	    OCP\JSON::success();
-    }     
-  } else {
-
-    switch ($_POST['action']) {
-      case "addgroup":
-    	OCP\JSON::error(array('data' => array('title'=> 'Add Group'  , 'message' => 'This group name already exists in the database. Please choose another one.' ))) ;
-	break;
-      case "addmember":
-	OCP\JSON::error(array('data' => array('title'=> 'Add Member'  , 'message' => 'Wrong name' ))) ;
-	break;
+	switch ($_POST['action']) {
+		case "addgroup":
+			$result = OC_User_Group_Admin_Util::createGroup($_POST['group'], OCP\USER::getUser ()) ;
+			break;
+		case "addmember":
+			if ( isset($_POST['member'])) {
+				$result = OC_User_Group_Admin_Util::addToGroup($_POST['member'], $_POST['group']);
+			}
+			break;
+		case "leavegroup":
+			$result = OC_User_Group_Admin_Util::removeFromGroup( OCP\User::getUser(), $_POST['group'] ) ;
+			OC_User_Group_Hooks::groupLeave($_POST['group'], OCP\User::getUser());
+			break;
+		case "delgroup":
+			$result = OC_User_Group_Admin_Util::deleteGroup($_POST['group'], OCP\User::getUser()) ;
+			OC_User_Group_Hooks::groupDelete($_POST['group'], OCP\User::getUser());
+			break;
+		case "delmember":
+			if ( isset($_POST['member'])) $result = OC_User_Group_Admin_Util::removeFromGroup( $_POST['member'],
+			$_POST['group'] ) ;
+			break;
+		case "showmembers":
+			$result = true;
+			break;
+		case "showmemberships":
+			$result = true;
+			break;
 	}
-  }
+
+	if ($result) {
+		switch ($_POST['action']) {
+			case "addgroup":
+				OC_User_Group_Hooks::groupCreate($_POST['group'], OCP\USER::getUser ());
+				OCP\JSON::success();
+				break;
+			case "addmember":  
+				OC_User_Group_Hooks::groupShare($_POST['group'], $_POST['member'], OCP\USER::getUser ());
+				$tmpl = new OCP\Template("user_group_admin", "members");
+				$tmpl->assign( 'group' , $_POST['group'], false );
+				$tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $_POST['group'] ), false );
+				$page = $tmpl->fetchPage();
+				OCP\JSON::success(array('data' => array('page'=>$page)));
+				break;
+			case "showmembers":
+				$tmpl = new OCP\Template("user_group_admin", "members");
+				$tmpl->assign( 'group' , $_POST['group'] , false );
+				$tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $_POST['group'] ), false );
+				$page = $tmpl->fetchPage();
+				OCP\JSON::success(array('data' => array('page'=>$page)));
+				break;
+			case "showmemberships":
+				$tmpl = new OCP\Template("user_group_admin", "memberships");
+				$tmpl->assign( 'group' , $_POST['group'] , false );
+				$tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $_POST['group'] ), false );
+				$page = $tmpl->fetchPage();
+				OCP\JSON::success(array('data' => array('page'=>$page)));
+				break;
+			default:
+				OCP\JSON::success();
+		}
+ 	}
+ 	else{
+	 	switch ($_POST['action']) {
+	 		case "addgroup":
+	 			OCP\JSON::error(array('data' => array('title'=> 'Add Group'  , 'message' => 'A group with this name already exists.' ))) ;
+				break;
+			case "addmember":
+				OCP\JSON::error(array('data' => array('title'=> 'Add Member'  , 'message' => 'Wrong name' ))) ;
+				break;
+		}
+	}
 }
 
