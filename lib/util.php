@@ -236,7 +236,7 @@ class OC_User_Group_Admin_Util {
 				$uid,
 				$gid
 		));
-		return $query->affected_rows()>0;
+		return $query->rowCount()>0;
 	}
 	
 	public static function dbSetUserFreeQuota($gid, $quota) {
