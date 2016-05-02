@@ -9,5 +9,5 @@ if(!OCA\FilesSharding\Lib::checkIP()){
 }
 
 $group = isset($_GET['gid'])?$_GET['gid']:\OCP\User::getUser();
-$owner = OC_User_Group_Admin_Util::dbGetGroupOwner($group);
+$info = OC_User_Group_Admin_Util::dbGetGroupInfo($group);
 OCP\JSON::encodedPrint($owner);

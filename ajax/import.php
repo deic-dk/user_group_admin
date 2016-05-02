@@ -32,13 +32,20 @@ if (isset($_FILES ['import_group_file'] ['tmp_name'])) {
 	$content = file_get_contents ( $from );
 	$data = json_decode($content, true);
 	$group = $data['group'];
-	if (!empty($group) && is_array ($data['members'])){
+	$user = OCP\USER::getUser();
+	$groupInfo = OC_User_Group_Admin_Util::getGroupInfo($group);
+	if(!empty($groupInfo) && !empty($groupInfo['owner'])){
+		$existingOwner = $groupInfo['owner'];
+	}
+	$owner = isset($data['owner'])?$data['owner']:$user;
+	if(!empty($group) && is_array($data['members']) &&
+			((empty($existingOwner) || $existingOwner===$user) && $owner===$user || OC_User::isAdminUser($user))){
 		// Create group if it doesn't exist
-		$result = OC_User_Group_Admin_Util::createGroup ($group, OCP\USER::getUser());
+		$result = OC_User_Group_Admin_Util::createGroup($group, $owner);
 		if($result){
-			$activity = OC_User_Group_Hooks::groupCreate($group, OCP\USER::getUser());
+			$activity = OC_User_Group_Hooks::groupCreate($group, $user);
 		}
-		foreach($members as $member){
+		foreach($data['members'] as $member){
 			if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
 				$userExists = \OCP\User::userExists($member);
 			}
@@ -47,8 +54,8 @@ if (isset($_FILES ['import_group_file'] ['tmp_name'])) {
 					false, true, null, 'files_sharding');
 			}
 			if($userExists){
-				OC_User_Group_Admin_Util::addToGroup($member, $group, OCP\USER::getUser());
-				OC_User_Group_Hooks::groupShare($group, $member, OCP\USER::getUser());
+				OC_User_Group_Admin_Util::addToGroup($member, $group);
+				OC_User_Group_Hooks::groupShare($group, $member, $user);
 			}
 			else{
 				$failed[] = $member;
@@ -57,7 +64,20 @@ if (isset($_FILES ['import_group_file'] ['tmp_name'])) {
 	}
 }
 if(empty($failed)){
-	header('Location: ' . OCP\Util::linkToAbsolute('user_group_admin', 'index.php'));
+	if($owner!==$user &&  !OC_User::isAdminUser($user)){
+		echo "<script type='text/javascript'>
+			var r = confirm('You cannot create create groups owned by other than yourself.');
+			if(r==true){
+				window.location.href='https://test.data.deic.dk/index.php/apps/user_group_admin';
+			}
+			else{
+				window.location.href='https://test.data.deic.dk/index.php/apps/user_group_admin';
+			}
+			</script>";
+	}
+	else{
+		header('Location: ' . OCP\Util::linkToAbsolute('user_group_admin', 'index.php'));
+	}
 }
 else{
 	$n = count($failed);

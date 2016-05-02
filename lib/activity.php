@@ -80,7 +80,6 @@ class Activity implements IExtension {
 		$preparedParams = $this->prepareParameters('user_group_admin',
 			$params, $this->getSpecialParameterList('user_group_admin', $text),
 			$stripPath, $highlightParams);
-		$owner = $preparedParams[2];
 		switch($text){
 			case 'created_self':
 				return (string) $this->l->t('You created group %1$s', $preparedParams);
@@ -89,16 +88,17 @@ class Activity implements IExtension {
 			case 'shared_user_self':
 				return (string) $this->l->t('You invited %2$s to group %1$s', $preparedParams);
 			case 'shared_with_by':
-				\OCP\Util::writeLog('User_Group_Admin', 'params: '.serialize($params), \OCP\Util::WARN);
+				$owner = $params[2];
 				if($owner==OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER){
 					return (string) $this->l->t('You\'ve been added to group %1$s', $preparedParams);
 				}
-				else {
+				else{
+					$group = $params[0];
 					return (string) $this->l->
 					t('You have been invited by %3$s to join group %1$s
 						<div class="invite_div" style="display:none">
-							<a href="#" class="accept btn btn-default btn-flat" group=\'%1$s\'>Accept</a>&nbsp
-							<a href="#" class="decline btn btn-default btn-flat" group=\'%1$s\'>Decline</a>
+							<a href="#" class="accept btn btn-default btn-flat" group=\''.$group.'\'>Accept</a>&nbsp
+							<a href="#" class="decline btn btn-default btn-flat" group=\''.$group.'\'>Decline</a>
 						</div>', $preparedParams);
 				}
 			case 'deleted_by':

@@ -1,12 +1,7 @@
 <?php
 
 $group=$_['group'];
-if(\OC_User::isAdminUser(\OC_User::getUser())){
-	$owner = OC_User_Group_Admin_Util::getGroupOwner($group);
-}
-else{
-	$owner = \OC_User::getUser();
-}
+$owner = OC_User_Group_Admin_Util::getGroupOwner($group);
 $members = OC_User_Group_Admin_Util::usersInGroup($group);
 $numMembers = count($members);
 $ownerAvatar = OC_User_Group_Admin_Util::prepareUser($owner);
@@ -21,13 +16,10 @@ echo "<div class='memberscount' members='".$numMembers."'>".$numMembers." member
 foreach($members as $member){
 	$uid = $member["uid"];
 	$status = $member["verified"];
-	if($status == 1){
-		$status = '';
-	}
-	elseif ($status == 0){
+	if ($status==OC_User_Group_Admin_Util::$GROUP_INVITATION_OPEN){
 		$status = '<i class="group_pending">Pending...</i>';
 	}
-	else{
+	elseif ($status===OC_User_Group_Admin_Util::$GROUP_INVITATION_DECLINED){
 		$status = '<i class="group_declined">Member declined the invitation';
 	}
 	$name = OC_User_Group_Admin_Util::prepareUser($uid);

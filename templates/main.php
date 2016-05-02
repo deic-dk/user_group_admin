@@ -68,9 +68,9 @@
 </thead>
 <tbody id='fileList'>
 <?php
-	$groups = OC_User_Group_Admin_Util::getOwnerGroups(OC_User::getUser () ) ;
-	$groupmemberships = OC_User_Group_Admin_Util::getUserGroups ( OC_User::getUser () );
-	foreach ($groups as $group) {
+	$ownedGroups = OC_User_Group_Admin_Util::getOwnerGroups(OC_User::getUser());
+	$groupmemberships = OC_User_Group_Admin_Util::getUserGroups (OC_User::getUser());
+	foreach ($ownedGroups as $group) {
 		echo "<tr role=\"owner\" group=\"$group\">
 		<td class='groupname'>
 		<div class='row'>
@@ -80,31 +80,28 @@
 		</td>";
 		$members = OC_User_Group_Admin_Util::usersInGroup( $group );
 		$size = count($members);
-		echo "<td id='members'><div class='nomembers'><span id='nomembers'>$size</span></div></td>";
-		echo "<td>Owner</td><td><a href='#' original-title='Delete' id='delete-group'
-	  													class='action icon icon-trash-empty'></a></td>
+		echo "<td group=\"$group\"><div class='nomembers'><span id='nomembers'>$size</span></div></td>";
+		echo "<td>Owner</td><td><a href='#' original-title='Delete' class='delete-group action icon icon-trash-empty'></a></td>
 	  		</tr>";
 	}
 
 	$count = 0;
 	foreach ($groupmemberships as $groupmembership) {
-		if ($groupmembership["verified"] == 1) {
-			$group = (string)$groupmembership["gid"];
-			$count++;
+		$group = (string)$groupmembership["gid"];
+		if($groupmembership["verified"]!=1 || in_array($group, $ownedGroups)){
+			continue;
+		}
+		$count++;
 		echo "<tr role=\"member\" group=\"$group\">
 		<td class='groupname'><div class='row'>
 			<div class='col-xs-8 filelink-wrap'><a class='name'><i class='icon-users deic_green icon'></i>
 				<span class='nametext'>$group</span></a></div>
 		</div></td>";
 		$members = OC_User_Group_Admin_Util::usersInGroup( $group ) ;
-	        $size = count($members);
-		echo "<td group=\"$group\"><div class='nomemberships'>
-						<span id='nomembers' >$size</span>
-					</div></td>";
-		echo "<td>Member</td>
-					<td><a href='#' original-title='Delete' id='delete-group' class='action icon icon-trash-empty'></a></td>
+		$size = count($members);
+		echo "<td group=\"$group\"><div class='nomemberships'><span id='nomembers' >$size</span></div></td>";
+		echo "<td>Member</td><td><a href='#' original-title='Leave' class='delete-group action icon icon-trash-empty'></a></td>
 				</tr>";
-		}
 	}
 
 	if(\OC_User::isAdminUser(\OC_User::getUser())){
@@ -131,9 +128,9 @@
 <tfoot>
 	<tr class="summary text-sm">
 		<td>
-
-		       <span class="info"><?php
- 			echo count($groups)+$count." groups"; ?></span>
+		<span class="info"><?php
+		$allGroups = count($ownedGroups)+$count;
+		echo $allGroups." group".($allGroups>1?"s":""); ?></span>
 		</td>
 	</tr>
 
@@ -145,21 +142,21 @@
 </div>
 
 <?php
-if (!empty($_GET['code'])) {
-	$groups = OC_User_Group_Admin_Util::getUserGroups ( OC_User::getUser () );
-	foreach ( $groups as $group ) {
+if(!empty($_GET['code'])){
+	$groups = OC_User_Group_Admin_Util::getUserGroups (OC_User::getUser ());
+	foreach($groups as $group){
 		$groupname = $group["gid"];
 		$acceptCode = $group["accept"];
 		$declineCode = $group["decline"];
-		if ( $_GET['code'] == $acceptCode ) {
-			OC_User_Group_Admin_Util::updateStatus( $groupname, OCP\USER::getUser (),
-				OC_User_Group_Admin_Util::$GROUP_INVITATION_ACCEPTED, true );
+		if($_GET['code']==$acceptCode &&
+			OC_User_Group_Admin_Util::updateStatus($groupname, OCP\USER::getUser (),
+				OC_User_Group_Admin_Util::$GROUP_INVITATION_ACCEPTED, true)){
 			echo "<script type='text/javascript'>location.reload();</script>";
 			break;
 		}
-		elseif ($declineCode == $_GET['code']) {
+		elseif($declineCode==$_GET['code'] &&
 			OC_User_Group_Admin_Util::updateStatus($groupname, OCP\USER::getUser (),
-				OC_User_Group_Admin_Util::$GROUP_INVITATION_DECLINED, true );
+				OC_User_Group_Admin_Util::$GROUP_INVITATION_DECLINED, true)){
 			echo "<script type='text/javascript'>location.reload();</script>";
 			break;
 		}

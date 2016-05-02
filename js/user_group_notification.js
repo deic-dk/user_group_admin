@@ -1,19 +1,19 @@
 $(document).ready(function() {
-	$(document).on ("click", ".accept", function () {
+	$(document).on ("click", ".invite_div .accept", function () {
 		var group = $(this).attr('group');
-		$(this).parent().html('<span group="' + group + '">Accepted</span>');
+		$(this).parent().html('<span group="' + group + '"><strong>Accepted</strong></span>');
 		$.ajax({
 			url:OC.linkTo('user_group_admin', 'ajax/acceptinvitation.php'),
 			type: 'post',
 			data: { 'group': $(this).attr('group'), 'accept': 'yes'},
 			success: function(data, status) {
-				}
-			});
+			}
 		});
+	});
 	
-	$(document).on ("click", ".decline", function () {
+	$(document).on ("click", ".invite_div .decline", function () {
 		var group = $(this).attr('group');
-		$(this).parent().html('<span group="' + group + '">Rejected</span>');
+		$(this).parent().html('<span group="' + group + '"><strong>Rejected</strong></span>');
 		$.ajax({
 			url:OC.linkTo('user_group_admin', 'ajax/acceptinvitation.php'),
 			type: 'post',
@@ -44,6 +44,7 @@ function checkAccept(){
 			cache: false,
 			success: function(){
 				$('.bell').addClass('ringing');
+				$('.num-notifications').text(acceptArr.length);
 				}
 			});
 	}

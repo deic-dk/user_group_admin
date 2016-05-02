@@ -19,7 +19,7 @@ switch ($action) {
 		$result = OC_User_Group_Admin_Util::dbAddToGroup($userid, $name);
 		break;
 	case "deleteGroup":
-		$result = OC_User_Group_Admin_Util::dbDeleteGroup($name, $userid);
+		$result = OC_User_Group_Admin_Util::dbDeleteGroup($name);
 		break;
 	case "leaveGroup":
 		$result = OC_User_Group_Admin_Util::dbRemoveFromGroup($userid, $name);

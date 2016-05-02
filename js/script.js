@@ -104,7 +104,7 @@ $(document).ready(function() {
 		$('#newgroup').slideToggle();
 	});
 
-	$("#groupstable td #delete-group").live('click', function() {
+	$("#groupstable td .delete-group").live('click', function() {
 		var role = $(this).closest('tr').attr('role') ;
 		var groupSelected = $(this).closest('tr').attr('group') ;
 		$( '#dialogalert' ).dialog({ buttons: [ { id:'test','data-test':'data test', text: 'Delete', click: function() {
@@ -193,35 +193,26 @@ $(document).ready(function() {
 		});
 
 		$('.ui-helper-clearfix').css("display", "none");
-		if (role=='owner' || role=='admin'){
-			$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmembers"} ,
-			function ( jsondata ){
-				if(jsondata.status == 'success' ) {
-					$('.dropmembers').html(jsondata.data.page);
-					$('.avatar').each(function() {
-						var element = $(this);
-						element.avatar(element.data('user'), 28);
-					});
-				}
-				else{
-					OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
-				}
+		if (role=='owner' || role=='admin' || role=='member'){
+			$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'),
+				{group: group, action : "showmembers"} ,
+				function ( jsondata ){
+					if(jsondata.status == 'success' ) {
+						$('.dropmembers').html(jsondata.data.page);
+						$('.avatar').each(function() {
+							var element = $(this);
+							element.avatar(element.data('user'), 28);
+						});
+						if (role=='member') {
+							$('.removemember').hide();
+						}
+					}
+					else{
+						OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
+					}
 			});
 		}
-		else if (role=='member') {
-			$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: group, action : "showmemberships"} ,
-			function ( jsondata ){
-				if(jsondata.status == 'success' ) {
-					$('.dropmembers').html(jsondata.data.page);
-					$('.avatar').each(function() {
-						var element = $(this);
-						element.avatar(element.data('user'), 28);
-					});
-					}
-				else{
-					OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
-				}
-			});
+		if (role=='member') {
 			$('.invite').hide();
 		}
 	});

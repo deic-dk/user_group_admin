@@ -109,10 +109,6 @@ table td.groupname a:hover {
 		text-align: center;
 }
 
-#memberships {
-	text-align: center;
-}
-
 .itext {
 	font-weight:bold;
 	font-size:120%;
@@ -268,9 +264,9 @@ table#groupstable th .columntitle.name {
 }
 
 .oc-dialog .oc-dialog-close {
-    height: 10px;
-    right: 0;
-    top: 0;
+    height: 4px;
+    right: 6px;
+    top: 10px;
     width: 10px;
 }
 
