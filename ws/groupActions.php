@@ -26,7 +26,7 @@ switch ($action) {
 		break;
 	case "updateStatus":
 		$status = isset($_GET['status'])?$_GET['status']:null;
-		$checkOpen = isset($_GET['check_open'])?$_GET['check_open']==='yes':false;
+		$checkOpen = isset($_GET['checkOpen'])?$_GET['checkOpen']==='yes':false;
 		$result = OC_User_Group_Admin_Util::dbUpdateStatus($name, $userid, $status, $checkOpen);
 		break;
 }

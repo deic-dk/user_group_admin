@@ -148,21 +148,20 @@ if(!empty($_GET['code'])){
 		$groupname = $group["gid"];
 		$acceptCode = $group["accept"];
 		$declineCode = $group["decline"];
-		if($_GET['code']==$acceptCode &&
-			OC_User_Group_Admin_Util::updateStatus($groupname, OCP\USER::getUser (),
-				OC_User_Group_Admin_Util::$GROUP_INVITATION_ACCEPTED, true)){
-			echo "<script type='text/javascript'>location.reload();</script>";
-			break;
-		}
-		elseif($declineCode==$_GET['code'] &&
-			OC_User_Group_Admin_Util::updateStatus($groupname, OCP\USER::getUser (),
-				OC_User_Group_Admin_Util::$GROUP_INVITATION_DECLINED, true)){
-			echo "<script type='text/javascript'>location.reload();</script>";
-			break;
+		if($_GET['code']===$acceptCode || $_GET['code']===$declineCode){
+			if(OC_User_Group_Admin_Util::updateStatus($groupname, OCP\USER::getUser (),
+				$_GET['code']===$acceptCode?OC_User_Group_Admin_Util::$GROUP_INVITATION_ACCEPTED:
+																		OC_User_Group_Admin_Util::$GROUP_INVITATION_DECLINED, true)){
+				echo "<script type='text/javascript'>location.reload();</script>";
+				break;
+			}
+			else{
+				echo "<script type='text/javascript'>OC.dialogs.alert('You have already accepted or declined the invitation.', 'Invitation invalid');</script>";
+			}
 		}
 	}
 }
 
-echo "<div id='dialogalert' title='Delete Confirmation' style='display:none;' ><p>Are you sure you want to delete this group?</p></div>";
+echo "<div id='dialogalert' title='Confirmation' style='display:none;' ><p>Are you sure you want to delete this group?</p></div>";
 ?>
 

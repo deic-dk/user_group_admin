@@ -57,7 +57,7 @@ function doAction($group, $owner, $user){
 			break;
 		case "leavegroup":
 			$result = OC_User_Group_Admin_Util::removeFromGroup($user, $group);
-			OC_User_Group_Hooks::groupLeave($group, $user);
+			OC_User_Group_Hooks::groupLeave($group, $user, $owner);
 			break;
 		case "delgroup":
 			if(checkOwner($user, $owner)){

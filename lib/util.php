@@ -105,9 +105,9 @@ class OC_User_Group_Admin_Util {
 	 * @return bool Deletes a group and removes it from the group_user-table
 	 */
 	public static function dbDeleteGroup($gid) {
-		$stmt = OC_DB::prepare ("DELETE FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?");
+		$stmt = OC_DB::prepare("DELETE FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?");
 		$stmt->execute(array(gid));
-		$stmt = OC_DB::prepare ("DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ?");
+		$stmt = OC_DB::prepare("DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ?");
 		$stmt->execute(array($gid));
 		return true;
 	}
@@ -123,23 +123,28 @@ class OC_User_Group_Admin_Util {
 		return $result;
 	}
 
-	/**
-	 * @brief is user in group?
-	 *
-	 * @param string $uid
-	 *        	uid of the user
-	 * @param string $gid
-	 *        	gid of the group
-	 * @return bool Checks whether the user is member of a group or not.
-	 */
+/**
+ * NOTICE: includes pending, but not declined users
+ * @param unknown $uid
+ * @param unknown $gid
+ * @return boolean
+ */
 	public static function inGroup($uid, $gid) {
-		$stmt = OC_DB::prepare ( "SELECT `uid` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? " );
-		$result = $stmt->execute ( array (
-				$gid,
-				$uid
-		) );
-
-		return $result->fetchRow () ? true : false;
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			return self::dbInGroup($uid, $gid);
+		}
+		else{
+			$result = \OCA\FilesSharding\Lib::ws('usersInGroup', array('gid'=>urlencode($gid)),
+				false, true, null, 'user_group_admin');
+			if(!empty($result) && sizeof($result)>0){
+				foreach($result as $row){
+					if($row['uid']==$uid){
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -152,14 +157,12 @@ class OC_User_Group_Admin_Util {
 	 * @return bool Adds a user to a group.
 	 */
 	public static function dbAddToGroup($uid, $gid) {
-		if(self::dbInGroup($gid, $uid)){
-			return false;
-		}
-		$accept = md5 ( $uid . time (). 1 );
-		$decline = md5 ($uid . time () . 0);
 		$owner = self::getGroupOwner($gid);
-		$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `verified`, `accept`, `decline`) VALUES( ?, ?, ?, ?, ?)" );
-		if($uid===$owner || self::dbHiddenGroupExists ($gid)){
+		if(self::dbInGroup($uid, $gid, true)){
+			return self::updateStatus($gid, $uid, $uid===$owner || self::dbHiddenGroupExists($gid)?self::$GROUP_INVITATION_ACCEPTED:self::$GROUP_INVITATION_OPEN);
+		}
+		$stmt = OC_DB::prepare("INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `verified`, `accept`, `decline`) VALUES( ?, ?, ?, ?, ?)" );
+		if($uid===$owner || self::dbHiddenGroupExists($gid)){
 			$stmt->execute ( array (
 					$gid,
 					$uid,
@@ -169,6 +172,8 @@ class OC_User_Group_Admin_Util {
 			));
 		}
 		else{
+			$accept = md5 ( $uid . time (). 1 );
+			$decline = md5 ($uid . time () . 0);
 			$stmt->execute ( array (
 					$gid,
 					$uid,
@@ -219,9 +224,24 @@ class OC_User_Group_Admin_Util {
 		}
 	}
 
-	public static function dbInGroup($gid, $uid){
-		$stmt = OC_DB::prepare ( "SELECT `uid`  FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? " );
-		$res = $stmt->execute(array($gid, $uid))->fetchOne();
+	/**
+	 * NOTICE: includes pending users
+	 * @param unknown $uid
+	 * @param unknown $gid
+	 * @return boolean
+	 */
+	public static function dbInGroup($uid, $gid, $includeDeclined=false){
+		if($includeDeclined){
+			$stmt = OC_DB::prepare ( "SELECT `uid`  FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ?" );
+			$res = $stmt->execute(array($gid, $uid))->fetchOne();
+		}
+		else{
+			$stmt = OC_DB::prepare ( "SELECT `uid`  FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` = ? AND `verified` != ?" );
+			$res = $stmt->execute(array($gid, $uid, self::$GROUP_INVITATION_DECLINED))->fetchOne();
+		}
+		\OCP\Util::writeLog('User_Group_Admin',
+				'In group: '.$gid.'/'.$uid.'-->'.serialize($res),
+				\OCP\Util::WARN);
 		return !empty($res);
 	}
 
@@ -236,7 +256,7 @@ class OC_User_Group_Admin_Util {
 				$uid,
 				$gid
 		));
-		return $query->rowCount()>0;
+		return $result;
 	}
 	
 	public static function dbSetUserFreeQuota($gid, $quota) {
@@ -367,13 +387,14 @@ class OC_User_Group_Admin_Util {
 	 * @param string $search
 	 * @param int $limit
 	 * @param int $offset
-	 * @return array with user ids
+	 * @return array of users
 	 */
 	public static function dbUsersInGroup($gid, $search = '', $limit = null, $offset = null) {
-		$stmt = OC_DB::prepare ( 'SELECT * FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` LIKE ?', $limit, $offset );
+		$stmt = OC_DB::prepare ( 'SELECT * FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ? AND `uid` LIKE ? AND `verified` != ?', $limit, $offset );
 		$result = $stmt->execute(array(
 				$gid,
-				$search . '%'
+				$search . '%',
+				self::$GROUP_INVITATION_DECLINED
 		));
 		$users = array();
 		while($row = $result->fetchRow()){
@@ -392,7 +413,7 @@ class OC_User_Group_Admin_Util {
 			$result = self::dbUsersInGroup($gid, $search, $limit, $offset);
 		}
 		else{
-			$result = \OCA\FilesSharding\Lib::ws('userInGroup', array('gid'=>urlencode($gid)),
+			$result = \OCA\FilesSharding\Lib::ws('usersInGroup', array('gid'=>urlencode($gid)),
 				false, true, null, 'user_group_admin');
 		}
 		return $result;
@@ -411,7 +432,8 @@ class OC_User_Group_Admin_Util {
 				$name = \OCP\Util::sanitizeHTML($name);
 			}
 		}
-		return '<div class="avatar" data-user="' . $param . '"></div>'. '<strong style="font-size:92%">' . $name . '</strong>';
+		return '<div class="avatar" data-user="' . $param . '"></div>'. '<strong style="font-size:92%">'.
+			$name . '</strong>';
 	}
 
 	public static function getGroupsForAdmin($limit = null, $offset = null ) {

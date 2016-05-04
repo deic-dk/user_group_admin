@@ -107,7 +107,9 @@ $(document).ready(function() {
 	$("#groupstable td .delete-group").live('click', function() {
 		var role = $(this).closest('tr').attr('role') ;
 		var groupSelected = $(this).closest('tr').attr('group') ;
-		$( '#dialogalert' ).dialog({ buttons: [ { id:'test','data-test':'data test', text: 'Delete', click: function() {
+		var textHtml = $( '#dialogalert' ).html().replace(role == 'member'?'delete':'leave', role == 'member'?'leave':'delete');
+		 $( '#dialogalert' ).html(textHtml);
+		$( '#dialogalert' ).dialog({ buttons: [ { id:'test','data-test':'data test', text: role == 'member'?'Leave':'Delete', click: function() {
 			if (role == 'owner' || role == 'admin') {
 				$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : groupSelected , action : "delgroup"} , function ( jsondata){
 					if(jsondata.status == 'success' ) {

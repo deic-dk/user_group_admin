@@ -101,8 +101,18 @@ class Activity implements IExtension {
 							<a href="#" class="decline btn btn-default btn-flat" group=\''.$group.'\'>Decline</a>
 						</div>', $preparedParams);
 				}
+			case 'joined_user_self':
+				return (string) $this->l->t('%2$s joined group %1$s', $preparedParams);
+			case 'joined_with_by':
+				return (string) $this->l->t('You\'ve joined group %1$s', $preparedParams);
 			case 'deleted_by':
-				return (string) $this->l->t('%2$s left group %1$s', $preparedParams);	
+				$user = \OCP\User::getUser();
+				if($user!=$params[1]){
+					return (string) $this->l->t('%2$s left group %1$s', $preparedParams);
+				}
+				else{
+					return (string) $this->l->t('You left group %1$s', $preparedParams);
+				}
 			default:
 				return false;
 		}

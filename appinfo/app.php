@@ -33,6 +33,9 @@ OCP\App::addNavigationEntry(
 $user = \OCP\User::getUser();
 $groups = OC_User_Group_Admin_Util::getUserGroups($user); 
 foreach ($groups as $group){
+	if($group['verified']!=OC_User_Group_Admin_Util::$GROUP_INVITATION_ACCEPTED){
+		continue;
+	}
 	if(empty($group['user_freequota'])){
 		continue;
 	}
