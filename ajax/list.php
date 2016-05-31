@@ -5,18 +5,21 @@ OCP\JSON::checkLoggedIn();
 $l = OC_L10N::get('files');
 
 // Load the files
+$gid = isset($_GET['gid']) ? $_GET['gid'] : '';
 $dir = isset($_GET['dir']) ? $_GET['dir'] : '';
-$dir = \OC\Files\Filesystem::normalizePath($dir);
+
 
 try {
-	$dirInfo = \OC\Files\Filesystem::getFileInfo($dir);
+	$dir = \OC\Files\Filesystem::normalizePath('/'.$gid.$dir);
+	$fs = \OCP\Files::getStorage('user_group_admin');
+	\OCP\Util::writeLog('User_Group_Admin', 'DIR: '.$dir, \OCP\Util::WARN);
+	$dirInfo = $fs->getFileInfo($dir);
 	if (!$dirInfo || !$dirInfo->getType() === 'dir') {
 		header("HTTP/1.0 404 Not Found");
 		exit();
 	}
 
 	$data = array();
-	$baseUrl = OCP\Util::linkTo('files', 'index.php') . '?dir=';
 
 	$permissions = $dirInfo->getPermissions();
 
@@ -25,8 +28,11 @@ try {
 
 	// make filelist
 
-	$files = \OCA\Files\Helper::getFiles($dir, $sortAttribute, $sortDirection);
+	//$files = \OCA\Files\Helper::getFiles($dir, $sortAttribute, $sortDirection);
+	$content = $fs->getDirectoryContent($dir);
+	$files = \OCA\Files\Helper::sortFiles($content, $sortAttribute, $sortDirection);
 	$data['directory'] = $dir;
+	$data['gid'] = $gid;
 	$data['files'] = \OCA\Files\Helper::formatFileInfos($files);
 	$data['permissions'] = $permissions;
 

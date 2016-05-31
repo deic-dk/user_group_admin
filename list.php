@@ -5,7 +5,7 @@
 
  $tmpl = new OCP\Template('user_group_admin', 'list', '');
 
- //OCP\Util::addScript('user_group_admin', 'filelist');
+ OCP\Util::addScript('user_group_admin', 'filelist');
 
  $tmpl->printPage();
 

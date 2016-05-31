@@ -8,7 +8,11 @@ if(!OCA\FilesSharding\Lib::checkIP()){
 	exit;
 }
 
+$onlyVerified = isset($_GET['only_verified'])&&$_GET['only_verified']==='yes';
+$hideHidden = isset($_GET['hide_hidden'])&&$_GET['hide_hidden']==='yes';
+$onlyWithFreeQuota = isset($_GET['only_with_free_quota'])&&$_GET['only_with_free_quota']==='yes';
 $user = isset($_GET['userid'])?$_GET['userid']:\OCP\User::getUser();
-$groups = OC_User_Group_Admin_Util::dbGetUserGroups($user);
+
+$groups = OC_User_Group_Admin_Util::dbGetUserGroups($user, $onlyVerified, $hideHidden, $onlyWithFreeQuota);
 \OCP\Util::writeLog('user_group_admin', 'Returning groups '.serialize($groups), \OC_Log::DEBUG);
 OCP\JSON::encodedPrint($groups);

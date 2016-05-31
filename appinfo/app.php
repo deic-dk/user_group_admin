@@ -18,7 +18,7 @@ OCP\App::addNavigationEntry(
            'order' => 4,
            'href'  => OCP\Util::linkTo( 'user_group_admin' , 'index.php' ),
 //           'icon'  => OCP\Util::imagePath( 'user_group_admin', 'nav-icon.png' ),
-           'name'  => 'Teams' )
+           'name'  => 'Groups' )
          );
 
 \OC::$server->getActivityManager()->registerExtension(function() {
@@ -31,25 +31,30 @@ OCP\App::addNavigationEntry(
 });
 
 $user = \OCP\User::getUser();
-$groups = OC_User_Group_Admin_Util::getUserGroups($user); 
+$groups = OC_User_Group_Admin_Util::getUserGroups($user, true, false, true);
+$order = 2;
+
 foreach ($groups as $group){
-	if($group['verified']!=OC_User_Group_Admin_Util::$GROUP_INVITATION_ACCEPTED){
-		continue;
+	$fs = \OCP\Files::getStorage('user_group_admin');
+	$dir = \OC\Files\Filesystem::normalizePath('/'.$group['gid']);
+	$path = $fs->getLocalFile($dir);
+	if(!file_exists($path)){
+		mkdir($path, 0777, false);
 	}
-	if(empty($group['user_freequota'])){
-		continue;
-	}
-	$order+=1./100;
+	$order += 1./100;
+	\OCP\Util::writeLog('User_Group_Admin', 'Adding navigation entry '.$group['gid'].':'.$order, \OCP\Util::DEBUG);
 	\OCA\Files\App::getNavigationManager()->add(
 			array(
-					"id" => 'group-'.$group['gid'],
+					"id" => 'user-groups_'.$group['gid'],
 					"appname" => 'user_group_admin',
 					"script" => 'list.php',
 					"order" =>  $order,
-					"name" => $group['gid']
+					"name" => $group['gid'],
 			)
 	);
 }
 
+OCP\Util::addScript('user_group_admin','setview');
 OCP\Util::addScript('user_group_admin','user_group_notification');
+
 

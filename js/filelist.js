@@ -1,47 +1,45 @@
-/*
- * Copyright (c) 2015, written by Christian Brinch, DeIC.
- *
- * This file is licensed under the Affero General Public License version 3
- * or later.
- *
- * THIS FILE extends the default filelist. When the filelist is reloaded, groups
- * are loaded too.
- *
- */
- 
-(function() {
+ (function() {
 
 	var FileList = function($el, options) {
+		this.initialized = false;
 		this.initialize($el, options);
+		this.setupUploadEvents();
 		this.gid = options.gid;
+		this._currentDirectory = '/';
 	};
 	
-	FileList.oldCreateRow = OCA.Files.FileList.prototype._createRow;
 
   FileList.prototype = _.extend({}, OCA.Files.FileList.prototype, {
 		
 		appName: 'User_group_admin',
 
 		reload: function() {
-			if(this.gid) {
+			var viewParam = this.getGetParam( 'view');
+			if(this.gid && viewParam.indexOf('user-groups_')==0) {
 				this._selectedFiles = {};
 				this._selectionSummary.clear();
 				this.$el.find('.select-all').prop('checked', false);
 				this.showMask();
 				$('ul.nav-sidebar').find('.active').removeClass('active');
-				$('.nav-sidebar li[data-id=group-'+this.gid+'] a').addClass('active');
-				if (this._reloadCall) {
+				$('.nav-sidebar li[data-id=user-groups_'+this.gid+'] a').addClass('active');
+				// Change breadcrumb home icon to gift icon
+				$('#app-content-user-groups_'+this.gid+' #breadcrumb-container .breadcrumb .crumb a i.icon-home').addClass('icon-gift');
+				$('#app-content-user-groups_'+this.gid+' #breadcrumb-container .breadcrumb .crumb a i.icon-home').removeClass('icon-home');
+				// This is the original - and when not in the original files app, causes unnecessary abort and reload
+				/*if (this._reloadCall) {
 					this._reloadCall.abort();
+				}*/
+				if (!this._reloadCall) {
+					this._reloadCall = $.ajax({
+						url: this.getAjaxUrl('list'),
+						data: { 
+							dir :  this.getCurrentDirectory(),
+							sort: this._sort,
+							sortdirection: this._sortDirection,
+							gid: this.gid
+						}
+					});
 				}
-				this._reloadCall = $.ajax({
-					url: this.getAjaxUrl('list'),
-					data: { 
-						dir : this.getCurrentDirectory(),
-						sort: this._sort,
-						sortdirection: this._sortDirection,
-						gid: this.gid
-					}
-				}); 
 				var callBack = this.reloadCallback.bind(this);
 				return this._reloadCall.then(callBack, callBack);
 			}
@@ -68,14 +66,11 @@
 			else {
 				OCA.Files.FileList.prototype.updateEmptyContent.apply(this, arguments);
 			}
-		},
-		
-		_createRow: function(fileData) {
-			var tr = FileList.oldCreateRow.apply(this, arguments);
-			return OCA.Meta_data.App.newCreateRow(fileData, tr);
 		}
-		
-	});
+
+  });
 	
-	OCA.Meta_data.FileList = FileList;
+	OCA.UserGroups.FileList = FileList;
+	//OCA.Files.FileList = FileList;
+
 })();

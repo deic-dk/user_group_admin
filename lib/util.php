@@ -344,13 +344,24 @@ class OC_User_Group_Admin_Util {
 	 *         This function fetches all groups a user belongs to. It does not check
 	 *         if the user exists at all.
 	 */
-	public static function dbGetUserGroups($uid) {
-		$stmt = OC_DB::prepare("SELECT * FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ?");
-		$result = $stmt->execute(array($uid));
+	public static function dbGetUserGroups($uid, $onlyVerified=false, $hideHidden=false, $onlyWithFreeQuota=false) {
+		$sql = "SELECT * FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ?";
+		if($onlyVerified){
+			$sql .= " AND `verified` = ?";
+			$stmt = OC_DB::prepare($sql);
+			$result = $stmt->execute(array($uid, self::$GROUP_INVITATION_ACCEPTED));
+		}
+		else{
+			$stmt = OC_DB::prepare($sql);
+			$result = $stmt->execute(array($uid));
+		}
 		$groups = array();
 		while($row = $result->fetchRow()){
 			$groupInfo = self::dbGetGroupInfo($row["gid"]);
-			if($groupInfo['owner']==self::$HIDDEN_GROUP_OWNER){
+			if($hideHidden && $groupInfo['owner']==self::$HIDDEN_GROUP_OWNER){
+				continue;
+			}
+			if($onlyWithFreeQuota && empty($groupInfo['user_freequota'])){
 				continue;
 			}
 			$row['owner'] = $groupInfo['owner'];
@@ -360,13 +371,18 @@ class OC_User_Group_Admin_Util {
 		return $groups;
 	}
 
-	public static function getUserGroups($userid) {
+	public static function getUserGroups($userid, $onlyVerified=false, $hideHidden=false, $onlyWithFreeQuota=false) {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-			$result = self::dbGetUserGroups($userid);
+			$result = self::dbGetUserGroups($userid, $onlyVerified, $hideHidden, $onlyWithFreeQuota);
 		}
 		else{
-			$result = \OCA\FilesSharding\Lib::ws('getUserGroups', array('userid'=>$userid),
-				 false, true, null, 'user_group_admin');
+			$result = \OCA\FilesSharding\Lib::ws('getUserGroups',
+				array(	'userid'=>$userid,
+								'only_verified'=>!empty($onlyVerified)?'yes':'no',
+								'hide_hidden'=>!empty($hideHidden)?'yes':'no',
+								'only_with_freeQuota'=>!empty($onlyWithFreeQuota)?'yes':'no'
+				),
+				false, true, null, 'user_group_admin');
 		}
 		return $result;
 	}

@@ -17,7 +17,7 @@
   </div>
   <div id="newgroup" class="apanel">
      <span class="spanpanel" >
-	  <input class="editgroup" id="newgroup" type="text" placeholder="New group name">
+	  <input class="editgroup" id="newgroup" type="text" placeholder="New group name" />
 
 	    <span class="newgroup-span">
 		  <div id="ok" class="btn-group" original-title="">
