@@ -10,7 +10,7 @@ if(!OCA\FilesSharding\Lib::checkIP()){
 
 $onlyVerified = isset($_GET['only_verified'])&&$_GET['only_verified']==='yes';
 $hideHidden = isset($_GET['hide_hidden'])&&$_GET['hide_hidden']==='yes';
-$onlyWithFreeQuota = isset($_GET['only_with_free_quota'])&&$_GET['only_with_free_quota']==='yes';
+$onlyWithFreeQuota = isset($_GET['only_with_freequota'])&&$_GET['only_with_freequota']==='yes';
 $user = isset($_GET['userid'])?$_GET['userid']:\OCP\User::getUser();
 
 $groups = OC_User_Group_Admin_Util::dbGetUserGroups($user, $onlyVerified, $hideHidden, $onlyWithFreeQuota);

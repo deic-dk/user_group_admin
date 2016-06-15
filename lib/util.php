@@ -380,7 +380,7 @@ class OC_User_Group_Admin_Util {
 				array(	'userid'=>$userid,
 								'only_verified'=>!empty($onlyVerified)?'yes':'no',
 								'hide_hidden'=>!empty($hideHidden)?'yes':'no',
-								'only_with_freeQuota'=>!empty($onlyWithFreeQuota)?'yes':'no'
+								'only_with_freequota'=>!empty($onlyWithFreeQuota)?'yes':'no'
 				),
 				false, true, null, 'user_group_admin');
 		}
@@ -390,6 +390,11 @@ class OC_User_Group_Admin_Util {
 	private static function dbHiddenGroupExists($gid) {
 		$query = OC_DB::prepare ( 'SELECT `gid` FROM `*PREFIX*groups` WHERE `gid` = ?' );
 		$result = $query->execute(array( $gid ))->fetchOne();
+		if($result){
+			return true;
+		}
+		$query = OC_DB::prepare ( 'SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ? AND owner = ?' );
+		$result = $query->execute(array( $gid, self::$HIDDEN_GROUP_OWNER ))->fetchOne();
 		if($result){
 			return true;
 		}
