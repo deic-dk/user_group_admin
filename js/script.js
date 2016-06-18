@@ -58,7 +58,28 @@ OC.UserGroup = {
 					return false;
 			}
 		});
-	}
+	},
+	onFreeQuotaSelect: function(ev) {
+		var $select = $(ev.target);
+		var group = $select.attr('group');
+		var freeQuota = $select.val();
+		OC.UserGroup._updateFreeQuota(group, freeQuota, function(returnedFreeQuota){
+			if (freeQuota !== returnedFreeQuota) {
+				$select.find(':selected').text(returnedFreeQuota);
+				}
+			});
+		},
+	_updateFreeQuota: function(group, freeQuota, ready) {
+		$.post(
+				OC.filePath('files_accounting', 'ajax', 'setFreeQuota.php'),
+				{group: group, freequota: freeQuota},
+				function (result) {
+					if (ready) {
+						ready(result.freequota);
+						}
+					}
+				);
+		}
 };
 
 function getMembersCount(group){
@@ -68,7 +89,7 @@ function getMembersCount(group){
 function setMembersCount(group, n){
 	$("div[group='"+group+"']").find(".memberscount").attr("members", n);
 			$("div[group='"+group+"']").find(".memberscount").text(
-				''+n+' member'+(n>1?'s':'')
+				''+n+' member'+(n==1?'':'s')
 			);
 }
 
@@ -158,9 +179,10 @@ $(document).ready(function() {
 		});
 	});
 
+
 	$(document).click(function(e){
 		if (!$(e.target).parents().filter('.oc-dialog').length && !$(e.target).parents().filter('.name').length ) {
-			$(".oc-dialog").hide();
+			$(".oc-dialog").remove();
 			$('.modalOverlay').remove();
 		}
 	});
@@ -169,23 +191,28 @@ $(document).ready(function() {
 		var group = $(this).closest('tr').attr('group') ;
 		var role = $(this).closest('tr').attr('role');
 		var number = $("tr[group='"+group+"']").find("span#nomembers").html();
-		var html = '<div><div class="grouptitle" group="'+ group+'">'+ group+'</div>\
-				<a class="oc-dialog-close close svg"></a><div>\
+		var html = '<div class="group"><div class="grouptitle" group="'+ group+'">'+ group+'</div>\
+				<a class="oc-dialog-close close svg"></a><div class="memberlist">\
 				<div class="dropmembers" group=\''+ group+'\'></div>\
-				<div class="invitemembers"><button id="invite" class="invite btn btn-primary btn-flat">\
-				<i class="icon-user"></i>Invite user</button>&nbsp<button id="export-group" class="btn btn-default btn-flat">\
-				<i class="icon-export-alt"></i>Export</button></div><div class="userselect">\
+				<div class="invitemembers">\
+				<button id="invite" class="invite btn btn-primary btn-flat">\
+				<i class="icon-user"></i>Invite user</button>&nbsp\
+				<button id="export-group" class="btn btn-default btn-flat">\
+				<i class="icon-export-alt"></i>Export</button>\
+				<div class="freequota"></div>\
+				<div class="userselect">\
 				<input type="text" placeholder="Invite user" class="ui-autocomplete-input" autocomplete="off">\
-				<span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span></div>\
+				<span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>\
+				</div>\
 				</div>';
 
 		$(html).dialog({
-			  dialogClass: "oc-dialog",
-			  resizeable: false,
-			  draggable: false,
-			  height: 600,
-			  width: 720
-			});
+			dialogClass: "oc-dialog",
+			resizable: true,
+			draggable: true,
+			height: 600,
+			width: 720
+		});
 
 		$('body').append('<div class="modalOverlay">');
 
@@ -201,6 +228,8 @@ $(document).ready(function() {
 				function ( jsondata ){
 					if(jsondata.status == 'success' ) {
 						$('.dropmembers').html(jsondata.data.page);
+						$('.freequota').html(jsondata.data.freequota);
+						$('#setfreequota').on('change', OC.UserGroup.onFreeQuotaSelect);
 						$('.avatar').each(function() {
 							var element = $(this);
 							element.avatar(element.data('user'), 28);
@@ -216,6 +245,7 @@ $(document).ready(function() {
 		}
 		if (role=='member') {
 			$('.invite').hide();
+			$('.freequota').hide();
 		}
 	});
 

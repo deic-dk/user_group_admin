@@ -69,7 +69,7 @@
 <tbody id='fileList'>
 <?php
 	$ownedGroups = OC_User_Group_Admin_Util::getOwnerGroups(OC_User::getUser());
-	$groupmemberships = OC_User_Group_Admin_Util::getUserGroups (OC_User::getUser());
+	$groupmemberships = OC_User_Group_Admin_Util::getUserGroups(OC_User::getUser(), false, true, false);
 	foreach ($ownedGroups as $group) {
 		echo "<tr role=\"owner\" group=\"$group\">
 		<td class='groupname'>
@@ -105,7 +105,7 @@
 	}
 
 	if(\OC_User::isAdminUser(\OC_User::getUser())){
-		$users_groups = OC_User_Group_Admin_Util::getGroupsForAdmin();
+		$users_groups = OC_User_Group_Admin_Util::getGroups();
 		foreach ($users_groups as $users_group) {
 			$count++;
 			echo "<tr role=\"admin\" group=\"$users_group\">

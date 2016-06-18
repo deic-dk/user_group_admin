@@ -260,11 +260,23 @@ class OC_User_Group_Admin_Util {
 	}
 	
 	public static function dbSetUserFreeQuota($gid, $quota) {
-		$query = OC_DB::prepare ("UPDATE `*PREFIX*user_group_admin_groups` SET `user_freequota` = '$quota' WHERE `gid` = ? " );
+		$query = OC_DB::prepare ("UPDATE `*PREFIX*user_group_admin_groups` SET `user_freequota` = ? WHERE `gid` = ? " );
 		$result = $query->execute( array (
 				$quota,
 				$gid
 		));
+		return $result;
+	}
+	
+	public static function setUserFreeQuota($gid, $quota) {
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			$result = self::dbSetUserFreeQuota($gid, $quota);
+		}
+		else{
+			$result = \OCA\FilesSharding\Lib::ws('groupActions', array(
+					'name'=>urlencode($gid), 'quota'=>$quota, 'action'=>'setUserFreeQuota'),
+					false, true, null, 'user_group_admin');
+		}
 		return $result;
 	}
 
@@ -418,11 +430,8 @@ class OC_User_Group_Admin_Util {
 				self::$GROUP_INVITATION_DECLINED
 		));
 		$users = array();
+		$owner = self::dbGetGroupOwner($gid);
 		while($row = $result->fetchRow()){
-			$owner = self::dbGetGroupOwner($row["gid"]);
-			if($owner==self::$HIDDEN_GROUP_OWNER){
-				continue;
-			}
 			$row['owner'] = $owner;
 			$users[] = $row;
 		}
@@ -457,9 +466,9 @@ class OC_User_Group_Admin_Util {
 			$name . '</strong>';
 	}
 
-	public static function getGroupsForAdmin($limit = null, $offset = null ) {
-		$query = OC_DB::prepare('SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `owner`!= ? AND  `gid` LIKE ?', $limit, $offset );
-		$result = $query->execute (array (\OCP\User::getUser(), '%'));
+	public static function getGroups($search = '', $limit = null, $offset = null ) {
+		$query = OC_DB::prepare('SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` LIKE ?', $limit, $offset );
+		$result = $query->execute (array ($search));
 		$groups = array ();
 		while ( $row = $result->fetchRow () ) {
 			$groups [] = $row ['gid'];

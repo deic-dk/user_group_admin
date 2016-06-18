@@ -73,7 +73,10 @@ function doAction($group, $owner, $user){
 		case "showmembers":
 			$result = (checkOwner($user, $owner) || OC_User_Group_Admin_Util::inGroup($user, $group));
 			break;
-	}
+		case "getinfo":
+			$result = checkOwner($user, $owner);
+			break;
+		}
 
 	if(!empty($result)){
 		switch ($_POST['action']) {
@@ -94,7 +97,18 @@ function doAction($group, $owner, $user){
 				$tmpl->assign( 'group' , $group , false );
 				$tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $group ), false );
 				$page = $tmpl->fetchPage();
-				OCP\JSON::success(array('data' => array('page'=>$page)));
+				$tmpl = new OCP\Template("user_group_admin", "freequota");
+				$tmpl->assign( 'group' , $group , false );
+				$groupInfo = OC_User_Group_Admin_Util::getGroupInfo($group);
+				$tmpl->assign( 'user_freequota' , $groupInfo['user_freequota'] );
+				$quotaPreset = OC_Appconfig::getValue('files', 'quota_preset', '1 GB, 5 GB, 10 GB');
+				$quotaPresetArr = explode(',', $quotaPreset);
+				$tmpl->assign( 'quota_preset' , $quotaPresetArr );
+				$freequota_dropdown = $tmpl->fetchPage();
+				OCP\JSON::success(array('data' => array('page'=>$page, 'freequota'=>$freequota_dropdown)));
+				break;
+			case "getinfo":
+				OCP\JSON::success(array('data' => OC_User_Group_Admin_Util::getGroupInfo($group)));
 				break;
 			default:
 				OCP\JSON::success();
@@ -114,4 +128,5 @@ function doAction($group, $owner, $user){
 		}
 	}
 }
+
 

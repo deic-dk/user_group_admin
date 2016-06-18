@@ -8,6 +8,6 @@ if(!OCA\FilesSharding\Lib::checkIP()){
 }
 $group = isset($_GET['gid'])?$_GET['gid']:'';
 $users = OC_User_Group_Admin_Util::dbUsersInGroup($group);
-\OCP\Util::writeLog('user_group_admin', 'Returning users '.serialize($users), \OC_Log::WARN);
+\OCP\Util::writeLog('user_group_admin', 'Returning members of '.$group.': '.serialize($users), \OC_Log::WARN);
 OCP\JSON::encodedPrint($users);
 

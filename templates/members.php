@@ -10,7 +10,7 @@ echo "<div class='owner'>Owner</div>";
 $name = OC_User_Group_Admin_Util::prepareUser($owner);
 echo "<li data-member=$owner><span class='left'>$name </span></li>";
 
-echo "<div class='memberscount' members='".$numMembers."'>".$numMembers." member".($numMembers>1?"s":"")."</div>";
+echo "<div class='memberscount' members='".$numMembers."'>".$numMembers." member".($numMembers==1?"":"s")."</div>";
 
 foreach($members as $member){
 	$uid = $member["uid"];
