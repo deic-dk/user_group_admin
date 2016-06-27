@@ -21,11 +21,11 @@ now, only the owner is allowed to manage the groups he has created.
 The information in the tables is integrated with the ownCloud sharing mechanism
 by means of calls to `OC_Group::useBackend()` and `OCP\Util::connectHook()`.
 
-Our extensions introduce a special owner, 'hidden_group_owner', whose groups
-are hidden from the ownCloud sharing mechamisn, i.e. members can only be added
-programatically, not from the ownCloud files web interface or the web interface
-of this app. These groups also do not appear in the drop-downs when sharing
-files or directories in the files web interface.
+Our extensions introduce groups hidden from the ownCloud sharing mechamisn,
+members of which can only be added programatically, not from the ownCloud
+files web interface or the web interface of this app. These groups also do not
+appear in the drop-downs when sharing files or directories in the files web
+interface.
 
 We have extended the app user_saml to use such hidden groups with the name of
 the home institution of users when autocreating them, thus preventing that

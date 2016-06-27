@@ -88,12 +88,12 @@ class Activity implements IExtension {
 			case 'shared_user_self':
 				return (string) $this->l->t('You invited %2$s to group %1$s', $preparedParams);
 			case 'shared_with_by':
+				$group = $params[0];
 				$owner = $params[2];
-				if($owner==OC_User_Group_Admin_Util::$HIDDEN_GROUP_OWNER){
+				if(OC_User_Group_Admin_Util::groupIsHidden($group)){
 					return (string) $this->l->t('You\'ve been added to group %1$s', $preparedParams);
 				}
 				else{
-					$group = $params[0];
 					return (string) $this->l->
 					t('You have been invited by %3$s to join group %1$s
 						<div class="invite_div" style="display:none">

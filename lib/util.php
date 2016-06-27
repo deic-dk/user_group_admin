@@ -88,10 +88,11 @@ class OC_User_Group_Admin_Util {
 		}
 
 		// Add group and exit
-		$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` ) VALUES( ? , ? )" );
+		$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid`, `owner`, `hidden` ) VALUES( ?, ?, ? )" );
 		$result = $stmt->execute ( array (
 				$gid,
-				self::$HIDDEN_GROUP_OWNER
+				self::$HIDDEN_GROUP_OWNER,
+				'yes'
 		) );
 
 		return $result ? true : false;
@@ -370,7 +371,10 @@ class OC_User_Group_Admin_Util {
 		$groups = array();
 		while($row = $result->fetchRow()){
 			$groupInfo = self::dbGetGroupInfo($row["gid"]);
-			if($hideHidden && $groupInfo['owner']==self::$HIDDEN_GROUP_OWNER){
+			if($hideHidden && $groupInfo['hidden']==='yes' &&
+					$groupInfo['owner']!==$uid && !\OC_User::isAdminUser(\OC_User::getUser())){
+				/* If the owner of a hidden group has been set to $uid, show the group.
+				   Always show to admin. */
 				continue;
 			}
 			if($onlyWithFreeQuota && empty($groupInfo['user_freequota'])){
@@ -400,17 +404,22 @@ class OC_User_Group_Admin_Util {
 	}
 	
 	private static function dbHiddenGroupExists($gid) {
-		$query = OC_DB::prepare ( 'SELECT `gid` FROM `*PREFIX*groups` WHERE `gid` = ?' );
-		$result = $query->execute(array( $gid ))->fetchOne();
-		if($result){
-			return true;
-		}
-		$query = OC_DB::prepare ( 'SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ? AND owner = ?' );
-		$result = $query->execute(array( $gid, self::$HIDDEN_GROUP_OWNER ))->fetchOne();
+		$query = OC_DB::prepare ( 'SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ? AND hidden = ?' );
+		$result = $query->execute(array( $gid, 'yes' ))->fetchOne();
 		if($result){
 			return true;
 		}
 		return false;
+	}
+	
+	public static function groupIsHidden($gid) {
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			return dbHiddenGroupExists($gid);
+		}
+		else{
+			$groupInfo = self::getGroupInfo($gid);
+			return $groupInfo['hidden']==='yes';
+		}
 	}
 
 	/**

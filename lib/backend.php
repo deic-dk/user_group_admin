@@ -27,8 +27,6 @@
 class OC_User_Group_Admin_Backend extends OC_Group_Backend
 {
 
-		private static $HIDDEN_GROUP_OWNER = 'hidden_group_owner';
-
     /**
      * @brief is user in group?
      * @param  string $uid uid of the user
@@ -83,12 +81,20 @@ class OC_User_Group_Admin_Backend extends OC_Group_Backend
         $groups = array();
         while ($row = $result->fetchRow()) {
         	$group = $row['gid'];
-        	$owner = OC_User_Group_Admin_Util::getGroupOwner($group);
-        	if(!in_array($group, $groups) && $owner!=self::$HIDDEN_GROUP_OWNER){
+        	if(!in_array($group, $groups) && !self::dbHiddenGroupExists($group)){
 						$groups[] = $group;
 					}
         }
         return $groups;
+    }
+    
+    private static function dbHiddenGroupExists($gid) {
+    	$query = OC_DB::prepare ( 'SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ? AND hidden = ?' );
+    	$result = $query->execute(array( $gid, 'yes' ))->fetchOne();
+    	if($result){
+    		return true;
+    	}
+    	return false;
     }
 
     /**
