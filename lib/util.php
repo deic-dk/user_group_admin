@@ -41,7 +41,7 @@ class OC_User_Group_Admin_Util {
 		// Check for existence
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?" );
 		$result = $stmt->execute(array($gid));
-		if($result->fetchRow ()) {
+		if($result->fetchRow()){
 			return false;
 		}
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*groups` WHERE `gid` = ?" );
@@ -75,15 +75,15 @@ class OC_User_Group_Admin_Util {
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?" );
 		$result = $stmt->execute ( array (
 				$gid
-		) );
-		if ($result->fetchRow ()) {
+		));
+		if($result->fetchRow ()){
 			return false;
 		}
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*groups` WHERE `gid` = ?" );
 		$result = $stmt->execute ( array (
 			$gid
 		) );
-		if ($result->fetchRow ()) {
+		if($result->fetchRow()){
 			return false;
 		}
 
@@ -327,19 +327,22 @@ class OC_User_Group_Admin_Util {
 		return $result;
 	}
 
-	public static function dbGetOwnerGroups($owner) {
-		$stmt = OC_DB::prepare("SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `owner` = ?");
+	public static function dbGetOwnerGroups($owner, $with_freequota=false) {
+		$stmt = OC_DB::prepare("SELECT * FROM `*PREFIX*user_group_admin_groups` WHERE `owner` = ?");
 		$result = $stmt->execute(array($owner));
 		$groups = array ();
 		while($row = $result->fetchRow ()){
-			$groups [] = $row ["gid"];
+			if($with_freequota && empty($row['user_freequota'])){
+				continue;
+			}
+			$groups[] = $row;
 		}
 		return $groups;
 	}
 
-	public static function getOwnerGroups($owner) {
+	public static function getOwnerGroups($owner, $with_freequota=false) {
 		if (!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-			$result = self::dbGetOwnerGroups($owner);
+			$result = self::dbGetOwnerGroups($owner, $with_freequota);
 		}
 		else{
 		 	$result = \OCA\FilesSharding\Lib::ws('getOwnerGroups', Array('owner'=>$owner),
@@ -515,6 +518,83 @@ class OC_User_Group_Admin_Util {
 	public static function getGroupOwner($group) {
 		$info = self::getGroupInfo($group);
 		return !empty($info)&&isset($info['owner'])?$info['owner']:null;
+	}
+	
+	public static function getGroupUsageCharge($group) {
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			$result = self::dbGetGroupUsageCharge($group);
+		}
+		else{
+			$result = \OCA\FilesSharding\Lib::ws('groupActions',
+					array('action'=>'getGroupUsageCharge', 'name'=>$group), false, true, null, 'user_group_admin');
+		}
+		return $result;
+	}
+	
+	private static function dbGetGroupUsageCharge($group) {
+		if(!\OCP\App::isEnabled('files_sharding') || !\OCP\App::isEnabled('files_accounting')){
+			return 0;
+		}
+		$sql = 'SELECT * FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ?';
+		$stmt = OC_DB::prepare($sql);
+		$result = $stmt->execute(array($group));
+		$usage = 0;
+		while($row = $result->fetchRow()){
+			$row = $result->fetchRow();
+			$charges = \OCA\Files_Accounting\Storage_Lib::getChargeForUserServers($row['uid']);
+			$charge += ((int)$row['files_usage']) * ((int)$charges['charge_home']);
+		}
+		return $charge;
+	}
+	
+	public static function getGroupUsage($group, $user=null) {
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			$result = self::dbGetGroupUsage($group, $user);
+		}
+		else{
+			$arr = array('action'=>'getGroupUsage', 'name'=>$group);
+			if(!empty($user)){
+				$arr['userid'] = $user;
+			}
+			$result = \OCA\FilesSharding\Lib::ws('groupActions',
+					$arr, false, true, null, 'user_group_admin');
+		}
+		return $result;
+	}
+	
+	private static function dbGetGroupUsage($group, $user=null) {
+		$sql = 'SELECT `files_usage` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ?';
+		$arr = array($group);
+		if(!empty($user)){
+			$sql .= 'AND `uid` = ?';
+			$arr[] = $uid;
+		}
+		$stmt = OC_DB::prepare($sql);
+		$result = $stmt->execute($arr);
+		$usage = 0;
+		while($row = $result->fetchRow()){
+			$row = $result->fetchRow();
+			$usage += (int)$row['files_usage'];
+		}
+		return $usage;
+	}
+	
+	public static function updateGroupUsage($user, $group, $usage) {
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			$result = self::dbUpdateGroupUsage($user, $group, $usage);
+		}
+		else{
+			$result = \OCA\FilesSharding\Lib::ws('groupActions',
+					array('action'=>'updateGroupUsage', 'userid'=>$user, 'name'=>$group, 'usage'=>$usage),
+					false, true, null, 'user_group_admin');
+		}
+		return $result;
+	}
+	
+	public static function dbUpdateGroupUsage($user, $group, $usage) {
+		$query = \OCP\DB::prepare ( "UPDATE `*PREFIX*user_group_admin_group_user` SET `files_usage` = ? WHERE `uid` = ? AND `gid` = ?" );
+		$result = $query->execute ( array ($usage, $user, $group) );
+		return $result;
 	}
 	
 }

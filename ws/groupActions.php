@@ -11,6 +11,7 @@ $action = isset($_GET['action'])?$_GET['action']:null;
 $userid = isset($_GET['userid'])?$_GET['userid']:'';
 $name = isset($_GET['name'])?$_GET['name']:null;
 $quota = isset($_GET['quota'])?$_GET['quota']:'';
+$usage = isset($_GET['usage'])?$_GET['usage']:0;
 
 switch ($action) {
 	case "newGroup":
@@ -32,6 +33,15 @@ switch ($action) {
 		break;
 	case "setUserFreeQuota":
 		$result = OC_User_Group_Admin_Util::dbSetUserFreeQuota($name, $quota);
+		break;
+	case "getGroupUsage":
+		$result = OC_User_Group_Admin_Util::dbGetGroupUsage($name, $userid);
+		break;
+	case "updateGroupUsage":
+		$result = OC_User_Group_Admin_Util::dbUpdateGroupUsage($userid, $name, $usage);
+		break;
+	case "getGroupUsageCharge":
+		$result = OC_User_Group_Admin_Util::dbGetGroupUsageCharge($name);
 		break;
 }
 OCP\JSON::encodedPrint($result);

@@ -71,15 +71,21 @@
 				<notnull>true</notnull>
 				<length>128</length>
 			</field>
-
-
+			
 			<field>
-                                <name>decline</name>
-                                <type>text</type>
-                                <notnull>true</notnull>
-                                <length>128</length>
-                        </field>
-
+				<name>decline</name>
+				<type>text</type>
+				<notnull>true</notnull>
+				<length>128</length>
+			</field>
+			
+			<field>
+				<name>files_usage</name>
+				<type>integer</type>
+				<notnull>true</notnull>
+				<length>64</length>
+			</field>
+			
 		</declaration>
 
 	</table>

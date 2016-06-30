@@ -71,16 +71,16 @@
 	$ownedGroups = OC_User_Group_Admin_Util::getOwnerGroups(OC_User::getUser());
 	$groupmemberships = OC_User_Group_Admin_Util::getUserGroups(OC_User::getUser(), false, true, false);
 	foreach ($ownedGroups as $group) {
-		echo "<tr role=\"owner\" group=\"$group\">
+		echo "<tr role=\"owner\" group=\"".$group['gid']."\">
 		<td class='groupname'>
 		<div class='row'>
 			<div class='col-xs-8 filelink-wrap'><a class='name'><i class='icon-users deic_green icon'></i>
-					<span class='nametext'>$group</span></a></div>
+					<span class='nametext'>".$group['gid']."</span></a></div>
 		</div>
 		</td>";
-		$members = OC_User_Group_Admin_Util::usersInGroup( $group );
+		$members = OC_User_Group_Admin_Util::usersInGroup($group['gid']);
 		$size = count($members);
-		echo "<td group=\"$group\"><div class='nomembers'><span id='nomembers'>$size</span></div></td>";
+		echo "<td group=\"".$group['gid']."\"><div class='nomembers'><span id='nomembers'>$size</span></div></td>";
 		echo "<td>Owner</td><td><a href='#' original-title='Delete' class='delete-group action icon icon-trash-empty'></a></td>
 	  		</tr>";
 	}
@@ -88,7 +88,8 @@
 	$count = 0;
 	foreach ($groupmemberships as $groupmembership) {
 		$group = (string)$groupmembership["gid"];
-		if($groupmembership["verified"]!=1 || in_array($group, $ownedGroups)){
+		if($groupmembership["verified"]!=1 ||
+				array_search($group, array_column($ownedGroups, 'gid'))!==FALSE){
 			continue;
 		}
 		$count++;
