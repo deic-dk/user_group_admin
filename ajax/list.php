@@ -12,7 +12,7 @@ $dir = isset($_GET['dir']) ? $_GET['dir'] : '';
 try {
 	$dir = \OC\Files\Filesystem::normalizePath('/'.$gid.$dir);
 	$fs = \OCP\Files::getStorage('user_group_admin');
-	\OCP\Util::writeLog('User_Group_Admin', 'DIR: '.$dir, \OCP\Util::WARN);
+	\OCP\Util::writeLog('User_Group_Admin', 'DIR: '.$dir, \OCP\Util::DEBUG);
 	$dirInfo = $fs->getFileInfo($dir);
 	if (!$dirInfo || !$dirInfo->getType() === 'dir') {
 		header("HTTP/1.0 404 Not Found");
