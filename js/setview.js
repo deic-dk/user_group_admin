@@ -30,7 +30,9 @@ OCA.UserGroups.App = {
 				scrollContainer: $('#app-content'),
 				fileActions: fileActions,
 				allowLegacyActions: true,
-				gid: gid
+				gid: gid/*,
+				dragOptions: OCA.Files.dragOptions,
+				folderDropOptions: OCA.Files.folderDropOptions*/
 			}
 		);
 		this._FileList.$el.find('#emptycontent').text(t('UserGroups', 'No files here'));
@@ -71,18 +73,17 @@ OCA.UserGroups.App = {
 		window.FileActions.on('setDefault.app-files', this._onActionsUpdated);
 		window.FileActions.on('registerAction.app-files', this._onActionsUpdated);
 
-		
 		OCA.Files.App.fileList.initialize(view,
-				{scrollContainer: $('#app-content'), dragOptions: dragOptions, folderDropOptions: folderDropOptions,
+				{scrollContainer: $('#app-content'), dragOptions: OCA.Files.dragOptions, folderDropOptions: OCA.Files.folderDropOptions,
 				fileActions: fileActions, allowLegacyActions: true});
 		OCA.Files.App.fileList.changeDirectory(path, true, true);
 		
-		//OCA.Meta_data.App.modifyFilelist();
-		
+		//if(typeof OCA.Meta_data.App.tag_semaphore == 'undefined' && typeof OCA.Meta_data.App.modifyFilelist != 'undefined'){
+		//	OCA.Meta_data.App.modifyFilelist();
+		//}		
 		//$('#app-navigation ul li[data-id="'+$(this).attr('data-id')+'"] a').click();
 		//window.location.href = "/index.php/apps/files?view=" + $(this).attr('data-id')+"&dir="+$(this).attr('data-path');
 		
-	  // TODO: make bookmark links active also on reload - like below
   }
 };
 
@@ -141,6 +142,10 @@ $(document).ready(function(){
 		OCA.Files.App.fileList = FileList;
 		FileList.fixGroupLinks();
 		OC.Upload.init(group);
+		if(!OCA.Files.App.fileList.modified){
+			OCA.Meta_data.App.modifyFilelist(OCA.UserGroups.FileList);
+		}
+		OCA.Files.App.fileList.modified = true;
   });
-
+ 
 });

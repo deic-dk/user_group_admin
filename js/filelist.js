@@ -71,6 +71,5 @@
   });
 	
 	OCA.UserGroups.FileList = FileList;
-	//OCA.Files.FileList = FileList;
-
+	
 })();
