@@ -417,7 +417,7 @@ class OC_User_Group_Admin_Util {
 	
 	public static function groupIsHidden($gid) {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-			return dbHiddenGroupExists($gid);
+			return self::dbHiddenGroupExists($gid);
 		}
 		else{
 			$groupInfo = self::getGroupInfo($gid);

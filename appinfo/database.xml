@@ -27,6 +27,19 @@
 				<length>64</length>
 			</field>
 
+			<field>
+				<name>hidden</name>
+				<type>text</type>
+				<notnull>true</notnull>
+				<length>4</length>
+			</field>
+
+			<field>
+				<name>user_free_quota</name>
+				<type>text</type>
+				<notnull>true</notnull>
+				<length>64</length>
+			</field>
 
 		</declaration>
 

@@ -3,8 +3,14 @@
 	<id>user_group_admin</id>
 	<name>User Group Admin</name>
 	<description>Enable users to create and manage groups</description>
-	<version>0.5</version>
+	<version>0.6</version>
 	<licence>AGPL </licence>
 	<author>Jorge Rafael Garcia Ramos </author>
 	<require>4.93</require>
-</info>
+	<types>
+		<type>filesystem</type>
+	</types>
+	<remote>
+		<groupdirs>appinfo/remote.php</groupdirs>
+	</remote>
+	</info>
