@@ -538,7 +538,7 @@ class OC_User_Group_Admin_Util {
 		$sql = 'SELECT * FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ?';
 		$stmt = OC_DB::prepare($sql);
 		$result = $stmt->execute(array($group));
-		$usage = 0;
+		$charge = 0;
 		while($row = $result->fetchRow()){
 			$row = $result->fetchRow();
 			$charges = \OCA\Files_Accounting\Storage_Lib::getChargeForUserServers($row['uid']);
