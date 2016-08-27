@@ -148,16 +148,6 @@ input.editgroup {
 	line-height: 50px;
 }
 
-
-.modalOverlay {
-    z-index: 100;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0px;
-    left: 0px;
-}
-
 table.hidden {
 		display: none;
 }
@@ -225,7 +215,7 @@ table#groupstable th .columntitle.name {
 .oc-dialog .grouptitle {
 	margin-bottom: 12px;
 	text-left;
-	font-size:110%;
+	font-size:90%;
 	width: 90%;
 	font-weight:bold;
 }
