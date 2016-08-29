@@ -107,7 +107,7 @@ class OC_User_Group_Admin_Util {
 	 */
 	public static function dbDeleteGroup($gid) {
 		$stmt = OC_DB::prepare("DELETE FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?");
-		$stmt->execute(array(gid));
+		$stmt->execute(array($gid));
 		$stmt = OC_DB::prepare("DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ?");
 		$stmt->execute(array($gid));
 		return true;
