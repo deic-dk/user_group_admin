@@ -132,6 +132,14 @@ $(document).ready(function(){
 			}
 		}
 	});
+	// Fix sharing link to switch back to files view
+	$('ul.nav-sidebar li[data-id^="sharing"]').click(function(e) {
+		if(OCA.Files.App.getActiveView()!='files'){
+			if(typeof OCA.UserGroups.App.oldFileList!='undefined'){
+				OCA.Files.App.fileList = OCA.UserGroups.App.oldFileList;
+			}
+		}
+	});
 
   $('[id^="app-content-user-groups"]').on('show', function(e) {
 		var groupArr = e.target.getAttribute('id').split('_');
