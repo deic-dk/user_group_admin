@@ -36,6 +36,10 @@ $order = 2;
 
 foreach ($groups as $group){
 	$fs = \OCP\Files::getStorage('user_group_admin');
+	if(!$fs){
+		\OCP\Util::writeLog('User_Group_Admin', 'Could not add navigation entry for '.$group['gid'], \OCP\Util::ERROR);
+		break;
+	}
 	$dir = \OC\Files\Filesystem::normalizePath('/'.$group['gid']);
 	$path = $fs->getLocalFile($dir);
 	if(!file_exists($path)){
