@@ -2,6 +2,7 @@
 
 	var FileList = function($el, options) {
 		this.initialized = false;
+		this.modified = false;
 		this.initialize($el, options);
 		this.setupUploadEvents();
 		this.gid = options.gid;
@@ -21,7 +22,7 @@
 				this.$el.find('.select-all').prop('checked', false);
 				this.showMask();
 				$('ul.nav-sidebar').find('.active').removeClass('active');
-				$('.nav-sidebar li[data-id=user-groups_'+this.gid+'] a').addClass('active');
+				$('.nav-sidebar li[data-id=user-groups_'+this.gid.replace( /(:|\.|\[|\]|,|=)/g, "\\$1" )+'] a').addClass('active');
 				// Change breadcrumb home icon to gift icon
 				$('#app-content-user-groups_'+this.gid+' #breadcrumb-container .breadcrumb .crumb a i.icon-home').addClass('icon-gift');
 				$('#app-content-user-groups_'+this.gid+' #breadcrumb-container .breadcrumb .crumb a i.icon-home').removeClass('icon-home');

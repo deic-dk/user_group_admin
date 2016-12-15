@@ -32,7 +32,7 @@
 				</div>
 				<?php if(!isset($_['dirToken'])):?>
 						<div id="new" class="btn-group">
-							<a type="button" class="btn btn-default btn-flat"><?php p($l->t('New'));?> <i class="fa fa-caret-down"><img src="<?php p(\OC::$WEBROOT);?>/themes/<?=OC_Util::getTheme();?>/core/img/icon-chevron-down-gray.png"></i></a>
+							<a type="button" class="btn btn-default btn-flat"><?php p($l->t('New'));?> <i class="fa fa-caret-down"><img src="<?php p(\OC::$WEBROOT);?>/apps/user_group_admin/img/icon-chevron-down-gray.png"></i></a>
 							<ul>
 								<li class=""
 									data-type="file" data-newname="<?php p($l->t('New text file')) ?>.txt">

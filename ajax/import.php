@@ -68,10 +68,10 @@ if(empty($failed)){
 		echo "<script type='text/javascript'>
 			var r = confirm('You cannot create create groups owned by other than yourself.');
 			if(r==true){
-				window.location.href='https://test.data.deic.dk/index.php/apps/user_group_admin';
+				window.location.href=OC.webroot+'/index.php/apps/user_group_admin';
 			}
 			else{
-				window.location.href='https://test.data.deic.dk/index.php/apps/user_group_admin';
+				window.location.href=OC.webroot+'/index.php/apps/user_group_admin';
 			}
 			</script>";
 	}
@@ -84,10 +84,10 @@ else{
 	echo "<script type='text/javascript'>
 			var r = confirm('".$n." user".($n===1?"":"s")." not added to the group because adding requires existence.');
 			if(r==true){
-				window.location.href='https://test.data.deic.dk/index.php/apps/user_group_admin';
+				window.location.href=OC.webroot+'/index.php/apps/user_group_admin';
 			}
 			else{
-				window.location.href='https://test.data.deic.dk/index.php/apps/user_group_admin';
+				window.location.href=OC.webroot+'/index.php/apps/user_group_admin';
 			}
 			</script>";
 }

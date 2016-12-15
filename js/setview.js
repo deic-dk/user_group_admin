@@ -4,16 +4,14 @@ if (!OCA.UserGroups) {
 
 OCA.UserGroups.App = {
   //_bkFileList: null,
-  _gid: null,
-  _FileList: null,
+  _FileList: [],
   initialize: function($el, gid){
 		/*this._bkFileList = new OCA.Files.FileList($el);
 		this._bkFileList.changeDirectory(target);
 		return this._bkFileList;*/
-		if(this._FileList && this._gid==gid) {
-			return this._FileList;
+		if(gid in this._FileList) {
+			return this._FileList[gid];
 		}
-		this._gid = gid;
 		
 		//var fileActions = OCA.Meta_data.App._createFileActions()
 		var fileActions = new OCA.Files.FileActions();
@@ -24,8 +22,8 @@ OCA.UserGroups.App = {
 		// regular actions
 		fileActions.merge(OCA.Files.fileActions);
 
-		this._FileList = new OCA.UserGroups.FileList(
-				$('#app-content-user-groups_'+gid),
+		this._FileList[gid] = new OCA.UserGroups.FileList(
+				$('#app-content-user-groups_'+gid.replace( /(:|\.|\[|\]|,|=)/g, "\\$1" )),
 			{
 				scrollContainer: $('#app-content'),
 				fileActions: fileActions,
@@ -35,8 +33,8 @@ OCA.UserGroups.App = {
 				folderDropOptions: OCA.Files.folderDropOptions*/
 			}
 		);
-		this._FileList.$el.find('#emptycontent').text(t('UserGroups', 'No files here'));
-		return this._FileList;
+		this._FileList[gid].$el.find('#emptycontent').text(t('UserGroups', 'No files here'));
+		return this._FileList[gid];
   },
 	_onActionsUpdated: function(ev, newAction) {
 		// forward new action to the file list
@@ -84,7 +82,28 @@ OCA.UserGroups.App = {
 		//$('#app-navigation ul li[data-id="'+$(this).attr('data-id')+'"] a').click();
 		//window.location.href = "/index.php/apps/files?view=" + $(this).attr('data-id')+"&dir="+$(this).attr('data-path');
 		
-  }
+  },
+	fixGroupLinks:function(group){
+		if(typeof group === 'undefined'){
+			return false;
+		}
+		group = group.replace( /(:|\.|\[|\]|,|=)/g, "\\$1" );
+		$("div[id^='app-content-user-groups']:not('.hidden') #breadcrumb-container .crumb").each(function(){
+			var link = $(this).find('a');
+			var href = link.attr('href');
+			if(href.indexOf('&group=')<0){
+				link.attr('href', href+'&group='+group);
+			}
+		});
+		// Change breadcrumb home icon to gift icon
+		$('#app-content-user-groups_'+group+' #breadcrumb-container .breadcrumb .crumb a i.icon-home').addClass('icon-gift');
+		$('#app-content-user-groups_'+group+' #breadcrumb-container .breadcrumb .crumb a i.icon-home').removeClass('icon-home');
+		var topHref = $('#app-content-user-groups_'+group+' #breadcrumb-container .breadcrumb .crumb a').first().attr('href' );
+		if(topHref){
+			topHref = topHref.replace(/\&view=[^&]*&/g, '').replace(/\&view=[^&]*$/, '');
+			$('#app-content-user-groups_'+group+' #breadcrumb-container .breadcrumb .crumb a').first().attr('href', topHref+'&view=user-groups_'+group);
+		}
+	}
 };
 
 function updateUserGroups(){
@@ -116,8 +135,8 @@ $(document).ready(function(){
 		$('ul.nav-sidebar').find('.active').removeClass('active');
 		$(this).children('a').addClass('active');
 		
-		if($('#app-content-'+$(this).attr('data-id')).length !== 0){
-			$('#app-navigation ul li[data-id="'+$(this).attr('data-id')+'"] a').click();
+		if($('#app-content-'+$(this).attr('data-id').replace( /(:|\.|\[|\]|,|=)/g, "\\$1" )).length !== 0){
+			$('#app-navigation ul li[data-id="'+$(this).attr('data-id').replace( /(:|\.|\[|\]|,|=)/g, "\\$1" )+'"] a').click();
 		}
 		else{
 			window.location.href = "/index.php/apps/files?group=%2F&view=" + $(this).attr('data-id');
@@ -141,19 +160,29 @@ $(document).ready(function(){
 		}
 	});
 
+	 $('[id^="app-content-user-groups"]').on('hide', function(e) {
+		$('ul.nav-sidebar').find('.active').removeClass('active');
+	 });
+	
   $('[id^="app-content-user-groups"]').on('show', function(e) {
 		var groupArr = e.target.getAttribute('id').split('_');
 		groupArr.shift();
 		var group = groupArr.join('_');
-		OCA.UserGroups.App.oldFileList = OCA.Files.App.fileList;
+		if(typeof OCA.UserGroups.App.oldFileList==='undefined'){
+			OCA.UserGroups.App.oldFileList = OCA.Files.App.fileList;
+		}
 		FileList = OCA.UserGroups.App.initialize($(e.target), group);
 		OCA.Files.App.fileList = FileList;
-		FileList.fixGroupLinks();
+		if(!OCA.UserGroups.FileList.modified){
+			OCA.UserGroups.App.fixGroupLinks();
+  	}
 		OC.Upload.init(group);
-		if(!OCA.Files.App.fileList.modified){
+		//if(!OCA.Files.App.fileList.modified){
+		if(!OCA.UserGroups.FileList.modified){
 			OCA.Meta_data.App.modifyFilelist(OCA.UserGroups.FileList);
 		}
 		OCA.Files.App.fileList.modified = true;
+		OCA.UserGroups.FileList.modified = true;
   });
  
 });
