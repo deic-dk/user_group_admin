@@ -597,5 +597,26 @@ class OC_User_Group_Admin_Util {
 		return $result;
 	}
 	
+	public static function getGroup($fileId){
+		$user = \OC_User::getUser();
+		$groups = self::getUserGroups($user);
+		$ret = array();
+		foreach($groups as $group){
+			\OC\Files\Filesystem::tearDown();
+			$groupDir = '/'.$user.'/user_group_admin/'.$group['gid'];
+			\OC\Files\Filesystem::init($user, $groupDir);
+			$path = \OC\Files\Filesystem::getPath($fileId);
+			if(!empty($path) && $path!=='files'){
+				$ret['group'] = $group['gid'];
+				$ret['path'] = $path;
+				break; 
+			}
+		}
+		if(count($groups)>0){
+			\OC\Files\Filesystem::init($user, '/'.$user.'/files');
+		}
+		return $ret;
+	}
+	
 }
 
