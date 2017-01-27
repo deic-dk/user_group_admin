@@ -40,6 +40,18 @@ function checkOwner($user, $owner) {
 	return OC_User::isAdminUser($user) || !empty($owner) && $user===$owner;
 }
 
+function isReadable($group, $owner, $user) {
+	$info = OC_User_Group_Admin_Util::getGroupInfo($group);
+	return checkOwner($user, $owner) ||
+		empty($info['private']) || $info['private']!=='yes';
+}
+
+function canLeave($group, $owner, $user) {
+	$info = OC_User_Group_Admin_Util::getGroupInfo($group);
+	return checkOwner($user, $owner) ||
+		empty($info['hidden']) || $info['hidden']!=='yes';
+}
+
 function doAction($group, $owner, $user){
 	
 	switch ($_POST['action']) {
@@ -51,13 +63,29 @@ function doAction($group, $owner, $user){
 			}
 			break;
 		case "addmember":
-			if(isset($_POST['member']) && checkOwner($user, $owner)) {
-				$result = OC_User_Group_Admin_Util::addToGroup($_POST['member'], $group);
+			if(!empty($_POST['member'])){
+				$member = $_POST['member'];
+			}
+			elseif(!empty($_POST['email'])){
+				$member = OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER;
+			}
+			//\OCP\Util::writeLog('User_Group_Admin', 'Adding member '.$member, \OCP\Util::WARN);
+			if(!empty($member)) {
+				$accept = md5($member . time (). 1 );
+				$decline = md5($member . time () . 0);
+				if(checkOwner($user, $owner)) {
+					$result = OC_User_Group_Admin_Util::addToGroup($member, $group, $accept, $decline);
+				}
+				else{
+					$result = OC_User_Group_Admin_Util::addToGroup($member, $group, $accept, $decline, true);
+				}
 			}
 			break;
 		case "leavegroup":
-			$result = OC_User_Group_Admin_Util::removeFromGroup($user, $group);
-			OC_User_Group_Hooks::groupLeave($group, $user, $owner);
+			if(canLeave($group, $owner, $user)){
+				$result = OC_User_Group_Admin_Util::removeFromGroup($user, $group);
+				OC_User_Group_Hooks::groupLeave($group, $user, $owner);
+			}
 			break;
 		case "delgroup":
 			if(checkOwner($user, $owner)){
@@ -70,11 +98,16 @@ function doAction($group, $owner, $user){
 				$result = OC_User_Group_Admin_Util::removeFromGroup($_POST['member'], $group) ;
 			}
 			break;
+		case "setdescription":
+			if(checkOwner($user, $owner)){
+				$result = OC_User_Group_Admin_Util::setDescription($_POST['description'], $group) ;
+			}
+			break;
 		case "showmembers":
 			$result = (checkOwner($user, $owner) || OC_User_Group_Admin_Util::inGroup($user, $group));
 			break;
 		case "getinfo":
-			$result = checkOwner($user, $owner);
+			$result = isReadable($group, $owner, $user);
 			break;
 		}
 
@@ -84,28 +117,43 @@ function doAction($group, $owner, $user){
 				OC_User_Group_Hooks::groupCreate($group, $user);
 				OCP\JSON::success();
 				break;
-			case "addmember":  
-				OC_User_Group_Hooks::groupShare($group, $_POST['member'], $user);
+			case "addmember":
+				if(!empty($_POST['email']) && empty($_POST['member'])){
+					OC_User_Group_Hooks::groupShare($group,
+						OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER, $owner);
+					OC_User_Group_Admin_Util::sendVerificationToExternal($_POST['email'], $accept, $decline, $group);
+					OCP\JSON::success();
+					break;
+				}
+				OC_User_Group_Hooks::groupShare($group, $_POST['member'], $owner);
+				OC_User_Group_Admin_Util::sendVerification($user, $accept, $decline, $group);
+				$groupInfo = OC_User_Group_Admin_Util::getGroupInfo($group);
 				$tmpl = new OCP\Template("user_group_admin", "members");
-				$tmpl->assign( 'group' , $group, false );
-				$tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $group ), false );
+				$tmpl->assign( 'group' , $group );
+				$tmpl->assign( 'owner' , $groupInfo['owner'] );
+				$tmpl->assign( 'description' , $groupInfo['description'] );
+				$tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $group ) );
 				$page = $tmpl->fetchPage();
 				OCP\JSON::success(array('data' => array('page'=>$page)));
 				break;
 			case "showmembers":
+				$groupInfo = OC_User_Group_Admin_Util::getGroupInfo($group);
 				$tmpl = new OCP\Template("user_group_admin", "members");
-				$tmpl->assign( 'group' , $group , false );
-				$tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $group ), false );
+				$tmpl->assign( 'group' , $group );
+				$tmpl->assign( 'owner' , $groupInfo['owner'] );
+				$tmpl->assign( 'description' , $groupInfo['description'] );
+				$members = OC_User_Group_Admin_Util::usersInGroup( $group );
+				$tmpl->assign( 'members' , $members );
 				$page = $tmpl->fetchPage();
 				$tmpl = new OCP\Template("user_group_admin", "freequota");
-				$tmpl->assign( 'group' , $group , false );
-				$groupInfo = OC_User_Group_Admin_Util::getGroupInfo($group);
+				$tmpl->assign( 'group' , $group );
 				$tmpl->assign( 'user_freequota' , $groupInfo['user_freequota'] );
 				$quotaPreset = OC_Appconfig::getValue('files', 'quota_preset', '1 GB, 5 GB, 10 GB');
 				$quotaPresetArr = explode(',', $quotaPreset);
 				$tmpl->assign( 'quota_preset' , $quotaPresetArr );
 				$freequota_dropdown = $tmpl->fetchPage();
-				OCP\JSON::success(array('data' => array('page'=>$page, 'freequota'=>$freequota_dropdown)));
+				OCP\JSON::success(array('data' => array('page'=>$page, 'freequota'=>$freequota_dropdown,
+					'members'=>$members)));
 				break;
 			case "getinfo":
 				OCP\JSON::success(array('data' => OC_User_Group_Admin_Util::getGroupInfo($group)));

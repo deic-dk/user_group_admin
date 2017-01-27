@@ -33,8 +33,9 @@ OCP\Util::addStyle('user_group_admin', 'user_group_admin');
 OCP\Util::addStyle('files', 'files');
 
 OCP\Util::addScript('user_group_admin','script');
+OC_Util::addScript( 'core', 'multiselect' );
+OC_Util::addScript( 'core', 'singleselect' );
+OC_Util::addScript('core', 'jquery.inview');
 
 $tmpl = new OCP\Template('user_group_admin', 'main', 'user');
-$groupInfos = OC_User_Group_Admin_Util::getOwnerGroups(OC_User::getUser ());
-$tmpl->assign( 'groups' , array_column($groupInfos, 'gid'), true );
 $tmpl->printPage();

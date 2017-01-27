@@ -12,13 +12,16 @@ $userid = isset($_GET['userid'])?$_GET['userid']:'';
 $name = isset($_GET['name'])?$_GET['name']:null;
 $quota = isset($_GET['quota'])?$_GET['quota']:'';
 $usage = isset($_GET['usage'])?$_GET['usage']:0;
+$memberRequest = !empty($_GET['memberRequest'])?$_GET['memberRequest']=='yes':false;
+$accept = $_GET['accept'];
+$decline = $_GET['decline'];
 
 switch ($action) {
 	case "newGroup":
 		$result = OC_User_Group_Admin_Util::dbCreateGroup($name, $userid);
 		break;
 	case "newMember":
-		$result = OC_User_Group_Admin_Util::dbAddToGroup($userid, $name);
+		$result = OC_User_Group_Admin_Util::dbAddToGroup($userid, $name, $accept, $decline, $memberRequest);
 		break;
 	case "deleteGroup":
 		$result = OC_User_Group_Admin_Util::dbDeleteGroup($name);

@@ -15,6 +15,7 @@
 
 			<field>
 				<name>gid</name>
+				<primary>true</primary>
 				<type>text</type>
 				<notnull>true</notnull>
 				<length>64</length>
@@ -25,6 +26,20 @@
 				<type>text</type>
 				<notnull>true</notnull>
 				<length>64</length>
+			</field>
+
+			<field>
+				<name>private</name>
+				<type>text</type>
+				<notnull>true</notnull>
+				<length>4</length>
+			</field>
+
+			<field>
+				<name>open</name>
+				<type>text</type>
+				<notnull>true</notnull>
+				<length>4</length>
 			</field>
 
 			<field>
@@ -39,6 +54,11 @@
 				<type>text</type>
 				<notnull>true</notnull>
 				<length>64</length>
+			</field>
+
+			<field>
+				<name>description</name>
+				<type>text</type>
 			</field>
 
 		</declaration>
@@ -65,12 +85,6 @@
 				<length>64</length>
 			</field>
 
-			<field>
-				<name>owner</name>
-				<type>text</type>
-				<notnull>true</notnull>
-				<length>64</length>
-			</field>
 			
 			<field>
 				<name>verified</name>

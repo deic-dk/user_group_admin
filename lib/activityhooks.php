@@ -25,8 +25,14 @@ class OC_User_Group_Hooks {
 	
 	public static function dbGroupShare($group, $uid, $owner) {
 		$params = array($group, $uid, $owner);
-		self::addNotificationsForGroupAction($params, 'group', 'shared_user_self');
-		self::addNotificationsForGroupAction($params, 'group', 'shared_with_by');
+		if($owner==\OC_User::getUser()){
+			self::addNotificationsForGroupAction($params, 'group', 'shared_user_self');
+			self::addNotificationsForGroupAction($params, 'group', 'shared_with_by');
+		}
+		else{
+			self::addNotificationsForGroupAction($params, 'group', 'requested_user_self');
+			self::addNotificationsForGroupAction($params, 'group', 'requested_with_by');
+		}
 	}
 	
 	public static function groupShare($group, $uid, $owner) {
@@ -65,28 +71,33 @@ class OC_User_Group_Hooks {
 	}
 	
 	public static function addNotificationsForGroupAction($params, $activityType, $subject) {
+		\OCP\Util::writeLog('User_Group_Admin', 'Adding notification: '.$subject.'-->'.serialize($params), \OCP\Util::WARN);
 		if($subject == 'shared_user_self' || $subject == 'shared_with_by' ||
 				$subject == 'joined_user_self' || $subject == 'joined_with_by'){
-			$auser = $params[1];
+			$affecteduser = $params[1];
 			$user = $params[2];
+		}
+		elseif($subject == 'requested_user_self' || $subject == 'requested_with_by'){
+			$affecteduser = $params[2];
+			$user = $params[1];
 		}
 		else{	
 			$user = $params[1];
-			$auser = $params[1];
+			$affecteduser = $params[1];
 		}
-		$filteredStreamUsers = \OCA\Activity\UserSettings::filterUsersBySetting(array($user, $auser), 'stream', 'group');
-		$filteredEmailUsers = \OCA\Activity\UserSettings::filterUsersBySetting(array($user, $auser), 'email', 'group');
-		if($subject == 'shared_with_by' || $subject == 'joined_with_by'){
+		$filteredStreamUsers = \OCA\Activity\UserSettings::filterUsersBySetting(array($user, $affecteduser), 'stream', 'group');
+		$filteredEmailUsers = \OCA\Activity\UserSettings::filterUsersBySetting(array($user, $affecteduser), 'email', 'group');
+		if($subject == 'shared_with_by' || $subject == 'joined_with_by' || $subject == 'requested_with_by'){
 			self::addNotificationsForUser(
-				$user, $auser, $subject, $params, true,
-				!empty($filteredStreamUsers[$auser]),
-				!empty($filteredEmailUsers[$auser]) ? $filteredEmailUsers[$auser] : 0,
+				$user, $affecteduser, $subject, $params, true,
+				!empty($filteredStreamUsers[$affecteduser]),
+				!empty($filteredEmailUsers[$affecteduser]) ? $filteredEmailUsers[$affecteduser] : 0,
 				\OCA\UserNotification\Data::PRIORITY_MEDIUM, $activityType
 			);
 		}
 		else{
 			self::addNotificationsForUser(
-				$user, $auser, $subject, $params, true,
+				$user, $affecteduser, $subject, $params, true,
 				!empty($filteredStreamUsers[$user]),
 				!empty($filteredEmailUsers[$user]) ? $filteredEmailUsers[$user] : 0,
 				\OCA\UserNotification\Data::PRIORITY_MEDIUM, $activityType
@@ -94,42 +105,42 @@ class OC_User_Group_Hooks {
 		}
 	}
 	
-	protected static function addNotificationsForUser($user, $auser, $subject, $params, $isFile,
-			$streamSetting, $emailSetting, $priority , $type ) {
-		$link = \OC::$WEBROOT."/index.php/apps/user_group_admin"; 
+	protected static function addNotificationsForUser($user, $affecteduser, $subject, $params, $isFile,
+			$streamSetting, $emailSetting, $priority , $type) {
+		$link = OCP\Util::linkToAbsolute('user_group_admin', '');
 		$app = 'user_group_admin';
 		if($streamSetting){
-			if($subject == 'shared_user_self' || $subject == 'joined_user_self'){
+			if($subject == 'shared_user_self' || $subject == 'joined_user_self' || $subject == 'requested_user_self'){
 				self::send($app, $subject, $params, '', array(), '', $link, $user, $user, $type, \OCA\UserNotification\Data::PRIORITY_HIGH);
 			}
-			else if($subject == 'shared_with_by' || $subject == 'joined_with_by') {
+			else if($subject == 'shared_with_by' || $subject == 'joined_with_by' || $subject == 'requested_with_by') {
 				\OCP\Util::writeLog('User_Group_Admin', 'PATH: '.serialize($params), \OCP\Util::WARN);
-				self::send($app, $subject, $params, '', array(), '', $link, $user, $auser, $type, \OCA\UserNotification\Data::PRIORITY_HIGH); 
+				self::send($app, $subject, $params, '', array(), '', $link, $user, $affecteduser, $type, \OCA\UserNotification\Data::PRIORITY_HIGH); 
 			}
 			else if($subject == 'deleted_self') {
-				self::send($app, $subject, array($params[0]), '', array(), '', $link, $user, $auser,$type, \OCA\UserNotification\Data::PRIORITY_HIGH); 
+				self::send($app, $subject, array($params[0]), '', array(), '', $link, $user, $affecteduser,$type, \OCA\UserNotification\Data::PRIORITY_HIGH); 
 			}
 			else if($subject == 'deleted_by'){
 				if($params[1]!==$params[2]){
 					self::send($app, $subject, array($params[0], $user, $params[2]), '', array(), '', $link, $user, $params[2], $type, \OCA\UserNotification\Data::PRIORITY_HIGH);
 				}
-				self::send($app, $subject, array($params[0], $user, $params[2]), '', array(), '', $link, $user, $auser, $type, \OCA\UserNotification\Data::PRIORITY_HIGH);   
+				self::send($app, $subject, array($params[0], $user, $params[2]), '', array(), '', $link, $user, $affecteduser, $type, \OCA\UserNotification\Data::PRIORITY_HIGH);   
 			}
 			else{
-				self::send($app, $subject, array($params[0]), '', array(), '', $link, $user, $auser, $type, \OCA\UserNotification\Data::PRIORITY_HIGH);
+				self::send($app, $subject, array($params[0]), '', array(), '', $link, $user, $affecteduser, $type, \OCA\UserNotification\Data::PRIORITY_HIGH);
 			}
 		}
 		if($emailSetting){
 			$latestSend = time() + $emailSetting;
-			if($subject == 'shared_user_self'){
+			if($subject == 'shared_user_self' || $subject == 'requested_user_self'){
 				\OCA\Activity\Data::storeMail($app, $subject, $params, $user, 'group', $latestSend);
-				\OCA\Activity\Data::storeMail($app, 'shared_with_by', array($params[0],$user), $auser, 'group', $latestSend);
+				\OCA\Activity\Data::storeMail($app, 'shared_with_by', array($params[0],$user), $affecteduser, 'group', $latestSend);
 			}
 			else if($subject == 'deleted_self'){
-				\OCA\Activity\Data::storeMail($app, $subject, array($params[0]), $auser, 'group', $latestSend);	
+				\OCA\Activity\Data::storeMail($app, $subject, array($params[0]), $affecteduser, 'group', $latestSend);	
 			}
 			else if($subject == 'deleted_by'){
-				\OCA\Activity\Data::storeMail($app, $subject, array($params[0],$user), $auser, 'group', $latestSend);
+				\OCA\Activity\Data::storeMail($app, $subject, array($params[0],$user), $affecteduser, 'group', $latestSend);
 			}
 			else{
 				\OCA\Activity\Data::storeMail($app, $subject, array($params[0]), $user, 'group', $latestSend);

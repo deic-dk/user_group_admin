@@ -13,6 +13,19 @@
   FileList.prototype = _.extend({}, OCA.Files.FileList.prototype, {
 		
 		appName: 'User_group_admin',
+		
+		getParam: function(href, key) {
+			var results = new RegExp('[\?&]' + key + '=([^&#]*)').exec(href);
+			if (results==null){
+				return '';// null;
+		}
+		else{
+			return results[1] || 0;
+		}
+	},
+	getGetParam: function(key) {
+		return this.getParam(window.location.href, key);
+	},
 
 		reload: function() {
 			var viewParam = this.getGetParam( 'view');

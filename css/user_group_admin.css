@@ -36,6 +36,17 @@ li
 	z-index: 1;
 }
 
+#join {
+	z-index: 1;
+	float: left;
+	margin-left: 16px;
+	margin-right: 4px;
+}
+
+#join i.icon-users {
+	margin-right: 0.36em;
+}
+
 .apanel {
 	width:100%;
 	border:solid 1px #e4e4e4;
@@ -163,7 +174,7 @@ a.action > img {
 		vertical-align: text-bottom;
 }
 
-.oc-dialog-title, .memberscount, .owner {
+.oc-dialog-title, .info {
 	padding: 10px 3px 10px 0;
 }
 
@@ -182,10 +193,21 @@ a.action > img {
 
 .userselect {
     display: none;
-    margin: 4px auto 10px 64px;
+    margin: 4px auto 10px 0;
     padding-left: 0;
     width: 70%;
 }
+
+.oc-dialog .emailaddresses input {
+    width: 70%;
+}
+
+.emailaddresses {
+    display: none;
+    margin: 4px auto 10px 0;
+    padding-left: 0;
+    width: 100%;
+}s
 
 .filelink-wrap {
 	padding-left:4px;
@@ -222,8 +244,8 @@ table#groupstable th .columntitle.name {
 
 .oc-dialog .oc-dialog-close {
     height: 10px;
-    right: 6px;
-    top: 4px;
+    right: 10px;
+    top: 8px;
     width: 10px;
 }
 
@@ -259,4 +281,14 @@ table#groupstable th .columntitle.name {
 .freequota {
 	float: right;
 	margin-right: 67px;
+}
+
+#invite-guests {
+	float: right;
+	margin-right: 67px;
+}
+
+textarea.description {
+	width: 96%;
+	margin-top: 6px;
 }

@@ -5,7 +5,7 @@ OC.UserGroup = {
 		OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_USER]  = [];
 		OC.UserGroup.groupMember[OC.Share.SHARE_TYPE_GROUP] = [];
 
-		$('.ui-autocomplete-input').autocomplete({
+		$('.userselect .ui-autocomplete-input').autocomplete({
 			minLength : 2,
 			source : function(search, response) {
 				$.get(OC.filePath('user_group_admin', 'ajax', 'members.php'), {
@@ -25,7 +25,7 @@ OC.UserGroup = {
 				$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {member : member, group : OC.UserGroup.groupSelected, action : "addmember"} ,
 					function ( jsondata ){
 						if(jsondata.status == 'success' ) {
-							$('.ui-autocomplete-input').val('');
+							$('.userselect .ui-autocomplete-input').val('');
 							var theint = parseInt($("tr[group='"+OC.UserGroup.groupSelected+"']").find("span#nomembers").html(),10);
 							theint++;
 							$("tr[group='"+OC.UserGroup.groupSelected+"']").find("span#nomembers").text(theint);
@@ -59,6 +59,78 @@ OC.UserGroup = {
 			}
 		});
 	},
+	
+	initGroupDropDown : function() {
+		$('.ui-autocomplete-group').autocomplete({
+			minLength : 1,
+			source : function(search, response) {
+				$.get(OC.filePath('user_group_admin', 'ajax', 'searchgroups.php'), {
+					search : search.term},
+					function(result) {
+						var data = [];
+						$.each(result, function(key, value){
+							data.push({'label': value.gid, 'value': value});
+						});
+						if(data.length > 0) {
+							response(data);
+						}
+					});
+			},
+			focus : function(event, focused) {
+				event.preventDefault();
+			},
+			select : function(event, selected) {
+				var gid = selected.item.value.gid;
+				$('#joingroup .editgroup').val(selected.item.value.gid);
+				$('.group-info').remove();
+				$('#joingroup .editgroup').after('<a href=# class="group-info" group="'+selected.item.value.gid+'" owner="'+
+						selected.item.value.owner+'" members="'+selected.item.value.members+'" ownerDisplayName="'+
+						selected.item.value.ownerDisplayName+'">info</a>')
+				return false;
+			}
+		});
+	},
+	
+	joinGroup: function(gid){
+		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), 
+				{member : OC.currentUser, group : gid, action : "addmember"} ,
+				function ( jsondata ){
+					if(jsondata.status == 'success' ) {
+						$('#joingroup .ui-autocomplete-input').val('');
+						var theint = parseInt($("tr[group='"+gid+"']").find("span#nomembers").html(),10);
+						theint++;
+						$("tr[group='"+gid+"']").find("span#nomembers").text(theint);
+						var intnew = getMembersCount(gid);
+						intnew++;
+						setMembersCount(gid, intnew);
+						$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {group: gid, action : "showmembers"} ,
+						function ( jsondata ){
+							if(jsondata.status == 'success' ) {
+								$('#joingroup .editgroup').val("");
+								$('.group-info').remove();
+								location.reload();
+							}
+							else{
+								OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
+								}
+						});
+					}
+					else{
+						OC.dialogs.alert( jsondata.data.message , jsondata.data.title );
+					}
+			});
+	},
+	
+	sendInvitationEmail: function(email, group){
+		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), 
+				{email: email, group: group, action: "addmember"} ,
+				function ( jsondata ){
+					if(jsondata.status != 'success' ) {
+						OC.dialogs.alert( jsondata , 'Problem' );
+					}
+			});
+	},
+	
 	onFreeQuotaSelect: function(ev) {
 		var $select = $(ev.target);
 		var group = $select.attr('group');
@@ -93,10 +165,136 @@ function setMembersCount(group, n){
 			);
 }
 
+function showMembers(group, role, info){
+	var html = '<div class="group"><div class="grouptitle" group="'+group+'">'+ group+'</div>\
+			<a class="oc-dialog-close close svg"></a><div class="memberlist">\
+			<div class="dropmembers" group=\''+ group+'\'></div>'+
+			(!(role=='owner' || role=='admin')?'':
+			'<div class="invitemembers">\
+				<button id="invite" class="btn btn-primary btn-flat">\
+			<i class="icon-user"></i>Invite user</button>&nbsp\
+				<button id="invite-guests" class="btn btn-default btn-flat">\
+				Invite via email</button><br />\
+				<div class="userselect">\
+				<input type="text" placeholder="Search users" class="ui-autocomplete-input" autocomplete="off">\
+				<span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>\
+				</div>\
+			<div class="emailaddresses">\
+				<input type="text" placeholder="Email of user who has never logged in">\
+				<button id="send-invite" class="btn btn-default btn-flat" group=\''+ group+'\'>Send</button>\
+				</div>\
+				<br />\
+			<button id="export-group" class="btn btn-default btn-flat">\
+			<i class="icon-export-alt"></i>Export</button>\
+			<div class="freequota"></div>\
+			</div>')+
+			'</div>';
+
+	$(html).dialog({
+		dialogClass: "oc-dialog",
+		resizable: true,
+		draggable: true,
+		height: (info?300:600),
+		width: (info?400:720)
+	});
+
+	$('body').append('<div class="modalOverlay">');
+
+	$('.oc-dialog-close').live('click', function(ev) {
+		if($('.ui-dialog .group .invitemembers').length && $('.group textarea.description').length &&
+				!$('.group textarea.description').is('[readonly]')){
+			saveDescription();
+		}
+		ev.target.closest(".oc-dialog").remove();
+		$('.modalOverlay').remove();
+	});
+
+	$('.ui-helper-clearfix').css("display", "none");
+	if (role=='owner' || role=='admin' || role=='member' || role=='pending'){
+		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'),
+			{group: group, action : "showmembers"} ,
+			function ( jsondata ){
+				if(jsondata.status == 'success' ) {
+					$('.dropmembers').html(jsondata.data.page);
+					if(role=='owner' || role=='admin'){
+						$('.dropmembers textarea').removeAttr('readonly');
+					}
+					$('.freequota').html(jsondata.data.freequota);
+					$('#setfreequota').singleSelect().on('change', OC.UserGroup.onFreeQuotaSelect);
+					$('.avatar').each(function() {
+						var element = $(this);
+						element.avatar(element.data('user'), 28);
+					});
+					if (role=='member') {
+						$('.removemember').hide();
+					}
+				}
+				else{
+					OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
+				}
+		});
+	}
+	else if(info){
+		$('.dropmembers').append(info);
+	}
+	if (role=='member') {
+		$('.invite').hide();
+		$('.freequota').hide();
+	}
+}
+
+function saveDescription(){
+	$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'),
+			{ group : $('.group .grouptitle').attr('group'), action: "setdescription", description : $('.group textarea.description').val() } ,
+			function ( jsondata ){
+		if(jsondata.status != 'success' ) {
+			OC.dialogs.alert( jsondata) ;
+		}
+	});
+}
+
+function sendInvite(group){
+	var myEmails = $('.invitemembers .emailaddresses input').val();
+	var myEmailList = myEmails.match(/[a-zA-z0-9_.]+@[a-zA-Z0-9_.]+\.(.*)/g);
+	if(myEmailList == null || myEmailList.length == 0) {
+		OC.dialogs.alert('Cannot parse this input.' , 'Bad email address(es)');
+		$('.grouptitle').parent().parent().css('z-index', '100');
+		$('#send_emails').parent().parent().parent().css('z-index', '200');
+		return false;
+	}
+	var myEmailListString = myEmailList.join(', ');
+	var textHtml = "Inviting via email is intended to allow sharing with users who have not yet signed in.  " +
+			"When clicking on the received link, they will first be asked to sign in, then added to the group.<br /><br />" +
+			"Emails will now be sent to the following recipients:<br /><br />"+myEmailListString;
+	$('#dialogalert' ).html(textHtml);
+	// This gets hidden when showing alerts...
+	$( '#dialogalert' ).parent().find('.ui-dialog-titlebar').show();
+	$( '#dialogalert' ).parent().find('.ui-dialog-buttonpane').show();
+	$( '#dialogalert' ).dialog({
+		buttons: [ 
+	{ id:'send_emails', text: 'Send', click: function() {
+		$.each(myEmailList, function(key, value){
+			OC.UserGroup.sendInvitationEmail(value, group);
+		});
+		$(this).dialog( 'close' );
+	}},
+	{id:'send_emails_cancel', text: 'Cancel',
+		click: function() {
+			$(this).dialog( 'close' );
+		}
+	}]});
+	$('.grouptitle').parent().parent().css('z-index', '100');
+	$('#send_emails').parent().parent().parent().css('z-index', '200');
+}
+
 $(document).ready(function() {
 	
 	$('a#create').click(function() {
 		$('#newgroup').slideToggle();
+	});
+	
+	$('a#join').click(function() {
+		$('#joingroup').slideToggle();
 	});
 	
 	$('a#importgroup').click(function() {
@@ -104,33 +302,62 @@ $(document).ready(function() {
 	});
 
 	$('#newgroup #ok').on('click', function() {
-		if( $('.editgroup').val() != "") {
-
-			$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : $('.editgroup').val(), action: "addgroup" } , function ( jsondata ){
+		if($('#newgroup .editgroup').val() != "") {
+			$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : $('#newgroup .editgroup').val(), action: "addgroup" } , function ( jsondata ){
 				if(jsondata.status == 'success' ) {
 					$('#newgroup').slideToggle();
-					$('#newgroup').val("");
+					$('#newgroup .editgroup').val("");
 					$('#user_group_admin_holder').hide();
 					location.reload();
 				}else{
-					OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
+					OC.dialogs.alert( jsondata.data.message , jsondata.data.title );
 				}
 			});
 		} else {
 			$('#user_group_admin_holder').hide();
 		}
 	});
+	
+	$('#joingroup #join_group').on('click', function() {
+		
+		if( $('#joingroup .editgroup').val() == "") {
+			$('#user_group_admin_holder').hide();
+			return false;
+		}
+		var textHtml = "A request for membership will now be sent to the group owner. Click 'Join' to proceed.";
+		$( '#dialogalert' ).html(textHtml);
+		// This gets hidden when showing alerts...
+		$('.ui-dialog-titlebar').show();
+		$('.ui-dialog-buttonpane').show();
+		$('#dialogalert').dialog({ buttons: [ { id:'join_group', text: 'Join', click: function() {
+			OC.UserGroup.joinGroup($('#joingroup .editgroup').val());
+			$(this).dialog( 'close' );
+		}},
+		{id:'join_group_cancel', text: 'Cancel',
+			click: function() {
+				$(this).dialog( 'close' );
+			}
+		}]});
+		
+	});
 
 	$('#newgroup #cancel').click(function() {
 		$('#newgroup').slideToggle();
 	});
+	
+	$('#joingroup #cancel_join').click(function() {
+		$('#joingroup .editgroup').val("");
+		$('.group-info').remove();
+		$('#joingroup').slideToggle();
+	});
 
-	$("#groupstable td .delete-group").live('click', function() {
+	$("#groupstable td .delete-group").live('click', function(ev) {
+		ev.stopPropagation();
 		var role = $(this).closest('tr').attr('role') ;
 		var groupSelected = $(this).closest('tr').attr('group') ;
-		var textHtml = $( '#dialogalert' ).html().replace(role == 'member'?'delete':'leave', role == 'member'?'leave':'delete');
-		 $( '#dialogalert' ).html(textHtml);
-		$( '#dialogalert' ).dialog({ buttons: [ { id:'test','data-test':'data test', text: role == 'member'?'Leave':'Delete', click: function() {
+		var textHtml = $( '#dialogalert' ).html().replace( role == 'owner'?'leave':'delete', role == 'owner'?'delete':'leave');
+		 $('#dialogalert').html(textHtml);
+		$('#dialogalert').dialog({ buttons: [ { id:'delete_leave_group', text: role == 'owner'?'Delete':'Leave', click: function() {
 			if (role == 'owner' || role == 'admin') {
 				$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : groupSelected , action : "delgroup"} , function ( jsondata){
 					if(jsondata.status == 'success' ) {
@@ -153,7 +380,7 @@ $(document).ready(function() {
 			}
 			$(this).dialog( 'close' );
 		}},
-		{id:'test2','data-test':'data test', text: 'Cancel',
+		{id:'delete_leave_group_cancel', text: 'Cancel',
 			click: function() {
 				$(this).dialog( 'close' );
 			}
@@ -170,7 +397,7 @@ $(document).ready(function() {
 		OC.UserGroup.groupSelected = $('.grouptitle').attr('group');
 		$(".userselect").css("display", "block");
 		OC.UserGroup.initDropDown() ;
-		$('.ui-autocomplete-input').focus();
+		$('.userselect .ui-autocomplete-input').focus();
 		event.stopPropagation();
 		$('html').click(function(event) {
 			if ( !$(event.target).closest("div[class='userselect']").length )  {
@@ -178,74 +405,53 @@ $(document).ready(function() {
 			}
 		});
 	});
+	
+	$("#invite-guests").live('click', function(event) {
+		OC.UserGroup.groupSelected = $('.grouptitle').attr('group');
+		$(".emailaddresses").css("display", "block");
+		event.stopPropagation();
+		$('html').click(function(event) {
+			if($(event.target).closest(".oc-dialog").find('.group').length &&
+					!$(event.target).closest("div[class='emailaddresses']").length)  {
+					$("div[class='emailaddresses']").hide();
+			}
+		});	});
 
 
 	$(document).click(function(e){
-		if (!$(e.target).parents().filter('.oc-dialog').length && !$(e.target).parents().filter('.name').length ) {
+		if ($(".oc-dialog").length &&
+				!$(e.target).parents().filter('.oc-dialog').length && !$(e.target).parents().filter('.ui-dialog').length &&
+				!$(e.target).parents().filter('.name').length ) {
+			if($('.ui-dialog .group .invitemembers').length && $('.group textarea.description').length &&
+					!$('.group textarea.description').is('[readonly]')){
+				saveDescription();
+			}
 			$(".oc-dialog").remove();
 			$('.modalOverlay').remove();
+			$('#dialogalert').closest('.ui-dialog').remove();
+		}
+		else if($(e.target).attr('group') && $(e.target).hasClass('group-info')){
+			showMembers($(e.target).attr('group'), '',
+					'<div class="info">Description: '+($(e.target).attr('description')||'')+'</div>'+
+					'<div class="info">Owner: '+$(e.target).attr('ownerDisplayName')+'</div>'+
+					'<div class="info">Members: '+$(e.target).attr('members')+'</div>');
+		}
+		else if($(e.target).prop('id') && $(e.target).prop('id')=='send-invite'){
+			sendInvite($(e.target).attr('group'));
 		}
 	});
 
 	$("#groupstable .nametext").live('click', function() {
 		var group = $(this).closest('tr').attr('group') ;
 		var role = $(this).closest('tr').attr('role');
-		var number = $("tr[group='"+group+"']").find("span#nomembers").html();
-		var html = '<div class="group"><div class="grouptitle" group="'+ group+'">'+ group+'</div>\
-				<a class="oc-dialog-close close svg"></a><div class="memberlist">\
-				<div class="dropmembers" group=\''+ group+'\'></div>\
-				<div class="invitemembers">\
-				<button id="invite" class="invite btn btn-primary btn-flat">\
-				<i class="icon-user"></i>Invite user</button>&nbsp\
-				<button id="export-group" class="btn btn-default btn-flat">\
-				<i class="icon-export-alt"></i>Export</button>\
-				<div class="freequota"></div>\
-				<div class="userselect">\
-				<input type="text" placeholder="Invite user" class="ui-autocomplete-input" autocomplete="off">\
-				<span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>\
-				</div>\
-				</div>';
-
-		$(html).dialog({
-			dialogClass: "oc-dialog",
-			resizable: true,
-			draggable: true,
-			height: 600,
-			width: 720
-		});
-
-		$('body').append('<div class="modalOverlay">');
-
-		$('.oc-dialog-close').live('click', function() {
-			$(".oc-dialog").remove();
-			$('.modalOverlay').remove();
-		});
-
-		$('.ui-helper-clearfix').css("display", "none");
-		if (role=='owner' || role=='admin' || role=='member'){
-			$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'),
-				{group: group, action : "showmembers"} ,
-				function ( jsondata ){
-					if(jsondata.status == 'success' ) {
-						$('.dropmembers').html(jsondata.data.page);
-						$('.freequota').html(jsondata.data.freequota);
-						$('#setfreequota').on('change', OC.UserGroup.onFreeQuotaSelect);
-						$('.avatar').each(function() {
-							var element = $(this);
-							element.avatar(element.data('user'), 28);
-						});
-						if (role=='member') {
-							$('.removemember').hide();
-						}
-					}
-					else{
-						OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
-					}
-			});
+		var hidden = $(this).closest('tr').attr('hiddenGroup');
+		if(hidden){
+			showMembers(group, '',
+					'<div class="info">Description: <i>This is a system group</i></div>'+
+					'<div class="info">Owner: <i>hidden</i></div>');
 		}
-		if (role=='member') {
-			$('.invite').hide();
-			$('.freequota').hide();
+		else{
+			showMembers(group, role);
 		}
 	});
 
@@ -273,6 +479,8 @@ $(document).ready(function() {
 	$('#importnew #import_group_file').change(function() {
 		$('#import_group_form').submit();
 	});
-
+	
+	OC.UserGroup.initGroupDropDown() ;
+	
 });
 

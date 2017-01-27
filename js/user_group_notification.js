@@ -2,14 +2,20 @@ $(document).ready(function() {
 	$(document).on ("click", ".invite_div .accept", function () {
 		var group = $(this).attr('group');
 		var activityId = $(this).parent().attr('activity_id');
+		var user = $(this).attr('user');
+		var userDisplayName = $(this).attr('userdisplayname');
 		$(this).parent().html('<span group="' + group + '"><strong>Accepted</strong></span>');
 		markSeen(activityId);
 		$.ajax({
 			url:OC.linkTo('user_group_admin', 'ajax/acceptinvitation.php'),
 			type: 'post',
-			data: { 'group': $(this).attr('group'), 'accept': 'yes'},
+			data: { 'group': $(this).attr('group'), 'user':  user, 'accept': 'yes'},
 			success: function(data, status) {
-				OC.dialogs.alert('Congratulations! You\'ve joined the group '+group, 'Welcome to group', function(el){
+				var msg = 'Congratulations! You\'ve joined the group '+group+'.';
+				if(typeof user != 'undefined' && user != OC.currentUser){
+					msg = 'OK! '+userDisplayName+' has joined the group '+group+'.';
+				}
+				OC.dialogs.alert(msg, 'New member of group', function(el){
 					OC.redirect(OC.generateUrl('apps/user_group_admin'));
 				}, true);
 			}
@@ -24,9 +30,9 @@ $(document).ready(function() {
 		$.ajax({
 			url:OC.linkTo('user_group_admin', 'ajax/acceptinvitation.php'),
 			type: 'post',
-			data: {'group': $(this).attr('group'), 'accept': 'no'},
+			data: {'group': $(this).attr('group'), 'user':  $(this).attr('user'), 'accept': 'no'},
 			success: function(data, status) {
-				OC.dialogs.alert('OK, not joining '+group, 'Decline confirmation', null, true);
+				OC.dialogs.alert('OK, declining membership of '+group+'.', 'Decline confirmation', null, true);
 			}
 		});
 	});

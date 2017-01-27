@@ -25,6 +25,7 @@
 class OC_User_Group_Admin_Util {
 	
 	public static $HIDDEN_GROUP_OWNER = 'hidden_group_owner';
+	public static $UNKNOWN_GROUP_MEMBER = 'unknown_group_member';
 	public static $GROUP_INVITATION_OPEN = 0;
 	public static $GROUP_INVITATION_ACCEPTED = 1;
 	public static $GROUP_INVITATION_DECLINED = 2;
@@ -152,18 +153,42 @@ class OC_User_Group_Admin_Util {
 	 * @brief Add a user to a group
 	 *
 	 * @param string $uid
-	 *        	Name of the user to add to group
+	 * 					Name of the user to add to group
 	 * @param string $gid
-	 *        	Name of the group in which add the user
+	 *					Name of the group in which add the user
+	 * @param string accept
+	 * 					verification hash
+	 * @param string decline
+	 * 					verification hash
+	 * @param boolean $memberRequest
+	 * 					Whether this was initiated by a user requesting group membership
+	 * 					or a group owner adding a user.
 	 * @return bool Adds a user to a group.
 	 */
-	public static function dbAddToGroup($uid, $gid) {
-		$owner = self::getGroupOwner($gid);
+	public static function dbAddToGroup($uid, $gid, $accept, $decline, $memberRequest=false) {
+		$groupInfo = self::getGroupInfo($gid);
+		$owner = $groupInfo['owner'];
 		if(self::dbInGroup($uid, $gid, true)){
-			return self::updateStatus($gid, $uid, $uid===$owner || self::dbHiddenGroupExists($gid)?self::$GROUP_INVITATION_ACCEPTED:self::$GROUP_INVITATION_OPEN);
+			return self::updateStatus($gid, $uid,
+					$uid===$owner||self::dbHiddenGroupExists($gid)||$memberRequest&&$groupInfo['open']=='yes'?
+					self::$GROUP_INVITATION_ACCEPTED:self::$GROUP_INVITATION_OPEN);
 		}
 		$stmt = OC_DB::prepare("INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `verified`, `accept`, `decline`) VALUES( ?, ?, ?, ?, ?)" );
-		if($uid===$owner || self::dbHiddenGroupExists($gid)){
+		// Case 1: A user requests group membership:
+		//   A confirmation message is sent to the group owner.
+		if($memberRequest && $uid!=$owner){
+			$stmt->execute ( array (
+					$gid,
+					$uid,
+					self::$GROUP_INVITATION_OPEN,
+					$accept,
+					$decline
+			) );
+		}
+		// Case 2: A user adds himself to an open group or a group owned by himself or a user is
+		// added automatically to a hidden group (on first login):
+		//   No confirmation message
+		elseif($uid===$owner || self::dbHiddenGroupExists($gid) || $memberRequest&&$groupInfo['open']=='yes'){
 			$stmt->execute ( array (
 					$gid,
 					$uid,
@@ -172,9 +197,9 @@ class OC_User_Group_Admin_Util {
 					''
 			));
 		}
+		// Case 3: A user is added to a group by a group owner:
+		//  A confirmation message is sent to the user.
 		else{
-			$accept = md5 ( $uid . time (). 1 );
-			$decline = md5 ($uid . time () . 0);
 			$stmt->execute ( array (
 					$gid,
 					$uid,
@@ -182,18 +207,38 @@ class OC_User_Group_Admin_Util {
 					$accept,
 					$decline
 			) );
-			self::sendVerification($uid, $accept, $decline, $gid);
 		}
 		return true;
 	}
 
-	public static function addToGroup($uid, $gid) {
+	public static function addToGroup($uid, $gid, $accept, $decline, $memberRequest=false) {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-			$result = self::dbAddToGroup($uid, $gid);
+			$result = self::dbAddToGroup($uid, $gid, $accept, $decline, $memberRequest);
 		}
 		else{
 			$result = \OCA\FilesSharding\Lib::ws('groupActions', array(
-					'name'=>urlencode($gid), 'userid'=>$uid, 'action'=>'newMember'),
+					'name'=>urlencode($gid), 'userid'=>$uid, 'action'=>'newMember',
+					'accept'=>$accept, 'decline'=>$decline,
+					'memberRequest'=>$memberRequest?'yes':'no'),
+					false, true, null, 'user_group_admin');
+		}
+		return $result;
+	}
+
+	public static function dbSetDescription($description, $gid) {
+		$sql = "UPDATE `*PREFIX*user_group_admin_groups` SET `description` = ? WHERE `gid` = ?";
+		$query = OC_DB::prepare($sql);
+		$result = $query->execute(array($description, $gid));
+		return $result;
+	}
+	
+	public static function setDescription($description, $gid) {
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			$result = self::dbSetDescription($description, $gid);
+		}
+		else{
+			$result = \OCA\FilesSharding\Lib::ws('groupActions', array(
+					'description'=>urlencode($description), 'name'=>urlencode($gid), 'action'=>'setDescription'),
 					false, true, null, 'user_group_admin');
 		}
 		return $result;
@@ -202,19 +247,28 @@ class OC_User_Group_Admin_Util {
 	/**
 	 * Send invitation mail to a user.
 	 */
-	private static function sendVerification($uid, $accept, $decline, $gid) {
+	public static function sendVerification($uid, $accept, $decline, $gid, $memberRequest=false) {
 		$owner = self::getGroupOwner($gid);
 		$ownerName = \OCP\User::getDisplayName($owner);
 		$senderAddress = OCP\Config::getAppValue('user_group_admin', 'sender', '');
 		$defaults = new \OCP\Defaults();
 		$senderName = $defaults->getName();
 		$name = OCP\User::getDisplayName($uid);
-		$url = OCP\Config::getAppValue('user_group_admin', 'appurl', '');
+		$acceptUrl = OCP\Util::linkToAbsolute('user_group_admin', 'index.php', array('code' => $accept));
+		$declineUrl = OCP\Util::linkToAbsolute('user_group_admin', 'index.php', array('code' => $decline));
 		$subject = OCP\Config::getAppValue('user_group_admin', 'subject', '');
-		$message = 'Dear '.$name.','."\n \n".'You have been invited to join the group "' .
-			$gid . '" by ' . $ownerName . '. Click here to accept the invitation:'."\n".
-			$url . $accept ."\n \n".'or click here to decline:'."\n\n".
-			$url . $decline;
+		if(!$memberRequest){
+			$message = 'Dear '.$name.',\n \n'.'you have been invited to join the group "' .
+					$gid . '" by ' . $ownerName . '. Click here to accept the invitation:'."\n\n".
+					$acceptUrl ."\n \n".'or click here to decline:'."\n\n".
+					$declineUrl;
+		}
+		else{
+			$message = $name.' is requesting to join your group "' .
+					$gid . '. Click here to accept the request:'."\n".
+					$acceptUrl ."\n \n".'or click here to decline:'."\n\n".
+					$declineUrl;
+		}
 		try{
 			\OCP\Util::sendMail($uid, $name, $subject, $message, $senderAddress, $senderName);
 		}
@@ -224,7 +278,30 @@ class OC_User_Group_Admin_Util {
 				\OCP\Util::ERROR);
 		}
 	}
-
+	
+	public static function sendVerificationToExternal($email, $accept, $decline, $gid) {
+		$owner = self::getGroupOwner($gid);
+		$ownerName = trim(\OCP\User::getDisplayName($owner));
+		$senderAddress = OCP\Config::getAppValue('user_group_admin', 'sender', '');
+		$defaults = new \OCP\Defaults();
+		$senderName = $defaults->getName();
+		$acceptUrl = OCP\Util::linkToAbsolute('user_group_admin', 'index.php', array('code' => $accept));
+		$declineUrl = OCP\Util::linkToAbsolute('user_group_admin', 'index.php', array('code' => $decline));
+		$subject = OCP\Config::getAppValue('user_group_admin', 'subject', '');
+		$message = 'You have been invited to join the group "' .
+				$gid . '" by ' . $ownerName . '. Click here to accept the invitation:'."\n\n".
+				$acceptUrl ."\n \n".'or click here to decline:'."\n\n".
+				$declineUrl;
+		try{
+			\OCP\Util::sendMail($email, '', $subject, $message, $senderAddress, $senderName);
+		}
+		catch(\Exception $e){
+			\OCP\Util::writeLog('User_Group_Admin',
+					'A problem occurred while sending the e-mail to '.$email.'. Please revisit your settings.',
+					\OCP\Util::ERROR);
+		}
+	}
+	
 	/**
 	 * NOTICE: includes pending users
 	 * @param unknown $uid
@@ -247,6 +324,20 @@ class OC_User_Group_Admin_Util {
 	}
 
 	public static function dbUpdateStatus($gid, $uid, $status, $checkOpen=false) {
+		// This is an external invitate. The recipient has now logged in and we can use
+		// his real uid
+		if($uid==self::$UNKNOWN_GROUP_MEMBER){
+			$loggedInUser = \OC_User::getUser();
+			// First clean up potential existing group membership
+			$sql = "DELETE from `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `gid` = ?";
+			$query = OC_DB::prepare($sql);
+			$result = $query->execute(array($loggedInUser, $gid));
+			// Now accept or decline
+			$sql = "UPDATE `*PREFIX*user_group_admin_group_user` SET `uid` = ? WHERE `uid` = ? AND `gid` = ? AND `verified` = ?";
+			$query = OC_DB::prepare($sql);
+			$result = $query->execute(array($loggedInUser, $uid, $gid, self::$GROUP_INVITATION_OPEN));
+			$uid = \OC_User::getUser();
+		}
 		$sql = "UPDATE `*PREFIX*user_group_admin_group_user` SET `verified` = '".
 			$status."' WHERE `uid` = ? AND `gid` = ?";
 		if($checkOpen){
@@ -384,13 +475,15 @@ class OC_User_Group_Admin_Util {
 				continue;
 			}
 			$row['owner'] = $groupInfo['owner'];
+			$row['hidden'] = $groupInfo['hidden'];
 			$row['user_freequota'] = $groupInfo['user_freequota'];
 			$groups[] = $row;
 		}
 		return $groups;
 	}
 
-	public static function getUserGroups($userid, $onlyVerified=false, $hideHidden=false, $onlyWithFreeQuota=false) {
+	public static function getUserGroups($userid, $onlyVerified=false, $hideHidden=false,
+			$onlyWithFreeQuota=false) {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
 			$result = self::dbGetUserGroups($userid, $onlyVerified, $hideHidden, $onlyWithFreeQuota);
 		}
@@ -415,14 +508,9 @@ class OC_User_Group_Admin_Util {
 		return false;
 	}
 	
-	public static function groupIsHidden($gid) {
-		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-			return self::dbHiddenGroupExists($gid);
-		}
-		else{
+	public static function groupIsHiddenOrOpen($gid) {
 			$groupInfo = self::getGroupInfo($gid);
-			return $groupInfo['hidden']==='yes';
-		}
+			return $groupInfo['hidden']==='yes' || $groupInfo['open']==='yes';
 	}
 
 	/**
@@ -487,6 +575,36 @@ class OC_User_Group_Admin_Util {
 		}
 		return $groups;
 		
+	}
+	
+	private static function dbSearchGroups($gid = '', $uid = '', $limit = '', $offset = '',
+		$caseInsensitive=false) {
+		if(empty($uid)){
+			$uid = \OC_User::getUser();
+		}
+		$query = OC_DB::prepare('SELECT * FROM `*PREFIX*user_group_admin_groups` WHERE `owner` != ? AND `private` != "yes" AND `hidden` != "yes" AND `gid` LIKE ?', $limit, $offset );
+		$result = $query->execute(array($uid, $gid));
+		$groups = array();
+		while($row = $result->fetchRow()){
+			if(!self::dbInGroup($uid, $row['gid'], false)){
+				$groups[] = $row;
+			}
+		}
+		return $groups;
+	}
+	
+	public static function searchGroups($gid = '', $uid = '', $limit = null, $offset = null,
+		$caseInsensitive = false) {
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			$result = self::dbSearchGroups($gid, $uid, $limit, $offset);
+		}
+		else{
+			$result = \OCA\FilesSharding\Lib::ws('searchGroups',
+					array('gid'=>urlencode($gid), 'uid'=>$uid, 'limit'=>empty($limit)?'':$limit,
+							'offset'=>empty($offset)?'':$limit, 'caseInsensitive'=>$caseInsensitive?'yes':'no'),
+					false, true, null, 'user_group_admin');
+		}
+		return $result;
 	}
 	
 	public static function dbGetGroupInfo($group) {

@@ -8,10 +8,9 @@ OCP\JSON::callCheck();
 
 $group = $_POST['group'];
 $accept = $_POST['accept'];
+$user = !empty($_POST['user'])?$_POST['user']:OCP\USER::getUser();
 
 $owner = OC_User_Group_Admin_Util::getGroupOwner($group);
-
-$user = OCP\USER::getUser();
 
 if($accept==='yes'){
 	$result = OC_User_Group_Admin_Util::updateStatus($group, $user,
