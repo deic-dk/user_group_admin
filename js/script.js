@@ -445,7 +445,7 @@ $(document).ready(function() {
 		var group = $(this).closest('tr').attr('group') ;
 		var role = $(this).closest('tr').attr('role');
 		var hidden = $(this).closest('tr').attr('hiddenGroup');
-		if(hidden){
+		if(hidden && role!='owner'){
 			showMembers(group, '',
 					'<div class="info">Description: <i>This is a system group</i></div>'+
 					'<div class="info">Owner: <i>hidden</i></div>');
