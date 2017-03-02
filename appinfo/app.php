@@ -1,5 +1,8 @@
 <?php
 
+if(isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI']!='/' &&
+		strpos($_SERVER['REQUEST_URI'], "/js/")===false){
+
 OC::$CLASSPATH['OC_User_Group_Admin_Backend'] ='apps/user_group_admin/lib/backend.php';
 OC::$CLASSPATH['OC_User_Group_Admin_Util']    ='apps/user_group_admin/lib/util.php';
 OC::$CLASSPATH['OC_User_Group_Admin_Hooks']   ='apps/user_group_admin/lib/hooks.php';
@@ -61,4 +64,4 @@ foreach ($groups as $group){
 OCP\Util::addScript('user_group_admin','setview');
 OCP\Util::addScript('user_group_admin','user_group_notification');
 
-
+}
