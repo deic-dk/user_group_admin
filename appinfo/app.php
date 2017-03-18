@@ -45,7 +45,13 @@ foreach ($groups as $group){
 	}
 	$dir = \OC\Files\Filesystem::normalizePath('/'.$group['gid']);
 	$path = $fs->getLocalFile($dir);
+	$parent = dirname($path);
+	if(!file_exists($parent)){
+		\OCP\Util::writeLog('User_Group_Admin', 'Creating group folder '.$parent, \OCP\Util::WARN);
+		mkdir($parent, 0777, false);
+	}
 	if(!file_exists($path)){
+		\OCP\Util::writeLog('User_Group_Admin', 'Creating group folder '.$path, \OCP\Util::WARN);
 		mkdir($path, 0777, false);
 	}
 	$order += 1./100;

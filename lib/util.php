@@ -582,7 +582,9 @@ class OC_User_Group_Admin_Util {
 		if(empty($uid)){
 			$uid = \OC_User::getUser();
 		}
-		$query = OC_DB::prepare('SELECT * FROM `*PREFIX*user_group_admin_groups` WHERE `owner` != ? AND `private` != "yes" AND `hidden` != "yes" AND `gid` LIKE ?', $limit, $offset );
+		$query = OC_DB::prepare('SELECT * FROM `*PREFIX*user_group_admin_groups` WHERE `owner` != ? AND `private` != "yes" AND `hidden` != "yes" AND `gid`'.
+				($caseInsensitive?' COLLATE UTF8_GENERAL_CI':'').' LIKE ?',
+				$limit, $offset );
 		$result = $query->execute(array($uid, $gid));
 		$groups = array();
 		while($row = $result->fetchRow()){
@@ -594,9 +596,9 @@ class OC_User_Group_Admin_Util {
 	}
 	
 	public static function searchGroups($gid = '', $uid = '', $limit = null, $offset = null,
-		$caseInsensitive = false) {
+		$caseInsensitive=false) {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-			$result = self::dbSearchGroups($gid, $uid, $limit, $offset);
+			$result = self::dbSearchGroups($gid, $uid, $limit, $offset, $caseInsensitive);
 		}
 		else{
 			$result = \OCA\FilesSharding\Lib::ws('searchGroups',
