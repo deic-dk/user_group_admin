@@ -14,7 +14,7 @@ $limit = !empty($_GET['limit'])?$_GET['limit']:null;
 $offset = !empty($_GET['offset'])?$_GET['offset']:null;
 $caseInsensitive = !empty($_GET['caseInsensitive'])?$_GET['caseInsensitive']=='yes':false;
 
-$groups = OC_User_Group_Admin_Util::dbGetSearchGroups($gid, $uid, $limit, $offset, $caseInsensitive);
+$groups = OC_User_Group_Admin_Util::dbSearchGroups($gid, $uid, $limit, $offset, $caseInsensitive);
 \OCP\Util::writeLog('user_group_admin', 'Returning groups '.serialize($groups), \OC_Log::DEBUG);
 OCP\JSON::encodedPrint($groups);
 

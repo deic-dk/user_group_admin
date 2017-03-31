@@ -577,7 +577,7 @@ class OC_User_Group_Admin_Util {
 		
 	}
 	
-	private static function dbSearchGroups($gid = '', $uid = '', $limit = '', $offset = '',
+	public static function dbSearchGroups($gid = '', $uid = '', $limit = '', $offset = '',
 		$caseInsensitive=false) {
 		if(empty($uid)){
 			$uid = \OC_User::getUser();
