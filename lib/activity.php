@@ -219,7 +219,7 @@ class Activity implements IExtension {
 	 */
 	protected function prepareParam($app, $param, $highlightParams) {
 		if ($highlightParams) {
-			return '<strong>' . Util::sanitizeHTML($param) . '</strong>';
+			return '<strong>' .$param . '</strong>';
 		} else {
 			return $param;
 		}
@@ -260,7 +260,7 @@ class Activity implements IExtension {
 			return "";//$param;
 		}
 		if ($app === 'user_group_admin') {
-			return '<a class="filename" href="/index.php/apps/user_group_admin">' . \OCP\Util::sanitizeHTML($param) . '</a>';
+			return '<a class="filename" href="/index.php/apps/user_group_admin">' . $param . '</a>';
 		}
 		$title = ' title="' . $this->l->t('in %s', array(\OCP\Util::sanitizeHTML($path))) . '"';
 		return '<a class="filename tooltip" href="/index.php/apps/user_group_admin"' . $title . '>' . \OCP\Util::sanitizeHTML($name) . '</a>';
