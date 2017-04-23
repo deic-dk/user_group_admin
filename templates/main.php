@@ -168,9 +168,10 @@ function checkGroup($group, $groupUser){
 	$verified = $group["verified"];
 	if($verified==OC_User_Group_Admin_Util::$GROUP_INVITATION_OPEN &&
 			($_GET['code']===$acceptCode || $_GET['code']===$declineCode)){
+		\OCP\Util::writeLog('User_Group_Admin', 'GROUP: '.$group["gid"], \OCP\Util::WARN);
 		if(OC_User_Group_Admin_Util::updateStatus($groupname, $groupUser,
 				$_GET['code']===$acceptCode?OC_User_Group_Admin_Util::$GROUP_INVITATION_ACCEPTED:
-				OC_User_Group_Admin_Util::$GROUP_INVITATION_DECLINED, true)){
+				OC_User_Group_Admin_Util::$GROUP_INVITATION_DECLINED, true, $group["invitation_email"], $_GET['code'])){
 			echo "<script type='text/javascript'>var url=window.location.href.replace('code=','nocode='); ".
 			"OC.dialogs.alert('Welcome to the group ".$group["gid"].
 			"', 'Welcome', function(){window.location.href=url}, true);</script>";
@@ -193,7 +194,7 @@ if(!empty($_GET['code'])){
 	// Then check if it is an external invitation
 	$groups = OC_User_Group_Admin_Util::getUserGroups(OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER);
 	foreach($groups as $group){
-		$ret = $ret ||checkGroup($group, OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER);
+		$ret = $ret || checkGroup($group, OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER);
 	}
 	if(!$ret){
 		echo "<script type='text/javascript'>OC.dialogs.alert('Invalid code. You may already have accepted or declined membership.', 'Request invalid');</script>";

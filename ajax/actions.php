@@ -27,7 +27,9 @@
 
 OCP\JSON::checkLoggedIn();
 OCP\JSON::checkAppEnabled('user_group_admin');
-OCP\JSON::callCheck();
+if($_POST['action']!="disableuser"){
+	OCP\JSON::callCheck();
+}
 
 if(isset($_POST['group'])){
 	$group = $_POST['group'];
@@ -65,19 +67,23 @@ function doAction($group, $owner, $user){
 		case "addmember":
 			if(!empty($_POST['member'])){
 				$member = $_POST['member'];
+				$str = $member;
 			}
 			elseif(!empty($_POST['email'])){
 				$member = OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER;
+				$str = $_POST['email'];
 			}
 			//\OCP\Util::writeLog('User_Group_Admin', 'Adding member '.$member, \OCP\Util::WARN);
 			if(!empty($member)) {
-				$accept = md5($member . time (). 1 );
-				$decline = md5($member . time () . 0);
+				$accept = md5($str . time (). 1 );
+				$decline = md5($str . time () . 0);
 				if(checkOwner($user, $owner)) {
-					$result = OC_User_Group_Admin_Util::addToGroup($member, $group, $accept, $decline);
+					$result = OC_User_Group_Admin_Util::addToGroup($member, $group, $accept, $decline, false,
+						empty($_POST['email'])?'':$_POST['email']);
 				}
 				else{
-					$result = OC_User_Group_Admin_Util::addToGroup($member, $group, $accept, $decline, true);
+					$result = OC_User_Group_Admin_Util::addToGroup($member, $group, $accept, $decline, true,
+						empty($_POST['email'])?'':$_POST['email']);
 				}
 			}
 			break;
@@ -95,12 +101,28 @@ function doAction($group, $owner, $user){
 			break;
 		case "delmember":
 			if(isset($_POST['member']) && (checkOwner($user, $owner) || $_POST['member']==$user)){
-				$result = OC_User_Group_Admin_Util::removeFromGroup($_POST['member'], $group) ;
+				$result = OC_User_Group_Admin_Util::removeFromGroup($_POST['member'], $group);
+			}
+			break;
+		case "disableuser":
+			\OCP\Util::writeLog('User_Group_Admin', 'disabling user '.$_POST['user'].' <-- '.$user.' <-- '.$owner, \OCP\Util::WARN);
+			if(isset($_POST['user']) && $_POST['user']!=$user && checkOwner($user, $owner)){
+				$pending = OC_Preferences::getValue($owner, 'user_group_admin', 'pending_verify_'.$_POST['user'], '');
+				if(empty($pending)){
+					break;
+				}
+				$result = OC_User_Group_Admin_Util::removeFromGroup($_POST['user'], $group);
+				if(\OCP\App::isEnabled('files_sharding')){
+					\OCA\FilesSharding\Lib::disableUser($_POST['user']);
+					\OCP\Util::writeLog('User_Group_Admin', 'NOTICE: Disabled user '.$_POST['user'].
+							' as requested by '.$owner.' as owner of the group '.$group, \OCP\Util::ERROR);
+					\OC_Preferences::deleteKey($owner, 'user_group_admin', 'pending_verify_'.$user);
+				}
 			}
 			break;
 		case "setdescription":
 			if(checkOwner($user, $owner)){
-				$result = OC_User_Group_Admin_Util::setDescription($_POST['description'], $group) ;
+				$result = OC_User_Group_Admin_Util::setDescription($_POST['description'], $group);
 			}
 			break;
 		case "showmembers":
@@ -170,6 +192,9 @@ function doAction($group, $owner, $user){
 				break;
 			case "addmember":
 				OCP\JSON::error(array('data' => array('title'=> 'Add Member', 'message' => 'No permission')));
+				break;
+			case "disableuser":
+				OCP\JSON::error(array('data' => array('title'=> 'No permission', 'message' => 'This user has already been accepted by you.')));
 				break;
 			default:
 				OCP\JSON::error(array('data' => array('title'=> 'No permission', 'message' => 'Not admin, owner or member')));

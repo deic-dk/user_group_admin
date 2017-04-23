@@ -236,16 +236,17 @@ table#groupstable th .columntitle.name {
 
 .oc-dialog .grouptitle {
 	margin-bottom: 12px;
+	margin-top: 8px;
 	text-left;
-	font-size:90%;
+	font-size:128%;
 	width: 90%;
 	font-weight:bold;
 }
 
 .oc-dialog .oc-dialog-close {
     height: 10px;
-    right: 10px;
-    top: 8px;
+    right: 12px;
+    top: 11px;
     width: 10px;
 }
 
@@ -292,3 +293,32 @@ textarea.description {
 	width: 96%;
 	margin-top: 6px;
 }
+
+form#external_signup input[type=text], form#external_signup input[type=password] {
+	width: 240px;
+}
+
+form#external_signup textarea {
+	width: 240px;
+	height: 80px;
+}
+
+form#external_signup input[type="text"].highlight,
+form#external_signup input[type="password"].highlight,
+form#external_signup textarea.highlight {
+	border: 2px solid #9ecaed;
+	border-radius: 7px;
+	border-width: 2px 2px;
+	outline: none;
+	border-color: #9ecaed;
+	box-shadow: 0 0 10px #9ecaed;
+}
+
+a#revokeinvitation {
+	margin-right: 44px;
+}
+
+.signup div.verify_info {
+	margin-top: 24px;
+}
+

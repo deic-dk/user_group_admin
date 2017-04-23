@@ -13,15 +13,18 @@ $name = isset($_GET['name'])?$_GET['name']:null;
 $quota = isset($_GET['quota'])?$_GET['quota']:'';
 $usage = isset($_GET['usage'])?$_GET['usage']:0;
 $memberRequest = !empty($_GET['memberRequest'])?$_GET['memberRequest']=='yes':false;
+$invitationEmail = !empty($_GET['email'])?$_GET['email']:'';
 $accept = $_GET['accept'];
 $decline = $_GET['decline'];
+$code = isset($_GET['code'])?$_GET['code']:'';
 
 switch ($action) {
 	case "newGroup":
 		$result = OC_User_Group_Admin_Util::dbCreateGroup($name, $userid);
 		break;
 	case "newMember":
-		$result = OC_User_Group_Admin_Util::dbAddToGroup($userid, $name, $accept, $decline, $memberRequest);
+		$result = OC_User_Group_Admin_Util::dbAddToGroup($userid, $name, $accept, $decline, $memberRequest,
+			$invitationEmail);
 		break;
 	case "deleteGroup":
 		$result = OC_User_Group_Admin_Util::dbDeleteGroup($name);
@@ -32,7 +35,7 @@ switch ($action) {
 	case "updateStatus":
 		$status = isset($_GET['status'])?$_GET['status']:null;
 		$checkOpen = isset($_GET['checkOpen'])?$_GET['checkOpen']==='yes':false;
-		$result = OC_User_Group_Admin_Util::dbUpdateStatus($name, $userid, $status, $checkOpen);
+		$result = OC_User_Group_Admin_Util::dbUpdateStatus($name, $userid, $status, $checkOpen, $invitationEmail, $code);
 		break;
 	case "setUserFreeQuota":
 		$result = OC_User_Group_Admin_Util::dbSetUserFreeQuota($name, $quota);

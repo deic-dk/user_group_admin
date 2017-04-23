@@ -113,6 +113,13 @@
 				<length>64</length>
 			</field>
 			
+			<field>
+				<name>invitation_email</name>
+				<type>text</type>
+				<notnull>true</notnull>
+				<length>64</length>
+			</field>
+			
 		</declaration>
 
 	</table>

@@ -123,9 +123,19 @@ class Activity implements IExtension {
 							<a href="#" class="decline btn btn-default btn-flat" userdisplayname=\'%2$s\' user=\''.$user.'\'group=\''.$group.'\'>Decline</a>
 						</div>', $preparedParams);
 				}
+			case 'joined_user_self_external':
+				$group = $params[0];
+				$user = $params[1];
+				return (string) $this->l->
+					t('The external user %2$s has been signed up and added to the group %1$s
+						<div class="invite_div" style="display:none">
+							<a href="#" class="verify accept btn btn-default btn-flat" userdisplayname=\'%2$s\' user=\''.$user.'\' group=\''.$group.'\'>Verify</a>&nbsp
+						</div>', $preparedParams);
 			case 'joined_user_self':
 				return (string) $this->l->t('%2$s joined the group %1$s', $preparedParams);
 			case 'joined_with_by':
+				return (string) $this->l->t('You\'ve joined the group %1$s', $preparedParams);
+			case 'joined_with_by_external':
 				return (string) $this->l->t('You\'ve joined the group %1$s', $preparedParams);
 			case 'deleted_by':
 				$user = \OCP\User::getUser();
@@ -234,8 +244,10 @@ class Activity implements IExtension {
 	 * @return string
 	 */
 	protected function prepareUserParam($app, $param, $highlightParams) {
-		$displayName = \OCP\User::getDisplayName($param);
+		$param = str_replace('<strong>', '', $param);
+		$param = str_replace('</strong>', '', $param);
 		$param = \OCP\Util::sanitizeHTML($param);
+		$displayName = \OCP\User::getDisplayName($param);
 		$displayName = \OCP\Util::sanitizeHTML($displayName);
 		if ($highlightParams) {
 			return '<div class="avatar" data-user="' . $param . '"></div>'

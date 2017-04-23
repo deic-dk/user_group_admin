@@ -1,4 +1,5 @@
 $(document).ready(function() {
+	
 	$(document).on ("click", ".invite_div .accept", function () {
 		var group = $(this).attr('group');
 		var activityId = $(this).parent().attr('activity_id');
@@ -35,6 +36,14 @@ $(document).ready(function() {
 				OC.dialogs.alert('OK, declining membership of '+group+'.', 'Decline confirmation', null, true);
 			}
 		});
+	});
+	
+	$(document).on ("click", ".invite_div .verify", function () {
+		var group = $(this).attr('group');
+		var activityId = $(this).parent().attr('activity_id');
+		markSeen(activityId);
+		OC.redirect(OC.linkTo('user_group_admin', 'external_collaborator_verify.php') +
+				'?group=' + group+  '&user=' + $(this).attr('user'));
 	});
 	
 })

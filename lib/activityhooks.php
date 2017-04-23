@@ -47,22 +47,27 @@ class OC_User_Group_Hooks {
 		return $result;
 	}
 	
-	public static function dbGroupJoin($group, $uid, $owner) {
+	public static function dbGroupJoin($group, $uid, $owner, $externalUser = false) {
 		$params = array($group, $uid, $owner);
-		self::addNotificationsForGroupAction($params, 'group', 'joined_user_self');
-		self::addNotificationsForGroupAction($params, 'group', 'joined_with_by');
-	}
-	
-	public static function groupJoin($group, $uid, $owner) {
-		if(!\OCP\App::isEnabled('files_sharding')  || \OCA\FilesSharding\Lib::isMaster()){
-			$result = self::dbGroupJoin($group, $uid, $owner);
+		if($externalUser){
+			self::addNotificationsForGroupAction($params, 'group', 'joined_user_self_external');
+			self::addNotificationsForGroupAction($params, 'group', 'joined_with_by_external');
 		}
 		else{
-			$result = \OCA\FilesSharding\Lib::ws('groupJoin', array('group'=>urlencode($group),
-					'userid'=>$uid, 'owner'=>$owner),
+			self::addNotificationsForGroupAction($params, 'group', 'joined_user_self');
+			self::addNotificationsForGroupAction($params, 'group', 'joined_with_by');
+		}
+	}
+	
+	public static function groupJoin($group, $uid, $owner, $externalUser = false) {
+		if(!\OCP\App::isEnabled('files_sharding')  || \OCA\FilesSharding\Lib::isMaster()){
+			self::dbGroupJoin($group, $uid, $owner, $externalUser);
+		}
+		else{
+			\OCA\FilesSharding\Lib::ws('groupJoin', array('group'=>urlencode($group),
+					'userid'=>$uid, 'owner'=>$owner, 'externalUser'=>($externalUser?'yes':'no')),
 					false, true, null, 'user_group_admin');
 		}
-		return $result;
 	}
 	
 	public static function groupLeave($group, $uid, $owner) {
@@ -73,7 +78,8 @@ class OC_User_Group_Hooks {
 	public static function addNotificationsForGroupAction($params, $activityType, $subject) {
 		\OCP\Util::writeLog('User_Group_Admin', 'Adding notification: '.$subject.'-->'.serialize($params), \OCP\Util::WARN);
 		if($subject == 'shared_user_self' || $subject == 'shared_with_by' ||
-				$subject == 'joined_user_self' || $subject == 'joined_with_by'){
+				$subject == 'joined_user_self' || $subject == 'joined_with_by' ||
+				$subject == 'joined_user_self_external' || $subject == 'joined_with_by_external'){
 			$affecteduser = $params[1];
 			$user = $params[2];
 		}
@@ -87,7 +93,8 @@ class OC_User_Group_Hooks {
 		}
 		$filteredStreamUsers = \OCA\Activity\UserSettings::filterUsersBySetting(array($user, $affecteduser), 'stream', 'group');
 		$filteredEmailUsers = \OCA\Activity\UserSettings::filterUsersBySetting(array($user, $affecteduser), 'email', 'group');
-		if($subject == 'shared_with_by' || $subject == 'joined_with_by' || $subject == 'requested_with_by'){
+		if($subject == 'shared_with_by' || $subject == 'joined_with_by' ||
+				$subject == 'joined_with_by_external' || $subject == 'requested_with_by'){
 			self::addNotificationsForUser(
 				$user, $affecteduser, $subject, $params, true,
 				!empty($filteredStreamUsers[$affecteduser]),
@@ -110,10 +117,11 @@ class OC_User_Group_Hooks {
 		$link = OCP\Util::linkToAbsolute('user_group_admin', '');
 		$app = 'user_group_admin';
 		if($streamSetting){
-			if($subject == 'shared_user_self' || $subject == 'joined_user_self' || $subject == 'requested_user_self'){
+			if($subject == 'shared_user_self' || $subject == 'joined_user_self' || $subject == 'joined_user_self_external' || $subject == 'requested_user_self'){
 				self::send($app, $subject, $params, '', array(), '', $link, $user, $user, $type, \OCA\UserNotification\Data::PRIORITY_HIGH);
 			}
-			else if($subject == 'shared_with_by' || $subject == 'joined_with_by' || $subject == 'requested_with_by') {
+			else if($subject == 'shared_with_by' || $subject == 'joined_with_by' ||
+					$subject == 'requested_with_by' || $subject == 'joined_with_by_external') {
 				\OCP\Util::writeLog('User_Group_Admin', 'PATH: '.serialize($params), \OCP\Util::WARN);
 				self::send($app, $subject, $params, '', array(), '', $link, $user, $affecteduser, $type, \OCA\UserNotification\Data::PRIORITY_HIGH); 
 			}
