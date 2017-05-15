@@ -288,7 +288,8 @@ class OC_User_Group_Admin_Util {
 	public static function sendVerificationToExternal($email, $accept, $decline, $gid) {
 		$owner = self::getGroupOwner($gid);
 		$ownerName = trim(\OCP\User::getDisplayName($owner));
-		$senderAddress = OCP\Config::getAppValue('user_group_admin', 'sender', '');
+		$systemFrom = \OCP\Config::getSystemValue('fromemail', '');
+		$senderAddress = OCP\Config::getAppValue('user_group_admin', 'sender', $systemFrom);
 		$defaults = new \OCP\Defaults();
 		$senderName = $defaults->getName();
 		$acceptUrl = OCP\Util::linkToAbsolute('user_group_admin', 'index.php', array('code' => $accept));
