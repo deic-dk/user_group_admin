@@ -123,7 +123,8 @@ class OC_User_Group_Hooks {
 			else if($subject == 'shared_with_by' || $subject == 'joined_with_by' ||
 					$subject == 'requested_with_by' || $subject == 'joined_with_by_external') {
 				\OCP\Util::writeLog('User_Group_Admin', 'PATH: '.serialize($params), \OCP\Util::WARN);
-				self::send($app, $subject, $params, '', array(), '', $link, $user, $affecteduser, $type, \OCA\UserNotification\Data::PRIORITY_HIGH); 
+				self::send($app, $subject, $params, '', array(), '', $link, $user, $affecteduser, $type,
+						\OCA\UserNotification\Data::PRIORITY_VERYHIGH); 
 			}
 			else if($subject == 'deleted_self') {
 				self::send($app, $subject, array($params[0]), '', array(), '', $link, $user, $affecteduser,$type, \OCA\UserNotification\Data::PRIORITY_HIGH); 
