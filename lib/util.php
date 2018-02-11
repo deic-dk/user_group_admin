@@ -256,13 +256,26 @@ class OC_User_Group_Admin_Util {
 	public static function sendVerification($uid, $accept, $decline, $gid, $memberRequest=false) {
 		$owner = self::getGroupOwner($gid);
 		$ownerName = \OCP\User::getDisplayName($owner);
-		$senderAddress = OCP\Config::getAppValue('user_group_admin', 'sender', '');
+		$systemFrom = \OCP\Util::getDefaultEmailAddress('no-reply');
+		$senderAddress = OCP\Config::getAppValue('user_group_admin', 'sender', $systemFrom);
 		$defaults = new \OCP\Defaults();
 		$senderName = $defaults->getName();
 		$name = OCP\User::getDisplayName($uid);
-		$acceptUrl = OCP\Util::linkToAbsolute('user_group_admin', 'index.php', array('code' => $accept));
-		$declineUrl = OCP\Util::linkToAbsolute('user_group_admin', 'index.php', array('code' => $decline));
-		$subject = OCP\Config::getAppValue('user_group_admin', 'subject', '');
+		if(\OCP\App::isEnabled('files_sharding') ){
+			$masterUrl = \OCA\FilesSharding\Lib::getMasterURL();
+			$acceptUrl = $masterUrl.'/apps/user_group_admin/index.php?code='.$accept;
+			$declineUrl = $masterUrl.'/apps/user_group_admin/index.php?code='.$decline.'&decline=1';
+		}
+		else{
+			$acceptUrl = OCP\Util::linkToAbsolute('user_group_admin', 'index.php',
+					array('code' => $accept));
+			$declineUrl = OCP\Util::linkToAbsolute('user_group_admin', 'index.php',
+					array('code' => $decline, 'decline' => '1'));
+		}
+		$subject = OCP\Config::getAppValue('user_group_admin', 'subject', 'Group invitation');
+			if(empty(trim($subject))){
+			$subject = 'Group invitation';
+		}
 		if(!$memberRequest){
 			$message = 'Dear '.$name.',\n \n'.'you have been invited to join the group "' .
 					$gid . '" by ' . $ownerName . '.\n\nClick here to accept the invitation:'."\n\n".
@@ -293,9 +306,21 @@ class OC_User_Group_Admin_Util {
 		$senderAddress = OCP\Config::getAppValue('user_group_admin', 'sender', $systemFrom);
 		$defaults = new \OCP\Defaults();
 		$senderName = $defaults->getName();
-		$acceptUrl = OCP\Util::linkToAbsolute('user_group_admin', 'index.php', array('code' => $accept));
-		$declineUrl = OCP\Util::linkToAbsolute('user_group_admin', 'index.php', array('code' => $decline));
-		$subject = OCP\Config::getAppValue('user_group_admin', 'subject', '');
+		if(\OCP\App::isEnabled('files_sharding') ){
+			$masterUrl = \OCA\FilesSharding\Lib::getMasterURL();
+			$acceptUrl = $masterUrl.'/apps/user_group_admin/index.php?code='.$accept;
+			$declineUrl = $masterUrl.'/apps/user_group_admin/index.php?code='.$decline.'&decline=1';
+		}
+		else{
+			$acceptUrl = OCP\Util::linkToAbsolute('user_group_admin', 'index.php',
+					array('code' => $accept));
+			$declineUrl = OCP\Util::linkToAbsolute('user_group_admin', 'index.php',
+					array('code' => $decline, 'decline' => '1'));
+		}
+		$subject = OCP\Config::getAppValue('user_group_admin', 'subject', 'Group invitation');
+		if(empty(trim($subject))){
+			$subject = 'Group invitation';
+		}
 		$message = 'You have been invited to join the group "' .
 				$gid . '" by ' . $ownerName . ".\n\nClick here to accept the invitation:\n\n".
 				$acceptUrl ."\n\n".'or click here to decline:'."\n\n".
@@ -332,8 +357,8 @@ class OC_User_Group_Admin_Util {
 	}
 
 	public static function dbUpdateStatus($gid, $uid, $status, $checkOpen=false, $invitationEmail='', $code='') {
-		if(empty($invitationEmail)){
-			// When signing up external users, the invitation email is use as uid.
+		if(!empty($invitationEmail)){
+			// When signing up external users, the invitation email is used as uid.
 			$actualUser = $invitationEmail;
 		}
 		else{
@@ -356,7 +381,7 @@ class OC_User_Group_Admin_Util {
 			$actualEmail = empty($invitationEmail)?'%':$invitationEmail;
 			$result = $query->execute(array($actualUser, $uid, $gid, self::$GROUP_INVITATION_OPEN,
 					$actualEmail, $actualCode, $actualCode));
-			$uid = \OC_User::getUser();
+			$uid = $actualUser;
 		}
 		// Now accept or decline
 		$sql = "UPDATE `*PREFIX*user_group_admin_group_user` SET `verified` = '".

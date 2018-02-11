@@ -189,8 +189,8 @@ function showMembers(group, role, info){
 				<span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>\
 				</div>\
 			<div class="emailaddresses">\
-				<input type="text" placeholder="Email of user who has never logged in">\
-				<button id="send-invite" class="btn btn-default btn-flat" group=\''+ group+'\'>Send</button>\
+				<input type="text" placeholder="Email of person who has never logged in">\
+				<button id="send-invite" class="btn btn-default btn-flat" group=\"'+ group+'\">Send</button>\
 				</div>\
 				<br />\
 			<button id="export-group" class="btn btn-default btn-flat">\

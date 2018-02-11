@@ -121,6 +121,7 @@ function doAction($group, $owner, $user){
 			}
 			break;
 		case "setdescription":
+			\OCP\Util::writeLog('User_Group_Admin', 'Adding description '.$user.':'.$owner, \OCP\Util::WARN);
 			if(checkOwner($user, $owner)){
 				$result = OC_User_Group_Admin_Util::setDescription($_POST['description'], $group);
 			}

@@ -54,6 +54,9 @@ function checkGroup(&$group, $groupUser){
 			else{
 				$tmpl->assign('address', $_POST['address']);
 			}
+			if(!empty($_POST['affiliation'])){
+				$tmpl->assign('affiliation', $_POST['affiliation']);
+			}
 			// Form not completed, direct to form, highlighting missing fields
 			$tmpl->assign('email', $group["invitation_email"]);
 			$tmpl->assign('code', $group["accept"]);
@@ -66,6 +69,13 @@ function checkGroup(&$group, $groupUser){
 				$newuser = $group["invitation_email"];
 				$owner = $group["owner"];
 				OC_User::createUser($newuser, $_POST['password']);
+				if(\OCP\App::isEnabled('files_sharding') && \OCA\FilesSharding\Lib::isMaster()){
+					// Set home server to that of the group owner
+					$homeServerID = \OCA\FilesSharding\Lib::lookupServerIdForUser($owner);
+					\OCA\FilesSharding\Lib::setServerForUser($newuser, $homeServerID,
+						\OCA\FilesSharding\Lib::$USER_SERVER_PRIORITY_PRIMARY,
+						\OCA\FilesSharding\Lib::$USER_ACCESS_ALL);
+				}
 				OC_Preferences::setValue($newuser, 'settings', 'email', $newuser);
 				OC_User::setDisplayName($newuser, $_POST['fullname']);
 				OCP\Config::setUserValue($newuser, 'user_group_admin', 'address', $_POST['address']);
