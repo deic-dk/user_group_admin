@@ -38,12 +38,31 @@ $(document).ready(function() {
 		});
 	});
 	
+	function getMasterURL(callback, group, user){
+		$.ajax(OC.linkTo('files_sharding', 'ajax/get_master_url.php'), {
+			type: 'GET',
+			success: function(data){
+				if(data) {
+					callback(data.url, group, user);
+				}
+			},
+			error: function(data) {
+				alert("Unexpected error!");
+			}
+		});
+	}
+	
+	function redirectToMaster(masterUrl, group, user){
+		OC.redirect(masterUrl+'/apps/user_group_admin/external_collaborator_verify.php' +
+				'?group=' + group+  '&user=' + user);
+	}
+	
 	$(document).on ("click", ".invite_div .verify", function () {
 		var group = $(this).attr('group');
+		var user = $(this).attr('user');
 		var activityId = $(this).parent().attr('activity_id');
 		markSeen(activityId);
-		OC.redirect(OC.linkTo('user_group_admin', 'external_collaborator_verify.php') +
-				'?group=' + group+  '&user=' + $(this).attr('user'));
+		getMasterURL(redirectToMaster, group, user);
 	});
 	
 })

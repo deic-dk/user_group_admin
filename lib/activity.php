@@ -104,8 +104,8 @@ class Activity implements IExtension {
 					return (string) $this->l->
 					t('You have been invited by %3$s to join the group %1$s
 						<div class="invite_div" style="display:none">
-							<a href="#" class="accept btn btn-default btn-flat" group=\''.$group.'\'>Accept</a>&nbsp
-							<a href="#" class="decline btn btn-default btn-flat" group=\''.$group.'\'>Decline</a>
+							<a href="#" class="accept btn btn-default btn-flat" group=\"'.$group.'\">Accept</a>&nbsp
+							<a href="#" class="decline btn btn-default btn-flat" group=\"'.$group.'\">Decline</a>
 						</div>', $preparedParams);
 				}
 			case 'requested_with_by':
@@ -119,8 +119,8 @@ class Activity implements IExtension {
 					return (string) $this->l->
 					t('%2$s has requested to join the group %1$s
 						<div class="invite_div" style="display:none">
-							<a href="#" class="accept btn btn-default btn-flat" userdisplayname=\'%2$s\' user=\''.$user.'\' group=\''.$group.'\'>Accept</a>&nbsp
-							<a href="#" class="decline btn btn-default btn-flat" userdisplayname=\'%2$s\' user=\''.$user.'\'group=\''.$group.'\'>Decline</a>
+							<a href="#" class="accept btn btn-default btn-flat" userdisplayname=\'%2$s\' user=\"'.$user.'\" group=\"'.$group.'\">Accept</a>&nbsp
+							<a href="#" class="decline btn btn-default btn-flat" userdisplayname=\'%2$s\' user=\"'.$user.'\'group=\"'.$group.'\">Decline</a>
 						</div>', $preparedParams);
 				}
 			case 'joined_user_self_external':
