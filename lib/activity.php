@@ -93,19 +93,19 @@ class Activity implements IExtension {
 					return (string) $this->l->t('You invited %2$s to the group %1$s', $preparedParams);
 				}
 			case 'requested_user_self':
-				return (string) $this->l->t('You\'ve requested to join the group %1$s', $preparedParams);
+				return (string) $this->l->t("You've requested to join the group %1$s", $preparedParams);
 			case 'shared_with_by':
 				$group = $params[0];
 				$owner = $params[2];
 				if(OC_User_Group_Admin_Util::groupIsHiddenOrOpen($group)){
-					return (string) $this->l->t('You\'ve been added to the group %1$s', $preparedParams);
+					return (string) $this->l->t("You've been added to the group %1$s", $preparedParams);
 				}
 				else{
 					return (string) $this->l->
 					t('You have been invited by %3$s to join the group %1$s
 						<div class="invite_div" style="display:none">
-							<a href="#" class="accept btn btn-default btn-flat" group=\"'.$group.'\">Accept</a>&nbsp
-							<a href="#" class="decline btn btn-default btn-flat" group=\"'.$group.'\">Decline</a>
+							<a href="#" class="accept btn btn-default btn-flat" group="'.$group.'">Accept</a>&nbsp
+							<a href="#" class="decline btn btn-default btn-flat" group="'.$group.'">Decline</a>
 						</div>', $preparedParams);
 				}
 			case 'requested_with_by':
@@ -113,14 +113,14 @@ class Activity implements IExtension {
 				$user = $params[1];
 				$owner = $params[2];
 				if(OC_User_Group_Admin_Util::groupIsHiddenOrOpen($group)){
-					return (string) $this->l->t('%2$s has been added to the group %1$s', $preparedParams);
+					return (string) $this->l->t("%2$s has been added to the group %1$s", $preparedParams);
 				}
 				else{
 					return (string) $this->l->
 					t('%2$s has requested to join the group %1$s
 						<div class="invite_div" style="display:none">
-							<a href="#" class="accept btn btn-default btn-flat" userdisplayname=\'%2$s\' user=\"'.$user.'\" group=\"'.$group.'\">Accept</a>&nbsp
-							<a href="#" class="decline btn btn-default btn-flat" userdisplayname=\'%2$s\' user=\"'.$user.'\'group=\"'.$group.'\">Decline</a>
+							<a href="#" class="accept btn btn-default btn-flat" userdisplayname="'.$user.'" user="'.$user.'" group="'.$group.'">Accept</a>&nbsp
+							<a href="#" class="decline btn btn-default btn-flat" userdisplayname="'.$user.'" user="'.$user.'" group="'.$group.'">Decline</a>
 						</div>', $preparedParams);
 				}
 			case 'joined_user_self_external':
@@ -129,21 +129,21 @@ class Activity implements IExtension {
 				return (string) $this->l->
 					t('The external user %2$s has been signed up and added to the group %1$s
 						<div class="invite_div" style="display:none">
-							<a href="#" class="verify accept btn btn-default btn-flat" userdisplayname=\'%2$s\' user=\''.$user.'\' group=\''.$group.'\'>Verify</a>&nbsp
+							<a href="#" class="verify accept btn btn-default btn-flat" userdisplayname="'.$user.'" user="'.$user.'" group="'.$group.'">Verify</a>&nbsp
 						</div>', $preparedParams);
 			case 'joined_user_self':
 				return (string) $this->l->t('%2$s joined the group %1$s', $preparedParams);
 			case 'joined_with_by':
-				return (string) $this->l->t('You\'ve joined the group %1$s', $preparedParams);
+				return (string) $this->l->t("You've joined the group %1$s", $preparedParams);
 			case 'joined_with_by_external':
-				return (string) $this->l->t('You\'ve joined the group %1$s', $preparedParams);
+				return (string) $this->l->t("You've joined the group %1$s", $preparedParams);
 			case 'deleted_by':
 				$user = \OCP\User::getUser();
 				if($user!=$params[1]){
-					return (string) $this->l->t('%2$s left the group %1$s', $preparedParams);
+					return (string) $this->l->t("%2$s left the group %1$s", $preparedParams);
 				}
 				else{
-					return (string) $this->l->t('You left the group %1$s', $preparedParams);
+					return (string) $this->l->t("You left the group %1$s", $preparedParams);
 				}
 			default:
 				return false;
@@ -306,12 +306,12 @@ class Activity implements IExtension {
 		else if ($count == 2)
 		{
 			$firstItem = array_pop($parameterList);
-			return $this->l->t('%s and %s', array($firstItem, $lastItem));
+			return $this->l->t("%s and %s", array($firstItem, $lastItem));
 		}
 		else if ($count <= 5)
 		{
 			$list = implode($this->l->t(', '), $parameterList);
-			return $this->l->t('%s and %s', array($list, $lastItem));
+			return $this->l->t("%s and %s", array($list, $lastItem));
 		}
 		$firstParams = array_slice($parameterList, 0, 3);
 		$firstList = implode($this->l->t(', '), $firstParams);
@@ -324,7 +324,7 @@ class Activity implements IExtension {
 				$count - 3,
 				array($firstList, $trimmedList));
 		}
-		return $this->l->n('%s and %n more', '%s and %n more', $count - 3, array($firstList));
+		return $this->l->n("%s and %n more", "%s and %n more", $count - 3, array($firstList));
 	}
 
 	/**

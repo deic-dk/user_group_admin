@@ -24,6 +24,10 @@ class OC_User_Group_Hooks {
 	}
 	
 	public static function dbGroupShare($group, $uid, $owner) {
+		if(empty($group) || empty($uid) || empty($owner) ||
+				$uid==\OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER){
+			return;
+		}
 		$params = array($group, $uid, $owner);
 		if($owner==\OC_User::getUser()){
 			self::addNotificationsForGroupAction($params, 'group', 'shared_user_self');

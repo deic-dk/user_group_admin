@@ -424,7 +424,8 @@ $(document).ready(function() {
 					!$(event.target).closest("div[class='emailaddresses']").length)  {
 					$("div[class='emailaddresses']").hide();
 			}
-		});	});
+		});
+	});
 
 
 	$(document).click(function(e){
@@ -489,15 +490,13 @@ $(document).ready(function() {
 		$('#import_group_form').submit();
 	});
 	
-	OC.UserGroup.initGroupDropDown() ;
-	
-	$('#revokeinvitation').live('click', function(ev) {
+	$('.spanpanel').on('click', '#revokeinvitation', function(ev) {
 		var group = $(ev.target).attr('group');
 		var user = $(ev.target).attr('user');
-		OC.dialogs.confirm('Are you sure you want to revoke access for the user '+$(ev.target).attr('user')+'?', 'Confirm revoke',
+		OC.dialogs.confirm('Are you sure you want to revoke access for the user '+user+'?', 'Confirm revoke',
         function(res){
   				if(res){
-  					$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { user : user , group : group , action : "disableuser"} , function ( jsondata ){
+  					$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { user : user , group : group , action : 'disableuser'} , function ( jsondata ){
   						if(jsondata.status == 'success' ) {
   							OC.dialogs.alert('Revoked access for user '+user ,'Success') ;
   						}
@@ -509,6 +508,8 @@ $(document).ready(function() {
         }
      );
 	});
+	
+	OC.UserGroup.initGroupDropDown() ;
 	
 });
 
