@@ -464,9 +464,12 @@ class OC_User_Group_Admin_Util {
 		return $result;
 	}
 
-	public static function dbGetOwnerGroups($owner, $with_freequota=false) {
-		$stmt = OC_DB::prepare("SELECT * FROM `*PREFIX*user_group_admin_groups` WHERE `owner` = ?");
-		$result = $stmt->execute(array($owner));
+	public static function dbGetOwnerGroups($owner, $with_freequota=false, $search='%',
+			$caseInsensitive=true) {
+		$stmt = OC_DB::prepare("SELECT * FROM `*PREFIX*user_group_admin_groups` WHERE `owner` = ?".
+				"AND `gid`".
+				($caseInsensitive?" COLLATE UTF8_GENERAL_CI":"")." LIKE ?");
+		$result = $stmt->execute(array($owner, $search));
 		$groups = array ();
 		while($row = $result->fetchRow ()){
 			if($with_freequota && empty($row['user_freequota'])){
@@ -477,12 +480,15 @@ class OC_User_Group_Admin_Util {
 		return $groups;
 	}
 
-	public static function getOwnerGroups($owner, $with_freequota=false) {
+	public static function getOwnerGroups($owner, $with_freequota=false, $search='%',
+			$caseInsensitive=true) {
 		if (!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-			$result = self::dbGetOwnerGroups($owner, $with_freequota);
+			$result = self::dbGetOwnerGroups($owner, $with_freequota, $search, $caseInsensitive);
 		}
 		else{
-		 	$result = \OCA\FilesSharding\Lib::ws('getOwnerGroups', Array('owner'=>$owner),
+		 	$result = \OCA\FilesSharding\Lib::ws('getOwnerGroups', Array('owner'=>$owner,
+		 			'with_freequota'=>($with_freequota?'yes':'no'), 'search'=>$search,
+		 			'caseInsensitive'=>($caseInsensitive?'yes':'no')),
 				false, true, null, 'user_group_admin');
 		}
 		return $result;
@@ -628,7 +634,8 @@ class OC_User_Group_Admin_Util {
 		if(empty($uid)){
 			$uid = \OC_User::getUser();
 		}
-		$query = OC_DB::prepare('SELECT * FROM `*PREFIX*user_group_admin_groups` WHERE `owner` != ? AND `private` != "yes" AND `hidden` != "yes" AND `gid`'.
+		$query = OC_DB::prepare('SELECT * FROM `*PREFIX*user_group_admin_groups` WHERE `owner` != ? AND '.
+				'`private` != "yes" AND `hidden` != "yes" AND `gid`'.
 				($caseInsensitive?' COLLATE UTF8_GENERAL_CI':'').' LIKE ?',
 				$limit, $offset );
 		$result = $query->execute(array($uid, $gid));
