@@ -4,11 +4,13 @@
 			<div class="row">
 				<div class="text-right" style="margin-right: 19px;">
 					<div class="actions creatable">
-						<a id="join" class="btn btn-primary btn-flat" href="#"><i class="icon-users"></i>Join group</a>
+						<a id="join" class="btn btn-primary btn-flat" href="#"><i class="icon-users"></i>
+						<?php p($l->t("Join group"));?></a>
 						<div id="create" original-title="">
-							<a id="create" class="btn btn-primary btn-flat" href="#"><i class="icon"></i>New group</a>
+							<a id="create" class="btn btn-primary btn-flat" href="#"><i class="icon"></i>
+							<?php p($l->t("New group"));?></a>
 							<div id="importgroup" class="btn-group">
-								<a id="importgroup" type="button" class="btn btn-default btn-flat">Import</a>
+								<a id="importgroup" type="button" class="btn btn-default btn-flat"><?php p($l->t("Import"));?></a>
 							</div>
 						</div>
 					</div>
@@ -16,36 +18,36 @@
 			</div>
 			<div id="newgroup" class="apanel">
 				<span class="spanpanel" >
-					<input class="editgroup" type="text" placeholder="New group name" />
+					<input class="editgroup" type="text" placeholder="<?php p($l->t("New group name"));?>" />
 					<span class="newgroup-span">
 						<div id="ok" class="btn-group" original-title="">
-							<a class="btn btn-default btn-flat" href="#">Add</a>
+							<a class="btn btn-default btn-flat" href="#"><?php p($l->t("Add"));?></a>
 						</div>
 						<div id="cancel" class="btn-group" original-title="">
-							<a class="btn btn-default btn-flat" href="#">Cancel</a>
+							<a class="btn btn-default btn-flat" href="#"><?php p($l->t("Cancel"));?></a>
 						</div>
 					</span>
 				</span>
 			</div>
 			<div id="joingroup" class="apanel">
 				<span class="spanpanel" >
-					<input class="editgroup ui-autocomplete-group" type="text" placeholder="Search groups" />
+					<input class="editgroup ui-autocomplete-group" type="text" placeholder="<?php p($l->t("Search groups"));?>" />
 					<span class="newgroup-span">
 						<div id="join_group" class="btn-group" original-title="">
-							<a class="btn btn-default btn-flat" href="#">Join</a>
+							<a class="btn btn-default btn-flat" href="#"><?php p($l->t("Join"));?></a>
 						</div>
 						<div id="cancel_join" class="btn-group" original-title="">
-							<a class="btn btn-default btn-flat" href="#">Cancel</a>
+							<a class="btn btn-default btn-flat" href="#"><?php p($l->t("Cancel"));?></a>
 						</div>
 					</span>
 				</span>
 			</div>
 			<div id="importnew" class="apanel">
 				<div class="spanpanel">
-					Import group from text file:
+					<?php p($l->t("Import group from text file"));?>:
 					<span class="newimportform">
 					<form  id="import_group_form" class="btn btn-default btn-flat" action="<?php echo OCP\Util::linkTo('user_group_admin', 'ajax/import.php'); ?>"  method="post" enctype="multipart/form-data">
-						<span>Choose File</span>
+						<span><?php p($l->t("Choose file"));?></span>
 						<input id="import_group_file" type="file" name="import_group_file" />
 					</form></span>
 				</div>
@@ -60,19 +62,19 @@
 				<div id="headerName-container" class="row">
 					<div class="col-xs-3 col-sm-6">
 						<div class="name sort columntitle" data-sort="descr">
-							<span class="text-semibold">Group name</span>
+							<span class="text-semibold"><?php p($l->t("Group name"));?></span>
 						</div>
 					</div>
 				</div>
 			</th>
 			<th id="headerDisplay" class="column-display">
 				<div class="display sort columntitle" data-sort="public">
-					<span>Members</span>
+					<span><?php p($l->t("Members"));?></span>
 				</div>
 			</th>
 			<th id="headerDisplay" class="column-display" style="padding-right:3%; width:1%">
 				<div class="size sort columntitle" data-sort="size">
-					<span>Status</span>
+					<span><?php p($l->t("Status"));?></span>
 				</div>
 			</th>
 			<th></th>

@@ -1,4 +1,4 @@
-<span><?php p($l->t('Free Quota'));?></span>
+<span><?php p($l->t('Free quota'));?></span>
 <?php
 	$freequotaIsUserDefined = !empty($_['user_freequota']) &&
 		array_search($_['user_freequota'], $_['quota_preset'])===false;

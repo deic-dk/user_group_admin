@@ -85,7 +85,7 @@ OC.UserGroup = {
 				$('.group-info').remove();
 				$('#joingroup .editgroup').after('<a href=# class="group-info" group="'+selected.item.value.gid+'" owner="'+
 						selected.item.value.owner+'" members="'+selected.item.value.members+'" ownerDisplayName="'+
-						selected.item.value.ownerDisplayName+'">info</a>')
+						selected.item.value.ownerDisplayName+'">'+t('user_group_admin', 'Info')+'</a>')
 				return false;
 			}
 		});
@@ -170,8 +170,7 @@ function getMembersCount(group){
 function setMembersCount(group, n){
 	$("div[group='"+group+"']").find(".memberscount").attr("members", n);
 			$("div[group='"+group+"']").find(".memberscount").text(
-				''+n+' member'+(n==1?'':'s')
-			);
+					t('user_group_admin', 'Members')+': '+n);
 }
 
 function showMembers(group, role, info){
@@ -181,20 +180,20 @@ function showMembers(group, role, info){
 			(!(role=='owner' || role=='admin')?'':
 			'<div class="invitemembers">\
 				<button id="invite" class="btn btn-primary btn-flat">\
-			<i class="icon-user"></i>Invite user</button>&nbsp\
-				<button id="invite-guests" class="btn btn-default btn-flat">\
-				Invite via email</button><br />\
+			<i class="icon-user"></i>'+t('user_group_admin', 'Invite user')+'</button>&nbsp\
+				<button id="invite-guests" class="btn btn-default btn-flat">'+
+				t('user_group_admin', 'Invite via email')+'</button><br />\
 				<div class="userselect">\
-				<input type="text" placeholder="Search users" class="ui-autocomplete-input" autocomplete="off">\
+				<input type="text" placeholder="'+t('user_group_admin', 'Search users')+'" class="ui-autocomplete-input" autocomplete="off">\
 				<span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>\
 				</div>\
 			<div class="emailaddresses">\
-				<input type="text" placeholder="Email of person who has never logged in">\
+				<input type="text" placeholder="'+t('user_group_admin', 'Email of person who has never logged in')+'">\
 				<button id="send-invite" class="btn btn-default btn-flat" group=\"'+ group+'\">Send</button>\
 				</div>\
 				<br />\
 			<button id="export-group" class="btn btn-default btn-flat">\
-			<i class="icon-export-alt"></i>Export</button>\
+			<i class="icon-export-alt"></i>'+t('user_group_admin', 'Export')+'</button>\
 			<div class="freequota"></div>\
 			</div>')+
 			'</div>';
@@ -442,9 +441,9 @@ $(document).ready(function() {
 		}
 		else if($(e.target).attr('group') && $(e.target).hasClass('group-info')){
 			showMembers($(e.target).attr('group'), '',
-					'<div class="info">Description: '+($(e.target).attr('description')||'')+'</div>'+
-					'<div class="info">Owner: '+$(e.target).attr('ownerDisplayName')+'</div>'+
-					'<div class="info">Members: '+$(e.target).attr('members')+'</div>');
+					'<div class="info">'+t('user_group_admin', 'Description')+': '+($(e.target).attr('description')||'')+'</div>'+
+					'<div class="info">'+t('user_group_admin', 'Owner')+': '+$(e.target).attr('ownerDisplayName')+'</div>'+
+					'<div class="info">'+t('user_group_admin', 'Members')+': '+$(e.target).attr('members')+'</div>');
 		}
 		else if($(e.target).prop('id') && $(e.target).prop('id')=='send-invite'){
 			sendInvite($(e.target).attr('group'));
@@ -457,8 +456,8 @@ $(document).ready(function() {
 		var hidden = $(this).closest('tr').attr('hiddenGroup');
 		if(hidden && role!='owner'){
 			showMembers(group, '',
-					'<div class="info">Description: <i>This is a system group</i></div>'+
-					'<div class="info">Owner: <i>hidden</i></div>');
+					'<div class="info">'+t('user_group_admin', 'Description')+': <i>'+t('user_group_admin', 'This is a system group')+'</i></div>'+
+					'<div class="info">'+t('user_group_admin', 'Owner')+': <i>'+t('user_group_admin', 'Hidden')+'</i></div>');
 		}
 		else{
 			showMembers(group, role);

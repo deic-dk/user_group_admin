@@ -7,9 +7,6 @@
 	<licence>AGPL </licence>
 	<author>Jorge Rafael Garcia Ramos </author>
 	<require>4.93</require>
-	<types>
-		<type>filesystem</type>
-	</types>
 	<remote>
 		<groupdirs>appinfo/remote.php</groupdirs>
 	</remote>

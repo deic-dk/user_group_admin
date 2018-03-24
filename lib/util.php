@@ -786,6 +786,7 @@ class OC_User_Group_Admin_Util {
 			}
 		}
 		if(count($groups)>0){
+			\OC\Files\Filesystem::tearDown();
 			\OC\Files\Filesystem::init($user, '/'.$user.'/files');
 		}
 		return $ret;
