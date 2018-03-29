@@ -271,7 +271,7 @@ function sendInvite(group){
 		return false;
 	}
 	var myEmailListString = myEmailList.join(', ');
-	var textHtml = t("user_group_admin", "Inviting via email is intended to allow sharing with users who have not yet signed in.")+
+	var textHtml = t("user_group_admin", "Inviting via email is intended to allow sharing with users who have not yet signed in.")+" "+
 			t("user_group_admin", "When clicking on the received link, they will first be asked to sign in, then added to the group.")+"<br /><br />" +
 			 t("user_group_admin", "Emails will now be sent to the following recipients:")+"<br /><br />"+myEmailListString;
 	$('#dialogalert' ).html(textHtml);
