@@ -47,5 +47,6 @@ $TRANSLATIONS = array(
 		"Emails will now be sent to the following recipients:" => "Email vil nu blive sendt til følgende modtagere:",
 		"A request for membership will now be sent to the group owner. Click 'Join' to proceed." =>
 			"En anmodning om medlemskab vil nu blive sendt til gruppeindehaveren. Klik 'Ansøg' for at fortsætte.",
+		"Email was sent!" => "Emailen er sendt!",
 );
 $PLURAL_FORMS = "nplurals=2; plural=(n != 1);";

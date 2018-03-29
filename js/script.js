@@ -132,7 +132,7 @@ OC.UserGroup = {
 						// Inform about success
 						$('.group .invitemembers .emailaddresses input').val('');
 						var oldPlaceholder = $('.group .invitemembers .emailaddresses input').attr('placeholder');
-						$('.group .invitemembers .emailaddresses input').attr('placeholder', 'Email was sent!');
+						$('.group .invitemembers .emailaddresses input').attr('placeholder', t('user_group_admin', 'Email was sent!'));
 						$('.group .invitemembers .emailaddresses input').click(function(ev){
 							$(ev.target).attr('placeholder', oldPlaceholder);
 						});
