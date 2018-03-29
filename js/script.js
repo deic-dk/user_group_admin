@@ -271,9 +271,9 @@ function sendInvite(group){
 		return false;
 	}
 	var myEmailListString = myEmailList.join(', ');
-	var textHtml = "Inviting via email is intended to allow sharing with users who have not yet signed in.  " +
-			"When clicking on the received link, they will first be asked to sign in, then added to the group.<br /><br />" +
-			"Emails will now be sent to the following recipients:<br /><br />"+myEmailListString;
+	var textHtml = t("user_group_admin", "Inviting via email is intended to allow sharing with users who have not yet signed in.")+
+			t("user_group_admin", "When clicking on the received link, they will first be asked to sign in, then added to the group.")+"<br /><br />" +
+			 t("user_group_admin", "Emails will now be sent to the following recipients:")+"<br /><br />"+myEmailListString;
 	$('#dialogalert' ).html(textHtml);
 	// This gets hidden when showing alerts...
 	$( '#dialogalert' ).parent().find('.ui-dialog-titlebar').show();
@@ -332,7 +332,7 @@ $(document).ready(function() {
 			$('#user_group_admin_holder').hide();
 			return false;
 		}
-		var textHtml = "A request for membership will now be sent to the group owner. Click 'Join' to proceed.";
+		var textHtml = t("user_group_admin", "A request for membership will now be sent to the group owner. Click 'Join' to proceed.");
 		$( '#dialogalert' ).html(textHtml);
 		// This gets hidden when showing alerts...
 		$('.ui-dialog-titlebar').show();
@@ -363,9 +363,11 @@ $(document).ready(function() {
 		ev.stopPropagation();
 		var role = $(this).closest('tr').attr('role') ;
 		var groupSelected = $(this).closest('tr').attr('group') ;
-		var textHtml = $( '#dialogalert' ).html().replace( role == 'owner'?'leave':'delete', role == 'owner'?'delete':'leave');
+		var textHtml = $( '#dialogalert' ).html().replace( role == 'owner'?t('user_group_admin', 'Leave'):t('user_group_admin', 'Delete'),
+				role == 'owner'? t('user_grou_admin', 'Delete'):t('user_group_admin', 'Leave'));
 		 $('#dialogalert').html(textHtml);
-		$('#dialogalert').dialog({ buttons: [ { id:'delete_leave_group', text: role == 'owner'?'Delete':'Leave', click: function() {
+		$('#dialogalert').dialog({ buttons: [ { id:'delete_leave_group', text: role == 'owner'?t('user_group_admin', 'Delete'):t('user_group_admin', 'Leave'),
+				click: function() {
 			if (role == 'owner' || role == 'admin') {
 				$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { group : groupSelected , action : "delgroup"} , function ( jsondata){
 					if(jsondata.status == 'success' ) {

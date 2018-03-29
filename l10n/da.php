@@ -29,6 +29,7 @@ $TRANSLATIONS = array(
 		"Name" => "Navn",
 		"Download" => "Hent",
 		"Delete" => "Slet",
+		"Leave" => "Forlad",
 		"Size" => "Størrelse",
 		"Modified" => "Sidst ændret",
 		"Choose file" => "Vælg fil",
@@ -38,6 +39,13 @@ $TRANSLATIONS = array(
 		"Cancel" => "Fortryd",
 		"This is a system group" => "Dette er en systemgruppe",
 		"Hidden" => "Skjult",
-		"Info" => "Info"
+		"Info" => "Info",
+		"Inviting via email is intended to allow sharing with users who have not yet signed in" =>
+			"Invitation via email tillader deling med brugere, som ikke har logget ind endnu",
+		"When clicking on the received link, they will first be asked to sign in, then added to the group." =>
+			"Når de klikker på det modtagne link, vil de blive bedt om at logge ind og dernæst føjet til gruppen.",
+		"Emails will now be sent to the following recipients:" => "Email vil nu blive sendt til følgende modtagere:",
+		"A request for membership will now be sent to the group owner. Click 'Join' to proceed." =>
+			"En anmodning om medlemskab vil nu blive sendt til gruppeindehaveren. Klik 'Ansøg' for at fortsætte.",
 );
 $PLURAL_FORMS = "nplurals=2; plural=(n != 1);";
