@@ -15,9 +15,14 @@ li
 
 
 .normaltext {
-	font-size:80%
+	font-size:80%;
+	margin-left: 4px;
 } 
 
+.boldtext {
+	font-size:92%;
+	font-weight:bold; 
+} 
 .ownertext {
 	position:relative; 
 	font-size:80%; 

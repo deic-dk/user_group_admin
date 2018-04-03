@@ -6,7 +6,7 @@
 	<div>For this, you need an account here. Notice that the preferred way to obtain
 	this is for you to simply <a href="/">sign in via your home institution</a>.</div>
 	
-	<div>If this is not possible, you may sign up for an external collaborator account.
+	<div>If this is not possible, you may apply for an external collaborator account.
 	To do so, fill in the form below, then click 'Proceed'.
 	Your username will be the email address to which the invitation was sent:
 	<b><?php echo $_['email'];?></b></div>

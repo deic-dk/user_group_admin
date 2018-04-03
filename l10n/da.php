@@ -48,5 +48,6 @@ $TRANSLATIONS = array(
 		"A request for membership will now be sent to the group owner. Click 'Join' to proceed." =>
 			"En anmodning om medlemskab vil nu blive sendt til gruppeindehaveren. Klik 'Ansøg' for at fortsætte.",
 		"Email was sent!" => "Emailen er sendt!",
+		"invitation sent to %s" => "invitation sendt til %s",
 );
 $PLURAL_FORMS = "nplurals=2; plural=(n != 1);";

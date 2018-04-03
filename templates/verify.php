@@ -10,7 +10,7 @@
 	to do anything and you can simply click 'Home' to return to your files.</div>
 		
 	<?php if($_['verify_pending']=='yes'){?>
-	<div>If you cannot or will not accept the responsibilisty or if the information below
+	<div>If you cannot or will not accept the responsibility or if the information below
 	is not correct, please click "Revoke invitation". Notice that you must do this now
 	- you cannot return here and do this later.</div>
 	<div class=spanpanel>

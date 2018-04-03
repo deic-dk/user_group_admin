@@ -14,7 +14,7 @@ echo "<li><span class='left'>".
 echo "<div class='owner'>".$l->t("Owner")."</div>";
 
 $name = OC_User_Group_Admin_Util::prepareUser($owner);
-echo "<li data-member=$owner><span class='left'>$name </span></li>";
+echo "<li data-member=$owner><span class='left'>$name</span></li>";
 
 echo "<div class='memberscount info' members='".$numMembers."'>".$l->t("Members").": ".$numMembers."</div>";
 
@@ -37,28 +37,45 @@ else{
 
 if($showMembers){
 	foreach($members as $member){
-		$uid = $member["uid"];
 		$verified = $member["verified"];
 		$verifiedStr = "";
-		if($verified==OC_User_Group_Admin_Util::$GROUP_INVITATION_OPEN){
-			$verifiedStr = '<i class="group_pending">'.$l->t("Pending").'...</i>';
+		$userStr = "";
+		if(empty($member["uid"]) || $member["uid"]==OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER){
+			$uid = "";
+			$userStr = "";
+			$name = "";
 		}
-		elseif ($verified===OC_User_Group_Admin_Util::$GROUP_INVITATION_DECLINED){
+		else{
+			$uid = $member["uid"];
+			$userStr = "<span class='normaltext'><i>($uid)</i></span>";
+			$name = OC_User_Group_Admin_Util::prepareUser($uid);
+		}
+		
+		if($verified==OC_User_Group_Admin_Util::$GROUP_INVITATION_OPEN){
+			if((empty($uid) || $uid==OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER) &&
+					!empty($member['invitation_email'])){
+					$name = '</i> <span class="normaltext">'.
+					$l->t('invitation sent to %s', array($member['invitation_email'])).'</span>';
+					$verifiedStr = '<i class="group_pending">'.$l->t("Pending").'... </i>';
+			}
+			else{
+				$verifiedStr = '<i class="group_pending">'.$l->t("Pending").'... </i>';
+			}
+		}
+		elseif($verified===OC_User_Group_Admin_Util::$GROUP_INVITATION_DECLINED){
 			if($showMembers){
-				$verifiedStr = '<i class="group_declined">'.$l->t("User declined the invitation").'...</i>';
+				$verifiedStr = '<i class="group_declined">'.$l->t("User declined the invitation");
 			}
 			else{
 				continue;
 			}
 		}
-		$name = OC_User_Group_Admin_Util::prepareUser($uid);
-		
-		echo "<li data-member=$uid><span class='left'>$name </span>
-			<span class='normaltext'><i>($uid)</i></span>
-			<span class=\"member-actions\" id='spanaction'>
+		print_unescaped("<li data-member=$uid><span class='left'>$name</span>" .
+			$userStr .
+			"<span class=\"member-actions\" id='spanaction'>
 			<a href=# class='removemember' original-title=" . $l->t('Remove') . ">
 			<i class=\"icon icon-cancel-circled\"></i></a></span>
 			<span class='group_status'>$verifiedStr</span>
-			</li>" ;
+			</li>");
 	}
 }

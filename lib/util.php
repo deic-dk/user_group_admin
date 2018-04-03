@@ -277,7 +277,7 @@ class OC_User_Group_Admin_Util {
 			$subject = 'Group invitation';
 		}
 		if(!$memberRequest){
-			$message = 'Dear '.$name.',\n \n'.'you have been invited to join the group "' .
+			$message = 'Dear '.$name.",\n \n".'you have been invited to join the group "' .
 					$gid . '" by ' . $ownerName . '.\n\nClick here to accept the invitation:'."\n\n".
 					$acceptUrl ."\n \n".'or click here to decline:'."\n\n".
 					$declineUrl;
@@ -614,8 +614,11 @@ class OC_User_Group_Admin_Util {
 				$name = \OCP\Util::sanitizeHTML($name);
 			}
 		}
-		return '<div class="avatar" data-user="' . $param . '"></div>'. '<strong style="font-size:92%">'.
-			$name . '</strong>';
+		if(empty($name)){
+			return $user;
+		}
+		return '<div class="avatar" data-user="' . $param . '"></div>'. '<span class="boldtext">'.
+			$name . '</span>';
 	}
 
 	public static function getGroups($search = '', $limit = null, $offset = null ) {
