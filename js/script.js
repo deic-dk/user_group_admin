@@ -469,8 +469,19 @@ $(document).ready(function() {
 	$(' .removemember').live('click', function() {
 		group = $('.grouptitle').attr('group');
 		var container = $(this).parents('li').first();
-		var member    = container.data('member');
-		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { member : member , group : group , action : "delmember"} , function ( jsondata ){
+		var member = '';
+		var invitation_email = '';
+		if(container.data('member')){
+			member = container.data('member');
+		}
+		else if(container.data('invitation-email')){
+			invitation_email = container.data('invitation-email');
+		}
+		else{
+			OC.dialogs.alert( "Could not delete unidentified member!" ,"Error" ) ;
+		}
+		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { member : member , group : group , invitation_email: invitation_email,
+				action : "delmember"} , function ( jsondata ){
 			if(jsondata.status == 'success' ) {
 				container.remove();
 				var theint = getMembersCount(group);

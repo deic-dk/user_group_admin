@@ -50,10 +50,11 @@ if($showMembers){
 			$userStr = "<span class='normaltext'><i>($uid)</i></span>";
 			$name = OC_User_Group_Admin_Util::prepareUser($uid);
 		}
-		
+		$invitationEmail = "";
 		if($verified==OC_User_Group_Admin_Util::$GROUP_INVITATION_OPEN){
 			if((empty($uid) || $uid==OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER) &&
 					!empty($member['invitation_email'])){
+					$invitationEmail = $member['invitation_email'];
 					$name = '</i> <span class="normaltext">'.
 					$l->t('invitation sent to %s', array($member['invitation_email'])).'</span>';
 					$verifiedStr = '<i class="group_pending">'.$l->t("Pending").'... </i>';
@@ -70,7 +71,7 @@ if($showMembers){
 				continue;
 			}
 		}
-		print_unescaped("<li data-member=$uid><span class='left'>$name</span>" .
+		print_unescaped("<li data-member=\"$uid\" data-invitation-email=\"$invitationEmail\"><span class='left'>$name</span>" .
 			$userStr .
 			"<span class=\"member-actions\" id='spanaction'>
 			<a href=# class='removemember' original-title=" . $l->t('Remove') . ">

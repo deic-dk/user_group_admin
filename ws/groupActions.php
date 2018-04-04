@@ -18,6 +18,7 @@ $accept = isset($_GET['accept'])?$_GET['accept']:'';
 $decline = isset($_GET['decline'])?$_GET['decline']:'';
 $code = isset($_GET['code'])?$_GET['code']:'';
 $description = isset($_GET['description'])?$_GET['description']:'';
+$invitation_email = isset($_GET['invitation_email'])?$_GET['invitation_email']:'';
 
 switch ($action) {
 	case "newGroup":
@@ -31,7 +32,7 @@ switch ($action) {
 		$result = OC_User_Group_Admin_Util::dbDeleteGroup($name);
 		break;
 	case "leaveGroup":
-		$result = OC_User_Group_Admin_Util::dbRemoveFromGroup($userid, $name);
+		$result = OC_User_Group_Admin_Util::dbRemoveFromGroup($userid, $name, $invitation_email);
 		break;
 	case "updateStatus":
 		$status = isset($_GET['status'])?$_GET['status']:null;

@@ -169,7 +169,7 @@ class OC_User_Group_Admin_Util {
 			$email='') {
 		$groupInfo = self::getGroupInfo($gid);
 		$owner = $groupInfo['owner'];
-		if(self::dbInGroup($uid, $gid, true)){
+		if($uid!= self::$UNKNOWN_GROUP_MEMBER && self::dbInGroup($uid, $gid, true)){
 			return self::updateStatus($gid, $uid,
 					$uid===$owner||self::dbHiddenGroupExists($gid)||$memberRequest&&$groupInfo['open']=='yes'?
 					self::$GROUP_INVITATION_ACCEPTED:self::$GROUP_INVITATION_OPEN);
@@ -441,25 +441,40 @@ class OC_User_Group_Admin_Util {
 	 *        	Name of the user to remove from group
 	 * @param string $gid
 	 *        	Name of the group from which remove the user
+	 *@param string $invitation_email
+	 *        	Invitation email
 	 * @return bool removes the user from a group.
 	 */
-	public static function dbRemoveFromGroup($uid, $gid) {
-		$stmt = OC_DB::prepare ( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `gid` = ?" );
-		$stmt->execute ( array (
-				$uid,
-				$gid
-		) );
-
+	public static function dbRemoveFromGroup($uid, $gid, $invitation_email='') {
+		if((empty($uid) || $uid==OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER) &&
+				!empty($invitation_email)){
+					$stmt = OC_DB::prepare ( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `invitation_email` = ? AND `gid` = ?" );
+					$stmt->execute ( array (
+							$invitation_email,
+							$gid
+					) );
+		}
+		else if(!empty($uid)){
+			$stmt = OC_DB::prepare ( "DELETE FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `gid` = ?" );
+			$stmt->execute ( array (
+					$uid,
+					$gid
+			) );
+		}
+		else{
+			return false;
+		}
 		return true;
 	}
 
-	public static function removeFromGroup($uid, $gid) {
+	public static function removeFromGroup($uid, $gid, $invitation_email='') {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-			$result = self::dbRemoveFromGroup($uid,$gid);
+			$result = self::dbRemoveFromGroup($uid, $gid, $invitation_email);
 		}
 		else{
 			$result = \OCA\FilesSharding\Lib::ws('groupActions', array(
-					'name'=>urlencode($gid), 'userid'=>$uid, 'action'=>'leaveGroup'),false, true, null, 'user_group_admin');
+					'name'=>urlencode($gid), 'userid'=>$uid, 'invitation_email'=>$invitation_email,
+					'action'=>'leaveGroup'),false, true, null, 'user_group_admin');
 		}
 		return $result;
 	}

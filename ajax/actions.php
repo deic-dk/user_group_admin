@@ -100,8 +100,13 @@ function doAction($group, $owner, $user){
 			}
 			break;
 		case "delmember":
-			if(isset($_POST['member']) && (checkOwner($user, $owner) || $_POST['member']==$user)){
+			if(!empty($_POST['member']) && $_POST['member'] != OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER &&
+				(checkOwner($user, $owner) || $_POST['member']==$user)){
 				$result = OC_User_Group_Admin_Util::removeFromGroup($_POST['member'], $group);
+			}
+			elseif(isset($_POST['invitation_email']) && checkOwner($user, $owner)){
+				\OCP\Util::writeLog('User_Group_Admin', 'Removing invited user '.$_POST['invitation_email'], \OCP\Util::WARN);
+				$result = OC_User_Group_Admin_Util::removeFromGroup($_POST['member'], $group, $_POST['invitation_email']);
 			}
 			break;
 		case "disableuser":
