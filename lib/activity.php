@@ -102,11 +102,11 @@ class Activity implements IExtension {
 				}
 				else{
 					return (string) $this->l->
-					t('You have been invited by %3$s to join the group %1$s').
+						t('You have been invited by %3$s to join the group %1$s', $preparedParams).
 						'<div class="invite_div" style="display:none">
 							<a href="#" class="accept btn btn-default btn-flat" group="'.$group.'">'.$this->l->t('Accept').'</a>&nbsp
 							<a href="#" class="decline btn btn-default btn-flat" group="'.$group.'">'.$this->l->t('Decline').'</a>
-						</div>', $preparedParams);
+						</div>';
 				}
 			case 'requested_with_by':
 				$group = $params[0];
@@ -117,20 +117,20 @@ class Activity implements IExtension {
 				}
 				else{
 					return (string) $this->l->
-					t('%2$s has requested to join the group %1$s').
+						t('%2$s has requested to join the group %1$s', $preparedParams).
 						'<div class="invite_div" style="display:none">
 							<a href="#" class="accept btn btn-default btn-flat" userdisplayname="'.$user.'" user="'.$user.'" group="'.$group.'">'.$this->l->t('Accept').'</a>&nbsp
 							<a href="#" class="decline btn btn-default btn-flat" userdisplayname="'.$user.'" user="'.$user.'" group="'.$group.'">'.$this->l->t('Decline').'</a>
-						</div>', $preparedParams);
+						</div>';
 				}
 			case 'joined_user_self_external':
 				$group = $params[0];
 				$user = $params[1];
 				return (string) $this->l->
-					t('The external user %2$s has been signed up and added to the group %1$s').
+					t('The external user %2$s has been signed up and added to the group %1$s', $preparedParams).
 						'<div class="invite_div" style="display:none">
 							<a href="#" class="verify accept btn btn-default btn-flat" userdisplayname="'.$user.'" user="'.$user.'" group="'.$group.'">'.$this->l->t('Verify').'</a>&nbsp
-						</div>', $preparedParams);
+						</div>';
 			case 'joined_user_self':
 				return (string) $this->l->t('%2$s joined the group %1$s', $preparedParams);
 			case 'joined_with_by':
