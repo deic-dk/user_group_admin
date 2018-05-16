@@ -69,5 +69,12 @@ $TRANSLATIONS = array(
 		'%2$s left the group %1$s' => '%2$s har forladt gruppen %1$s',
 		'You left the group %1$s' => 'Du har forladt gruppen %1$s',
 		"%s and %s" => "%s og %s",
+		"Accepted" => "Accepteret",
+		"Congratulations! You've joined the group" => "Tillykke! Du er nu medlem af gruppen",
+		"has joined the group" => "er nu medlem af gruppen",
+		"New member of group" => "Nyt gruppemedlem",
+		"Rejected" => "Afslået",
+		"Declining membership of" => "Afslå medlemskab af",
+		"Decline confirmation" => "Bekræftelse",
 );
 $PLURAL_FORMS = "nplurals=2; plural=(n != 1);";

@@ -5,18 +5,18 @@ $(document).ready(function() {
 		var activityId = $(this).parent().attr('activity_id');
 		var user = $(this).attr('user');
 		var userDisplayName = $(this).attr('userdisplayname');
-		$(this).parent().html('<span group="' + group + '"><strong>Accepted</strong></span>');
+		$(this).parent().html('<span group="' + group + '"><strong>'+t('user_group_admin', 'Accepted')+'</strong></span>');
 		markSeen(activityId);
 		$.ajax({
 			url:OC.linkTo('user_group_admin', 'ajax/acceptinvitation.php'),
 			type: 'post',
 			data: { 'group': $(this).attr('group'), 'user':  user, 'accept': 'yes'},
 			success: function(data, status) {
-				var msg = 'Congratulations! You\'ve joined the group '+group+'.';
+				var msg = t('user_group_admin', "Congratulations! You've joined the group")+' '+group;
 				if(typeof user != 'undefined' && user != OC.currentUser){
-					msg = 'OK! '+userDisplayName+' has joined the group '+group+'.';
+					msg = userDisplayName+' '+t('user_group_admin', 'has joined the group')+' '+group+'.';
 				}
-				OC.dialogs.alert(msg, 'New member of group', function(el){
+				OC.dialogs.alert(msg, t('user_group_admin', 'New member of group'), function(el){
 					OC.redirect(OC.generateUrl('apps/user_group_admin'));
 				}, true);
 			}
@@ -26,14 +26,14 @@ $(document).ready(function() {
 	$(document).on ("click", ".invite_div .decline", function () {
 		var group = $(this).attr('group');
 		var activityId = $(this).parent().attr('activity_id');
-		$(this).parent().html('<span group="' + group + '"><strong>Rejected</strong></span>');
+		$(this).parent().html('<span group="' + group + '"><strong>'+t('user_group_admin', 'Rejected')+'</strong></span>');
 		markSeen(activityId);
 		$.ajax({
 			url:OC.linkTo('user_group_admin', 'ajax/acceptinvitation.php'),
 			type: 'post',
 			data: {'group': $(this).attr('group'), 'user':  $(this).attr('user'), 'accept': 'no'},
 			success: function(data, status) {
-				OC.dialogs.alert('OK, declining membership of '+group+'.', 'Decline confirmation', null, true);
+				OC.dialogs.alert(t('user_group_admin', 'Declining membership of')+' '+group+'.', t('user_group_admin', 'Decline confirmation'), null, true);
 			}
 		});
 	});
