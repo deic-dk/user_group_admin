@@ -146,23 +146,26 @@ function doAction($group, $owner, $user){
 				OCP\JSON::success();
 				break;
 			case "addmember":
+				$memberRequest = !checkOwner($user, $owner);
 				if(!empty($_POST['email']) && empty($_POST['member'])){
 					OC_User_Group_Hooks::groupShare($group,
 						OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER, $owner);
 					OC_User_Group_Admin_Util::sendVerificationToExternal($_POST['email'], $accept, $decline, $group);
 					OCP\JSON::success();
-					break;
 				}
-				OC_User_Group_Hooks::groupShare($group, $_POST['member'], $owner);
-				OC_User_Group_Admin_Util::sendVerification($user, $accept, $decline, $group);
-				$groupInfo = OC_User_Group_Admin_Util::getGroupInfo($group);
-				$tmpl = new OCP\Template("user_group_admin", "members");
-				$tmpl->assign( 'group' , $group );
-				$tmpl->assign( 'owner' , $groupInfo['owner'] );
-				$tmpl->assign( 'description' , $groupInfo['description'] );
-				$tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $group ) );
-				$page = $tmpl->fetchPage();
-				OCP\JSON::success(array('data' => array('page'=>$page)));
+				else{
+					OC_User_Group_Hooks::groupShare($group, $_POST['member'], $owner, $memberRequest);
+					OC_User_Group_Admin_Util::sendVerification(checkOwner($user, $owner)&&!empty($member)?$member:$user,
+							$accept, $decline, $group, $memberRequest);
+					$groupInfo = OC_User_Group_Admin_Util::getGroupInfo($group);
+					$tmpl = new OCP\Template("user_group_admin", "members");
+					$tmpl->assign( 'group' , $group );
+					$tmpl->assign( 'owner' , $groupInfo['owner'] );
+					$tmpl->assign( 'description' , $groupInfo['description'] );
+					$tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $group ) );
+					$page = $tmpl->fetchPage();
+					OCP\JSON::success(array('data' => array('page'=>$page)));
+				}
 				break;
 			case "showmembers":
 				$groupInfo = OC_User_Group_Admin_Util::getGroupInfo($group);

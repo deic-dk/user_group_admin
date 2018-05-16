@@ -277,15 +277,15 @@ class OC_User_Group_Admin_Util {
 			$subject = 'Group invitation';
 		}
 		if(!$memberRequest){
-			$message = 'Dear '.$name.",\n \n".'you have been invited to join the group "' .
-					$gid . '" by ' . $ownerName . '.\n\nClick here to accept the invitation:'."\n\n".
-					$acceptUrl ."\n \n".'or click here to decline:'."\n\n".
+			$message = "Dear ".$name.",\n \n".'you have been invited to join the group "' .
+					$gid . '" by ' . $ownerName . ".\n\nClick here to accept the invitation:\n\n".
+					$acceptUrl ."\n \nor click here to decline:\n\n".
 					$declineUrl;
 		}
 		else{
 			$message = $name.' is requesting to join your group "' .
-					$gid . '. Click here to accept the request:'."\n".
-					$acceptUrl ."\n \n".'or click here to decline:'."\n\n".
+					$gid . '". Click here to accept the request:'."\n".
+					$acceptUrl ."\n \nor click here to decline:\n\n".
 					$declineUrl;
 		}
 		try{

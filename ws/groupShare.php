@@ -11,6 +11,7 @@ if(!OCA\FilesSharding\Lib::checkIP()){
 $name = isset($_GET['group'])?$_GET['group']:'%';
 $user = isset($_GET['userid'])?$_GET['userid']:'';
 $owner = isset($_GET['owner'])?$_GET['owner']:OCP\USER::getUser ();
-$activityHook =  OC_User_Group_Hooks::dbGroupShare($name,$user,$owner);
+$memberRequest = !empty($_GET['memberRequest'])?$_GET['memberRequest']=='yes':false;
+$activityHook =  OC_User_Group_Hooks::dbGroupShare($name,$user,$owner, $memberRequest);
 OCP\JSON::encodedPrint($activityHook);
 

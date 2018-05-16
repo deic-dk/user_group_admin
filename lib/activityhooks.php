@@ -23,13 +23,13 @@ class OC_User_Group_Hooks {
 		self::addNotificationsForGroupAction($params, 'group', 'deleted_self');
 	}
 	
-	public static function dbGroupShare($group, $uid, $owner) {
+	public static function dbGroupShare($group, $uid, $owner, $memberRequest=false) {
 		if(empty($group) || empty($uid) || empty($owner) ||
 				$uid==\OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER){
 			return;
 		}
 		$params = array($group, $uid, $owner);
-		if($owner==\OC_User::getUser()){
+		if(!$memberRequest){
 			self::addNotificationsForGroupAction($params, 'group', 'shared_user_self');
 			self::addNotificationsForGroupAction($params, 'group', 'shared_with_by');
 		}
@@ -39,13 +39,13 @@ class OC_User_Group_Hooks {
 		}
 	}
 	
-	public static function groupShare($group, $uid, $owner) {
+	public static function groupShare($group, $uid, $owner, $memberRequest=false) {
 		if(!\OCP\App::isEnabled('files_sharding')  || \OCA\FilesSharding\Lib::isMaster()){
-			$result = self::dbGroupShare($group, $uid, $owner);
+			$result = self::dbGroupShare($group, $uid, $owner, $memberRequest);
 		}
 		else{
 			$result = \OCA\FilesSharding\Lib::ws('groupShare', array('group'=>urlencode($group),
-					'userid'=>$uid, 'owner'=>$owner),
+					'userid'=>$uid, 'owner'=>$owner, 'memberRequest'=>($memberRequest?'yes':'no')),
 					false, true, null, 'user_group_admin');
 		}
 		return $result;
