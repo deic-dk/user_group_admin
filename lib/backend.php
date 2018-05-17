@@ -85,6 +85,14 @@ class OC_User_Group_Admin_Backend extends OC_Group_Backend
 						$groups[] = $group;
 					}
         }
+        $stmt = OC_DB::prepare('SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` LIKE ? AND `owner` = ? GROUP BY `gid`', $limit, $offset);
+        $result = $stmt->execute(array($search.'%', $user));
+        while ($row = $result->fetchRow()) {
+        	$group = $row['gid'];
+        	if(!in_array($group, $groups) && !self::dbHiddenGroupExists($group)){
+        		$groups[] = $group;
+        	}
+        }
         return $groups;
     }
     
