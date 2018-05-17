@@ -35,10 +35,10 @@
 				this.$el.find('.select-all').prop('checked', false);
 				this.showMask();
 				$('ul.nav-sidebar').find('.active').removeClass('active');
-				$('.nav-sidebar li[data-id=user-groups_'+this.gid.replace( /(:|\.|\[|\]|,|=)/g, "\\$1" )+'] a').addClass('active');
+				$('.nav-sidebar li[data-id="user-groups_'+this.gid.replace( /(:|\.|\[|\]|,|=|\')/g, "\\$1" )+'"] a').addClass('active');
 				// Change breadcrumb home icon to gift icon
-				$('#app-content-user-groups_'+this.gid+' #breadcrumb-container .breadcrumb .crumb a i.icon-home').addClass('icon-gift');
-				$('#app-content-user-groups_'+this.gid+' #breadcrumb-container .breadcrumb .crumb a i.icon-home').removeClass('icon-home');
+				$('div[id="app-content-user-groups_'+this.gid+'"] #breadcrumb-container .breadcrumb .crumb a i.icon-home').addClass('icon-gift');
+				$('div[id="app-content-user-groups_'+this.gid+'"] #breadcrumb-container .breadcrumb .crumb a i.icon-home').removeClass('icon-home');
 				// This is the original - and when not in the original files app, causes unnecessary abort and reload
 				/*if (this._reloadCall) {
 					this._reloadCall.abort();

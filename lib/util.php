@@ -412,7 +412,7 @@ class OC_User_Group_Admin_Util {
 		}
 		else{
 			$result = \OCA\FilesSharding\Lib::ws('groupActions', array(
-					'name'=>urlencode($gid), 'quota'=>$quota, 'action'=>'setUserFreeQuota'),
+					'name'=>urlencode($gid), 'quota'=>urlencode($quota), 'action'=>'setUserFreeQuota'),
 					false, true, null, 'user_group_admin');
 		}
 		return $result;

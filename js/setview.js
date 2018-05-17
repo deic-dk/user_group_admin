@@ -23,7 +23,8 @@ OCA.UserGroups.App = {
 		fileActions.merge(OCA.Files.fileActions);
 
 		this._FileList[gid] = new OCA.UserGroups.FileList(
-				$('#app-content-user-groups_'+gid.replace( /(:|\.|\[|\]|,|=)/g, "\\$1" )),
+				$('div[id="app-content-user-groups_'+gid.replace( /(:|\.|\[|\]|,|=|\')/g, "\\$1" )+
+						'"]'),
 			{
 				scrollContainer: $('#app-content'),
 				fileActions: fileActions,
@@ -87,7 +88,7 @@ OCA.UserGroups.App = {
 		if(typeof group === 'undefined'){
 			return false;
 		}
-		group = group.replace( /(:|\.|\[|\]|,|=)/g, "\\$1" );
+		group = group.replace( /(:|\.|\[|\]|,|=|\')/g, "\\$1" );
 		$("div[id^='app-content-user-groups']:not('.hidden') #breadcrumb-container .crumb").each(function(){
 			var link = $(this).find('a');
 			var href = link.attr('href');
@@ -96,12 +97,12 @@ OCA.UserGroups.App = {
 			}
 		});
 		// Change breadcrumb home icon to gift icon
-		$('#app-content-user-groups_'+group+' #breadcrumb-container .breadcrumb .crumb a i.icon-home').addClass('icon-gift');
-		$('#app-content-user-groups_'+group+' #breadcrumb-container .breadcrumb .crumb a i.icon-home').removeClass('icon-home');
-		var topHref = $('#app-content-user-groups_'+group+' #breadcrumb-container .breadcrumb .crumb a').first().attr('href' );
+		$('div[id="app-content-user-groups_'+group+'"]'+' #breadcrumb-container .breadcrumb .crumb a i.icon-home').addClass('icon-gift');
+		$('div[id="app-content-user-groups_'+group+'"]'+' #breadcrumb-container .breadcrumb .crumb a i.icon-home').removeClass('icon-home');
+		var topHref = $('div[id="app-content-user-groups_'+group+'"]'+' #breadcrumb-container .breadcrumb .crumb a').first().attr('href' );
 		if(topHref){
 			topHref = topHref.replace(/\&view=[^&]*&/g, '').replace(/\&view=[^&]*$/, '');
-			$('#app-content-user-groups_'+group+' #breadcrumb-container .breadcrumb .crumb a').first().attr('href', topHref+'&view=user-groups_'+group);
+			$('div[id="app-content-user-groups_'+group+'"]'+' #breadcrumb-container .breadcrumb .crumb a').first().attr('href', topHref+'&view=user-groups_'+group);
 		}
 	}
 };
@@ -134,9 +135,8 @@ $(document).ready(function(){
   $('ul.nav-sidebar').on('click', 'li[data-id^="user-groups"]', function(e) {
 		$('ul.nav-sidebar').find('.active').removeClass('active');
 		$(this).children('a').addClass('active');
-		
-		if($('#app-content-'+$(this).attr('data-id').replace( /(:|\.|\[|\]|,|=)/g, "\\$1" )).length !== 0){
-			$('#app-navigation ul li[data-id="'+$(this).attr('data-id').replace( /(:|\.|\[|\]|,|=)/g, "\\$1" )+'"] a').click();
+		if($("div[id='app-content-"+$(this).attr('data-id').replace(/(:|\.|\[|\]|,|=|\')/g, "\\$1" )+"']").length !== 0){
+			$('#app-navigation ul li[data-id="'+$(this).attr('data-id').replace(/(:|\.|\[|\]|,|=|\')/g, "\\$1" )+'"] a').click();
 		}
 		else{
 			window.location.href = "/index.php/apps/files?group=%2F&view=" + $(this).attr('data-id');
