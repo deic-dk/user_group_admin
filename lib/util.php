@@ -717,7 +717,7 @@ class OC_User_Group_Admin_Util {
 		}
 		else{
 			$result = \OCA\FilesSharding\Lib::ws('groupActions',
-					array('action'=>'getGroupUsageCharge', 'name'=>$group), false, true, null, 'user_group_admin');
+					array('action'=>'getGroupUsageCharge', 'name'=>urlencode($group)), false, true, null, 'user_group_admin');
 		}
 		return $result;
 	}
@@ -743,7 +743,7 @@ class OC_User_Group_Admin_Util {
 			$result = self::dbGetGroupUsage($group, $user);
 		}
 		else{
-			$arr = array('action'=>'getGroupUsage', 'name'=>$group);
+			$arr = array('action'=>'getGroupUsage', 'name'=>urlencode($group));
 			if(!empty($user)){
 				$arr['userid'] = $user;
 			}
@@ -753,7 +753,7 @@ class OC_User_Group_Admin_Util {
 		return $result;
 	}
 	
-	private static function dbGetGroupUsage($group, $user=null) {
+	public static function dbGetGroupUsage($group, $user=null) {
 		$sql = 'SELECT `files_usage` FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ?';
 		$arr = array($group);
 		if(!empty($user)){
@@ -764,8 +764,7 @@ class OC_User_Group_Admin_Util {
 		$result = $stmt->execute($arr);
 		$usage = 0;
 		while($row = $result->fetchRow()){
-			$row = $result->fetchRow();
-			$usage += (int)$row['files_usage'];
+			$usage += (empty($row['files_usage'])?0:(int)$row['files_usage']);
 		}
 		return $usage;
 	}
@@ -776,7 +775,7 @@ class OC_User_Group_Admin_Util {
 		}
 		else{
 			$result = \OCA\FilesSharding\Lib::ws('groupActions',
-					array('action'=>'updateGroupUsage', 'userid'=>$user, 'name'=>$group, 'usage'=>$usage),
+					array('action'=>'updateGroupUsage', 'userid'=>$user, 'name'=>urlencode($group), 'usage'=>$usage),
 					false, true, null, 'user_group_admin');
 		}
 		return $result;
