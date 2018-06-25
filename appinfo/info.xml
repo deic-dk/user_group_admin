@@ -8,6 +8,6 @@
 	<author>Jorge Rafael Garcia Ramos </author>
 	<require>4.93</require>
 	<remote>
-		<groupdirs>appinfo/remote.php</groupdirs>
+		<group>appinfo/remote.php</group>
 	</remote>
 	</info>
