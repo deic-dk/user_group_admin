@@ -8,18 +8,21 @@ $l = OC_L10N::get('files');
 $gid = isset($_GET['gid']) ? $_GET['gid'] : '';
 $dir = isset($_GET['dir']) ? $_GET['dir'] : '';
 
+$data = array();
 
 try {
+	$data['directory'] = $dir;
+	$data['gid'] = $gid;
 	$dir = \OC\Files\Filesystem::normalizePath('/'.$gid.$dir);
 	$fs = \OCP\Files::getStorage('user_group_admin');
 	\OCP\Util::writeLog('User_Group_Admin', 'DIR: '.$dir, \OCP\Util::INFO);
 	$dirInfo = $fs->getFileInfo($dir);
 	if (!$dirInfo || !$dirInfo->getType() === 'dir') {
 		header("HTTP/1.0 404 Not Found");
+		OCP\JSON::error(array('data' => $data));
 		exit();
 	}
-
-	$data = array();
+	
 
 	$permissions = $dirInfo->getPermissions();
 

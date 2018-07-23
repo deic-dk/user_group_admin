@@ -27,7 +27,7 @@
 		return this.getParam(window.location.href, key);
 	},
 
-		reload: function() {
+		reload: function(_id, _owner, _group, _errorCallback) {
 			var viewParam = this.getGetParam( 'view');
 			if(this.gid && viewParam.indexOf('user-groups_')==0) {
 				this._selectedFiles = {};
@@ -55,7 +55,9 @@
 					});
 				}
 				var callBack = this.reloadCallback.bind(this);
-				return this._reloadCall.then(callBack, callBack);
+				var errorCallback = (typeof _errorCallback !== 'undefined'?_errorCallback:function(){return true;});
+				return this._reloadCall.then(function(response){return callBack(response, errorCallback);},
+				 function(response){return callBack(response, errorCallback);});
 			}
 			else {
 				return OCA.Files.FileList.prototype.reload.apply(this, arguments);

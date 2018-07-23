@@ -104,6 +104,26 @@ OCA.UserGroups.App = {
 			topHref = topHref.replace(/\&view=[^&]*&/g, '').replace(/\&view=[^&]*$/, '');
 			$('div[id="app-content-user-groups_'+group+'"]'+' #breadcrumb-container .breadcrumb .crumb a').first().attr('href', topHref+'&view=user-groups_'+group);
 		}
+	},
+	initGroupFileList:function(target){
+		var groupArr = target.getAttribute('id').split('_');
+		groupArr.shift();
+		var group = groupArr.join('_');
+		if(typeof OCA.UserGroups.App.oldFileList==='undefined'){
+			OCA.UserGroups.App.oldFileList = OCA.Files.App.fileList;
+		}
+		FileList = OCA.UserGroups.App.initialize($(target), group);
+		OCA.Files.App.fileList = FileList;
+		if(!OCA.UserGroups.FileList.modified){
+			OCA.UserGroups.App.fixGroupLinks();
+		}
+		OC.Upload.init(group);
+		//if(!OCA.Files.App.fileList.modified){
+		if(!OCA.UserGroups.FileList.modified){
+			OCA.Meta_data.App.modifyFilelist(OCA.UserGroups.FileList);
+		}
+		OCA.Files.App.fileList.modified = true;
+		OCA.UserGroups.FileList.modified = true;
 	}
 };
 
@@ -145,7 +165,7 @@ $(document).ready(function(){
   
 	// Fix the bookmark links to switch back to files view
 	$('ul.nav-sidebar li[data-id^="internal-bookmarks_"]').click(function(e) {
-		if(OCA.Files.App.getActiveView()!='files'){
+		if(OCA.Files.App.getActiveView()!='files' && !$(this).attr('data-group')){
 			if(typeof OCA.UserGroups.App.oldFileList!='undefined'){
 				OCA.Files.App.fileList = OCA.UserGroups.App.oldFileList;
 			}
@@ -165,24 +185,8 @@ $(document).ready(function(){
 	 });
 	
   $('[id^="app-content-user-groups"]').on('show', function(e) {
-		var groupArr = e.target.getAttribute('id').split('_');
-		groupArr.shift();
-		var group = groupArr.join('_');
-		if(typeof OCA.UserGroups.App.oldFileList==='undefined'){
-			OCA.UserGroups.App.oldFileList = OCA.Files.App.fileList;
-		}
-		FileList = OCA.UserGroups.App.initialize($(e.target), group);
-		OCA.Files.App.fileList = FileList;
-		if(!OCA.UserGroups.FileList.modified){
-			OCA.UserGroups.App.fixGroupLinks();
-  	}
-		OC.Upload.init(group);
-		//if(!OCA.Files.App.fileList.modified){
-		if(!OCA.UserGroups.FileList.modified){
-			OCA.Meta_data.App.modifyFilelist(OCA.UserGroups.FileList);
-		}
-		OCA.Files.App.fileList.modified = true;
-		OCA.UserGroups.FileList.modified = true;
+  	OCA.UserGroups.App.initGroupFileList(e.target);
   });
+
  
 });
