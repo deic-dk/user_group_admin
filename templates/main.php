@@ -173,10 +173,11 @@ function checkGroup($group, $groupUser){
 		\OCP\Util::writeLog('User_Group_Admin', 'GROUP: '.$group["gid"], \OCP\Util::WARN);
 		if(OC_User_Group_Admin_Util::updateStatus($groupname, $groupUser,
 				$_GET['code']===$acceptCode?OC_User_Group_Admin_Util::$GROUP_INVITATION_ACCEPTED:
-				OC_User_Group_Admin_Util::$GROUP_INVITATION_DECLINED, true, $group["invitation_email"], $_GET['code'])){
+				OC_User_Group_Admin_Util::$GROUP_INVITATION_DECLINED, true, $group["invitation_email"],
+				$_GET['code'])){
 			echo "<script type='text/javascript'>var url=window.location.href.replace('code=','nocode='); ".
-			"OC.dialogs.alert('Welcome to the group ".$group["gid"].
-			"', 'Welcome', function(){window.location.href=url}, true);</script>";
+					"OC.dialogs.alert('Welcome to the group ".str_replace("'", "\'", $group["gid"]).
+			"', 'Welcome', function(){window.location.href=url;}, true);</script>";
 			//echo "<script type='text/javascript'>location.reload();</script>";
 			//echo "<script type='text/javascript'>var url=window.location.href.replace('code=','nocode=');window.location.href=url;</script>";
 			return true;

@@ -357,12 +357,13 @@ class OC_User_Group_Admin_Util {
 	}
 
 	public static function dbUpdateStatus($gid, $uid, $status, $checkOpen=false, $invitationEmail='', $code='') {
-		if(!empty($invitationEmail)){
+		$user = \OCP\User::getUser();
+		if(empty($user) && !empty($invitationEmail)){
 			// When signing up external users, the invitation email is used as uid.
 			$actualUser = $invitationEmail;
 		}
 		else{
-			$actualUser = \OCP\User::getUser();
+			$actualUser = $user;
 		}
 		if(!empty($actualUser)){
 			// First clean up potential existing group membership
