@@ -734,7 +734,7 @@ class OC_User_Group_Admin_Util {
 		while($row = $result->fetchRow()){
 			$row = $result->fetchRow();
 			$charges = \OCA\Files_Accounting\Storage_Lib::getChargeForUserServers($row['uid']);
-			$charge += ((int)$row['files_usage']) * ((int)$charges['charge_home']);
+			$charge += round(((int)$row['files_usage']) * $charges['charge_home'] / pow(1024, 3), 3);
 		}
 		return $charge;
 	}
