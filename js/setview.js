@@ -92,7 +92,7 @@ OCA.UserGroups.App = {
 		$("div[id^='app-content-user-groups']:not('.hidden') #breadcrumb-container .crumb").each(function(){
 			var link = $(this).find('a');
 			var href = link.attr('href');
-			if(href.indexOf('&group=')<0){
+			if(link && (typeof href== 'undefined' || href.indexOf('&group='))<0){
 				link.attr('href', href+'&group='+group);
 			}
 		});
