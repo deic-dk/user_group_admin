@@ -723,7 +723,7 @@ class OC_User_Group_Admin_Util {
 		return $result;
 	}
 	
-	private static function dbGetGroupUsageCharge($group) {
+	public static function dbGetGroupUsageCharge($group) {
 		if(!\OCP\App::isEnabled('files_sharding') || !\OCP\App::isEnabled('files_accounting')){
 			return 0;
 		}
