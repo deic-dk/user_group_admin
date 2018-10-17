@@ -38,21 +38,11 @@ if(isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI']!='/' &&
 	$order = 2;
 	
 	foreach ($groups as $group){
-		$fs = \OCP\Files::getStorage('user_group_admin');
-		if(!$fs){
-			\OCP\Util::writeLog('User_Group_Admin', 'Could not add navigation entry for '.$group['gid'], \OCP\Util::ERROR);
-			break;
+		if(!OC_User_Group_Admin_Util::createGroupFolder($group['gid'])){
+			return false;
 		}
-		$dir = \OC\Files\Filesystem::normalizePath('/'.$group['gid']);
-		$path = $fs->getLocalFile($dir);
-		$parent = dirname($path);
-		if(!file_exists($parent)){
-			\OCP\Util::writeLog('User_Group_Admin', 'Creating group folder '.$parent, \OCP\Util::WARN);
-			mkdir($parent, 0777, false);
-		}
-		if(!file_exists($path)){
-			\OCP\Util::writeLog('User_Group_Admin', 'Creating group folder '.$path, \OCP\Util::WARN);
-			mkdir($path, 0777, false);
+		if(empty($group['hidden']) || $group['hidden']!='yes'){
+			OC_User_Group_Admin_Util::shareGroupFolder($user, $group['owner'], $group['gid']);
 		}
 		$order += 1./100;
 		\OCP\Util::writeLog('User_Group_Admin', 'Adding navigation entry '.$group['gid'].':'.$order, \OCP\Util::DEBUG);
@@ -70,4 +60,17 @@ if(isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI']!='/' &&
 OCP\Util::addScript('user_group_admin','setview');
 OCP\Util::addScript('user_group_admin','user_group_notification');
 
+}
+
+function shareItem($itemType, $itemSource, $shareType, $shareWith, $permissions, $group=''){
+	if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+		return \OCP\Share::shareItem($itemType, $itemSource, $shareType, $shareWith, $permissions);
+	}
+	else{
+		$itemPath = \OC\Files\Filesystem::getpath($itemSource);
+		return \OCA\FilesSharding\Lib::ws('share_action',
+				array('user_id' => \OC_User::getUser(), 'action' => 'share', 'itemType' => $itemType,
+						'itemSource' => $itemSource, 'itemPath' => $itemPath, 'shareType' => $shareType,
+						'shareWith' => $shareWith, 'permissions' => $permissions), true, true);
+	}
 }

@@ -69,6 +69,57 @@ class OC_User_Group_Admin_Util {
 		}
 		return $result ? true : false;
 	}
+	
+	public static function createGroupFolder($gid) {
+		$fs = \OCP\Files::getStorage('user_group_admin');
+		if(!$fs){
+			\OCP\Util::writeLog('User_Group_Admin', 'Could not create group folder '.$gid, \OCP\Util::ERROR);
+			return false;
+		}
+		$dir = \OC\Files\Filesystem::normalizePath('/'.$gid);
+		$path = $fs->getLocalFile($dir);
+		$parent = dirname($path);
+		if(!file_exists($parent)){
+			\OCP\Util::writeLog('User_Group_Admin', 'Creating group folder '.$parent, \OCP\Util::WARN);
+			mkdir($parent, 0777, false);
+		}
+		if(!file_exists($path)){
+			\OCP\Util::writeLog('User_Group_Admin', 'Creating group folder '.$path, \OCP\Util::WARN);
+			//mkdir($path, 0777, false);
+			return $fs->mkdir($gid);
+		}
+		return true;
+	}
+	
+	public static function shareGroupFolder($user, $owner, $gid){
+		if(!\OCP\App::isEnabled('files_sharding') || !\OCA\FilesSharding\Lib::onServerForUser($user)){
+			return false;
+		}
+		$fileInfo = \OCA\FilesSharding\Lib::getFileInfo('/', $user, '', '', $user, $gid);
+		$folderId = $fileInfo['fileid'];
+		$alreadySharedItem = \OCA\Files\Share_files_sharding\Api::getItemShared('file', $folderId);
+		\OCP\Util::writeLog('user_group_admin', 'Sharing group folder: '.$folderId.'-->'.
+				serialize($alreadySharedItem), \OC_Log::WARN);
+		if(empty($alreadySharedItem)){
+			\OC\Files\Filesystem::tearDown();
+			\OC\Files\Filesystem::init($user, '/'.$user.'/user_group_admin/'.$gid);
+			if(\OCA\FilesSharding\Lib::isMaster()){
+				$res = \OCP\Share::shareItem($itemType, $itemSource, $shareType, $shareWith, $permissions);
+			}
+			else{
+				$res = \OCA\FilesSharding\Lib::ws('share_action',
+						array('user_id' => $user, 'action' => 'share', 'itemType' => 'folder',
+								'itemSource' => $folderId, 'itemPath' => '/', 'shareType' => \OCP\Share::SHARE_TYPE_USER,
+								'shareWith' => $owner, 'permissions' => \OCP\PERMISSION_READ,
+								'groupFolder' => $gid
+						), true, true);
+			}
+			\OC\Files\Filesystem::tearDown();
+			\OC\Files\Filesystem::init($user, '/'.$user.'/files/');
+			return $res;
+		}
+		return true;
+	}
 
 	public static function createHiddenGroup($gid) {
 
@@ -519,17 +570,20 @@ class OC_User_Group_Admin_Util {
 	 *         This function fetches all groups a user belongs to. It does not check
 	 *         if the user exists at all.
 	 */
-	public static function dbGetUserGroups($uid, $onlyVerified=false, $hideHidden=false, $onlyWithFreeQuota=false) {
+	public static function dbGetUserGroups($uid, $onlyVerified=false, $hideHidden=false,
+			$onlyWithFreeQuota=false, $includeOwned=false) {
 		$sql = "SELECT * FROM `*PREFIX*user_group_admin_group_user` WHERE `uid` = ?";
+		$arr = array($uid);
 		if($onlyVerified){
 			$sql .= " AND `verified` = ?";
-			$stmt = OC_DB::prepare($sql);
-			$result = $stmt->execute(array($uid, self::$GROUP_INVITATION_ACCEPTED));
+			$arr[] = self::$GROUP_INVITATION_ACCEPTED;
 		}
-		else{
-			$stmt = OC_DB::prepare($sql);
-			$result = $stmt->execute(array($uid));
+		if($includeOwned){
+			$sql .= " OR `owner`= ?";
+			$arr[] = $uid;
 		}
+		$stmt = OC_DB::prepare($sql);
+		$result = $stmt->execute($arr);
 		$groups = array();
 		while($row = $result->fetchRow()){
 			$groupInfo = self::dbGetGroupInfo($row["gid"]);
@@ -551,16 +605,17 @@ class OC_User_Group_Admin_Util {
 	}
 
 	public static function getUserGroups($userid, $onlyVerified=false, $hideHidden=false,
-			$onlyWithFreeQuota=false) {
+			$onlyWithFreeQuota=false, $includeOwned=false) {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-			$result = self::dbGetUserGroups($userid, $onlyVerified, $hideHidden, $onlyWithFreeQuota);
+			$result = self::dbGetUserGroups($userid, $onlyVerified, $hideHidden, $onlyWithFreeQuota, $includeOwned);
 		}
 		else{
 			$result = \OCA\FilesSharding\Lib::ws('getUserGroups',
 				array(	'userid'=>$userid,
 								'only_verified'=>!empty($onlyVerified)?'yes':'no',
 								'hide_hidden'=>!empty($hideHidden)?'yes':'no',
-								'only_with_freequota'=>!empty($onlyWithFreeQuota)?'yes':'no'
+						'only_with_freequota'=>!empty($onlyWithFreeQuota)?'yes':'no',
+						'include_owned'=>!empty($includeOwned)?'yes':'no'
 				),
 				false, true, null, 'user_group_admin');
 		}
@@ -790,7 +845,7 @@ class OC_User_Group_Admin_Util {
 	
 	public static function getGroup($fileId){
 		$user = \OC_User::getUser();
-		$groups = self::getUserGroups($user);
+		$groups = self::getUserGroups($user, false, false, false);
 		$ret = array();
 		foreach($groups as $group){
 			\OC\Files\Filesystem::tearDown();

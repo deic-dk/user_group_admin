@@ -130,6 +130,9 @@ OCA.UserGroups.App = {
 function updateUserGroups(){
   $.ajax({
 		url: OC.filePath('user_group_admin', 'ajax', 'groups.php'),
+	  data:{
+		  onlyOwned: 'no'
+	  },
 		async: false,
 		success: function(response) {
 			if(response){
@@ -148,9 +151,37 @@ function updateUserGroups(){
   });
 }
 
+function updateOwnedGroups(){
+  $.ajax({
+		url: OC.filePath('user_group_admin', 'ajax', 'groups.php'),
+	  data:{
+		  onlyOwned: 'yes'
+	  },
+		async: false,
+		success: function(response) {
+			if(response){
+				var bookmarks = '';
+				$.each( response, function(key,value) {
+					bookmarks = bookmarks+'<li data-id="owned-group-folders_'+value.gid+
+					'"><a href="#"><i class="icon icon-binoculars deic_green"></i><span>'+value.gid+'</span></a></li>';
+				});
+				$('.nav-sidebar li[data-id^="owned-group-folders_"]').remove();
+				$('ul.nav-sidebar li[data-id="files_index"]').after(bookmarks);
+			}
+		}
+  });
+}
+
 $(document).ready(function(){
 
 	updateUserGroups();
+	updateOwnedGroups();
+	
+	$('ul.nav-sidebar li[data-id^="owned-group-folders_"]').click(function(e) {
+		$('ul.nav-sidebar').find('.active').removeClass('active');
+		$(this).children('a').addClass('active');
+		OCA.Files.App.setActiveView('sharingin', {silent: false})
+	});
 
   $('ul.nav-sidebar').on('click', 'li[data-id^="user-groups"]', function(e) {
 		$('ul.nav-sidebar').find('.active').removeClass('active');
