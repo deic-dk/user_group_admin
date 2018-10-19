@@ -104,7 +104,8 @@ class OC_User_Group_Admin_Util {
 			\OC\Files\Filesystem::tearDown();
 			\OC\Files\Filesystem::init($user, '/'.$user.'/user_group_admin/'.$gid);
 			if(\OCA\FilesSharding\Lib::isMaster()){
-				$res = \OCP\Share::shareItem($itemType, $itemSource, $shareType, $shareWith, $permissions);
+				$res = \OCP\Share::shareItem('folder', $folderId, \OCP\Share::SHARE_TYPE_USER,
+						$owner, \OCP\PERMISSION_READ);
 			}
 			else{
 				$res = \OCA\FilesSharding\Lib::ws('share_action',
@@ -300,7 +301,47 @@ class OC_User_Group_Admin_Util {
 		}
 		return $result;
 	}
-
+	
+	public static function dbGetShowOwned($gid) {
+		$stmt = OC_DB::prepare ( 'SELECT `show_owned` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?');
+		$result = $stmt->execute(array($gid));
+		$row = $result->fetchRow();
+		return $row['show_owned'];
+	}
+	
+	public static function getShowOwned($gid) {
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			$result = self::dbGetShowOwned($gid);
+		}
+		else{
+			$result = \OCA\FilesSharding\Lib::ws('groupActions', array(
+					'name'=>urlencode($gid), 'action'=>'getShowOwned'),
+					false, true, null, 'user_group_admin');
+		}
+		return $result;
+	}
+	
+	public static function dbToggleShowOwned($gid) {
+		$currentShowOwned = self::dbGetShowOwned($gid);
+		$newShowOwned = empty($currentShowOwned) || $currentShowOwned!='yes'?'yes':'no';
+		$sql = "UPDATE `*PREFIX*user_group_admin_groups` SET `show_owned` = ? WHERE `gid` = ?";
+		$query = OC_DB::prepare($sql);
+		$result = $query->execute(array($newShowOwned, $gid));
+		return $result?$newShowOwned:$currentShowOwned;
+	}
+	
+	public static function toggleShowOwned($gid) {
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			$result = self::dbToggleShowOwned($gid);
+		}
+		else{
+			$result = \OCA\FilesSharding\Lib::ws('groupActions', array(
+					'name'=>urlencode($gid), 'action'=>'toggleShowOwned'),
+					false, true, null, 'user_group_admin');
+		}
+		return $result;
+	}
+	
 	/**
 	 * Send invitation mail to a user.
 	 */

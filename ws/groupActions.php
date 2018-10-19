@@ -54,6 +54,12 @@ switch ($action) {
 	case "setDescription":
 		$result = OC_User_Group_Admin_Util::setDescription($description, $name);
 		break;
+	case "toggleShowOwned":
+		$result = OC_User_Group_Admin_Util::dbToggleShowOwned($name);
+		break;
+	case "getShowOwned":
+		$result = OC_User_Group_Admin_Util::dbGetShowOwned($name);
+		break;
 }
 OCP\JSON::encodedPrint($result);
 

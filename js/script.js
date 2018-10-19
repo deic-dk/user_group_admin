@@ -148,6 +148,12 @@ OC.UserGroup = {
 			if (freeQuota !== returnedFreeQuota) {
 				$select.find(':selected').text(returnedFreeQuota);
 				}
+				if(returnedFreeQuota=='none' || returnedFreeQuota=='0 B'){
+					$('#show_owned').addClass('hidden');
+				}
+				else{
+					$('#show_owned').removeClass('hidden');
+				}
 			});
 		},
 	_updateFreeQuota: function(group, freeQuota, ready) {
@@ -295,6 +301,36 @@ function sendInvite(group){
 	$('#send_emails').parent().parent().parent().css('z-index', '200');
 }
 
+function toggleShowOwned(){
+	var group = $('.grouptitle').attr('group');
+	var showOwned = $('input#show_owned_group_folders').is(':checked');
+	$.ajax(OC.linkTo('user_group_admin','ajax/actions.php'), {
+		type:'POST',
+			data:{
+				action: 'toggleshowowned',
+				group: group
+		},
+		dataType:'json',
+		success: function(s, textStatus, xhr){
+			if(s.error || !$.trim(s) || xhr.status>=300){
+				$('#group_msg').removeClass('success');
+					OC.msg.finishedSaving('#group_msg', {status: 'error', data: {message: "Unexpected error"+s.error}});
+				}
+				else{
+					$('#show_owned_group_folders').prop('checked', s.data.showowned==='yes');
+					//$('#group_msg').show();
+					//$('#group_msg').removeClass('error');
+					//OC.msg.finishedSaving('#group_msg', {status: 'success', data: {message: s.message}});
+				}
+				updateOwnedGroups();
+			},
+			error:function(s){
+			$('#group_msg').removeClass('success');
+			OC.msg.finishedSaving('#group_msg', {status: 'error', data: {message: "Unexpected error"}});
+		}
+	});
+}
+
 $(document).ready(function() {
 	
 	$('a#create').click(function() {
@@ -428,6 +464,11 @@ $(document).ready(function() {
 		});
 	});
 
+  $('#show_owned_group_folders').live('click', function(ev){
+  	ev.preventDefault();
+  	ev.stopPropagation();
+  	toggleShowOwned();
+  });
 
 	$(document).click(function(e){
 		if ($(".oc-dialog").length &&

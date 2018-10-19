@@ -24,3 +24,13 @@
 		...
 	</option>
 </select>
+<?php $showOwned = OC_User_Group_Admin_Util::getShowOwned($_['group']); ?>
+<div id="show_owned" <?php print_unescaped(empty($_['user_freequota'])||$_['user_freequota']=='none'||$_['user_freequota']=='0 B'?
+		'class="hidden"':'');?>>
+<?php p($l->t('Show owned group folders')); ?>&nbsp;
+<input id="show_owned_group_folders"
+<?php p($showOwned=='yes'?'checked="checked"':'');?>
+title="<?php p($l->t("Allow group owner to see group folders of members")); ?>"
+ type="checkbox"/>
+<label id="group_msg"></label>
+</div>

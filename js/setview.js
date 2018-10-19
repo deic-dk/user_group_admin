@@ -162,11 +162,13 @@ function updateOwnedGroups(){
 			if(response){
 				var bookmarks = '';
 				$.each( response, function(key,value) {
-					bookmarks = bookmarks+'<li data-id="owned-group-folders_'+value.gid+
-					'"><a href="#"><i class="icon icon-binoculars deic_green"></i><span>'+value.gid+'</span></a></li>';
+					if(typeof value.show_owned != 'undefined' && value.show_owned=='yes'){
+						bookmarks = bookmarks+'<li data-id="owned-group-folders_'+value.gid+
+						'"><a href="#"><i class="icon icon-binoculars deic_green"></i><span>'+value.gid+'</span></a></li>';
+					}
 				});
 				$('.nav-sidebar li[data-id^="owned-group-folders_"]').remove();
-				$('ul.nav-sidebar li[data-id="files_index"]').after(bookmarks);
+				$('ul.nav-sidebar li[data-id="sharing_out"]').before(bookmarks);
 			}
 		}
   });
@@ -180,17 +182,26 @@ $(document).ready(function(){
 	$('ul.nav-sidebar li[data-id^="owned-group-folders_"]').click(function(e) {
 		$('ul.nav-sidebar').find('.active').removeClass('active');
 		$(this).children('a').addClass('active');
-		OCA.Files.App.setActiveView('sharingin', {silent: false})
+		if(typeof OCA.Files=='undefined'){
+			$.getScript(OC.webroot+'/apps/files/js/app.js', function(){
+				$.getScript(OC.webroot+'/apps/files/js/navigation.js', function(){
+					OCA.Files.App.setActiveView('sharingin', {silent: false})
+				});
+			});
+		}
+		else{
+			OCA.Files.App.setActiveView('sharingin', {silent: false})
+		}
 	});
 
   $('ul.nav-sidebar').on('click', 'li[data-id^="user-groups"]', function(e) {
 		$('ul.nav-sidebar').find('.active').removeClass('active');
 		$(this).children('a').addClass('active');
 		if($("div[id='app-content-"+$(this).attr('data-id').replace(/(:|\.|\[|\]|,|=|\')/g, "\\$1" )+"']").length !== 0){
-			$('#app-navigation ul li[data-id="'+$(this).attr('data-id').replace(/(:|\.|\[|\]|,|=|\')/g, "\\$1" )+'"] a').click();
+			$('#app-navigation ul li[data-id="'+$(this).attr('data-id').replace(/(:|\.|\[|\]|,|=|\')/g, "\\$1")+'"] a').click();
 		}
 		else{
-			window.location.href = "/index.php/apps/files?group=%2F&view=" + $(this).attr('data-id');
+			window.location.href = "/index.php/apps/files?dir=%2F&view=" + $(this).attr('data-id').replace( /(:|\.|\[|\]|,|=|\')/g, "\\$1" );
 		}
 	});
   

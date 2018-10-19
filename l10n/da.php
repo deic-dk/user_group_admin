@@ -76,5 +76,7 @@ $TRANSLATIONS = array(
 		"Rejected" => "Afslået",
 		"Declining membership of" => "Afslå medlemskab af",
 		"Decline confirmation" => "Bekræftelse",
+		"Show owned group folders" => "Vis ejede grupper",
+		"Allow group owner to see group folders members" => "Tillad gruppe-ejer at se medlemmers gruppe-mapper",
 );
 $PLURAL_FORMS = "nplurals=2; plural=(n != 1);";

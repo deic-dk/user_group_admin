@@ -137,7 +137,10 @@ function doAction($group, $owner, $user){
 		case "getinfo":
 			$result = isReadable($group, $owner, $user);
 			break;
-		}
+		case "toggleshowowned":
+			$result = checkOwner($user, $owner);
+			break;
+	}
 
 	if(!empty($result)){
 		switch ($_POST['action']) {
@@ -188,6 +191,11 @@ function doAction($group, $owner, $user){
 				break;
 			case "getinfo":
 				OCP\JSON::success(array('data' => OC_User_Group_Admin_Util::getGroupInfo($group)));
+				break;
+			case "toggleshowowned":
+				OCP\JSON::success(array('data' =>
+					array('showowned'=>OC_User_Group_Admin_Util::toggleShowOwned($group))
+				));
 				break;
 			default:
 				OCP\JSON::success();
