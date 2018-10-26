@@ -180,14 +180,11 @@ $(document).ready(function(){
 	updateOwnedGroups();
 	
 	$('ul.nav-sidebar li[data-id^="owned-group-folders_"]').click(function(e) {
+		ownedGroup = $(this).attr('data-id').substr(20);
 		$('ul.nav-sidebar').find('.active').removeClass('active');
 		$(this).children('a').addClass('active');
 		if(typeof OCA.Files=='undefined'){
-			$.getScript(OC.webroot+'/apps/files/js/app.js', function(){
-				$.getScript(OC.webroot+'/apps/files/js/navigation.js', function(){
-					OCA.Files.App.setActiveView('sharingin', {silent: false})
-				});
-			});
+			window.location.href = "/index.php/apps/files?dir=%2F&view=sharingin&owned_group="+ownedGroup ;
 		}
 		else{
 			OCA.Files.App.setActiveView('sharingin', {silent: false})
