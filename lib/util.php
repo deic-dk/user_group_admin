@@ -97,10 +97,10 @@ class OC_User_Group_Admin_Util {
 		}
 		$fileInfo = \OCA\FilesSharding\Lib::getFileInfo('/', $user, '', '', $user, $gid);
 		$folderId = $fileInfo['fileid'];
-		$alreadySharedItem = \OCA\Files\Share_files_sharding\Api::getItemShared('file', $folderId);
-		\OCP\Util::writeLog('user_group_admin', 'Sharing group folder: '.$folderId.'-->'.
-				serialize($alreadySharedItem), \OC_Log::WARN);
+		$alreadySharedItem = \OCA\Files\Share_files_sharding\Api::getAllItemsShared('folder', $folderId);
 		if(empty($alreadySharedItem)){
+			\OCP\Util::writeLog('user_group_admin', 'Sharing group folder: '.$folderId.'-->'.
+					serialize($alreadySharedItem), \OC_Log::WARN);
 			\OC\Files\Filesystem::tearDown();
 			\OC\Files\Filesystem::init($user, '/'.$user.'/user_group_admin/'.$gid);
 			if(\OCA\FilesSharding\Lib::isMaster()){
