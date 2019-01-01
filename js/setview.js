@@ -204,7 +204,7 @@ $(document).ready(function(){
   
 	// Fix the bookmark links to switch back to files view
 	$('ul.nav-sidebar li[data-id^="internal-bookmarks_"]').click(function(e) {
-		if(OCA.Files.App.getActiveView()!='files' && !$(this).attr('data-group')){
+		if(OCA.Files && OCA.Files.App.getActiveView()!='files' && !$(this).attr('data-group')){
 			if(typeof OCA.UserGroups.App.oldFileList!='undefined'){
 				OCA.Files.App.fileList = OCA.UserGroups.App.oldFileList;
 			}
@@ -212,7 +212,7 @@ $(document).ready(function(){
 	});
 	// Fix sharing link to switch back to files view
 	$('ul.nav-sidebar li[data-id^="sharing"]').click(function(e) {
-		if(OCA.Files.App.getActiveView()!='files'){
+		if(OCA.Files && OCA.Files.App.getActiveView()!='files'){
 			if(typeof OCA.UserGroups.App.oldFileList!='undefined'){
 				OCA.Files.App.fileList = OCA.UserGroups.App.oldFileList;
 			}
