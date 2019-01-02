@@ -178,6 +178,12 @@ $(document).ready(function(){
 
 	updateUserGroups();
 	updateOwnedGroups();
+
+	var places = readCookie('OCplaces');
+
+	if(places == 'collapsed'){
+			$('ul.nav-sidebar li[data-id^="owned-group-folders_"]').hide();
+	}
 	
 	$('ul.nav-sidebar li[data-id^="owned-group-folders_"]').click(function(e) {
 		ownedGroup = $(this).attr('data-id').substr(20);
