@@ -400,7 +400,7 @@ $(document).ready(function() {
 		var role = $(this).closest('tr').attr('role') ;
 		var groupSelected = $(this).closest('tr').attr('group') ;
 		var textHtml = $( '#dialogalert' ).html().replace( role == 'owner'?t('user_group_admin', 'Leave'):t('user_group_admin', 'Delete'),
-				role == 'owner'? t('user_grou_admin', 'Delete'):t('user_group_admin', 'Leave'));
+				role == 'owner'? t('user_group_admin', 'Delete'):t('user_group_admin', 'Leave'));
 		 $('#dialogalert').html(textHtml);
 		$('#dialogalert').dialog({ buttons: [ { id:'delete_leave_group', text: role == 'owner'?t('user_group_admin', 'Delete'):t('user_group_admin', 'Leave'),
 				click: function() {
