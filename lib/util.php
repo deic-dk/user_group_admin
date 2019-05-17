@@ -720,7 +720,7 @@ class OC_User_Group_Admin_Util {
 			$name = \OCP\Util::sanitizeHTML($displayName);
 		}
 		else{
-			$displayName = \OCA\FilesSharding\Lib::ws('getDisplayNames', array('search'=>$user),
+			$displayName = \OCA\FilesSharding\Lib::ws('getDisplayNames', array('search'=>$user, 'exact'=>'yes'),
 				false, true, null, 'files_sharding');
 			foreach ($displayName as $name) {
 				$name = \OCP\Util::sanitizeHTML($name);
