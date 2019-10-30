@@ -459,9 +459,11 @@ class OC_User_Group_Admin_Util {
 		}
 		if(!empty($actualUser)){
 			// First clean up potential existing group membership
-			$sql = "DELETE from `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `gid` = ?";
-			$query = OC_DB::prepare($sql);
-			$result = $query->execute(array($actualUser, $gid));
+			// What was that? $actualUser will never be empty and we will always delete the
+			// membership before we can accept it - for users on master. FO. 
+			//$sql = "DELETE from `*PREFIX*user_group_admin_group_user` WHERE `uid` = ? AND `gid` = ?";
+			//$query = OC_DB::prepare($sql);
+			//$result = $query->execute(array($actualUser, $gid));
 		}
 		// This is an external invite.
 		if($uid==self::$UNKNOWN_GROUP_MEMBER){
