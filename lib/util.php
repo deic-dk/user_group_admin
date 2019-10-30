@@ -353,6 +353,7 @@ class OC_User_Group_Admin_Util {
 		$defaults = new \OCP\Defaults();
 		$senderName = $defaults->getName();
 		$name = OCP\User::getDisplayName($uid);
+		$userEmail = \OCP\Config::getUserValue($uid, 'settings', 'email');
 		if(\OCP\App::isEnabled('files_sharding') ){
 			$masterUrl = \OCA\FilesSharding\Lib::getMasterURL();
 			$acceptUrl = $masterUrl.'/apps/user_group_admin/index.php?code='.$accept;
@@ -381,7 +382,7 @@ class OC_User_Group_Admin_Util {
 					$declineUrl;
 		}
 		try{
-			\OCP\Util::sendMail($uid, $name, $subject, $message, $senderAddress, $senderName);
+			\OCP\Util::sendMail($userEmail, $name, $subject, $message, $senderAddress, $senderName);
 		}
 		catch(\Exception $e){
 			\OCP\Util::writeLog('User_Group_Admin',

@@ -158,7 +158,8 @@ function doAction($group, $owner, $user){
 				}
 				else{
 					OC_User_Group_Hooks::groupShare($group, $_POST['member'], $owner, $memberRequest);
-					OC_User_Group_Admin_Util::sendVerification(checkOwner($user, $owner)&&!empty($member)?$member:$user,
+					OC_User_Group_Admin_Util::sendVerification(
+							checkOwner($user, $owner)&&!empty($_POST['member'])?$_POST['member']:$user,
 							$accept, $decline, $group, $memberRequest);
 					$groupInfo = OC_User_Group_Admin_Util::getGroupInfo($group);
 					$tmpl = new OCP\Template("user_group_admin", "members");
