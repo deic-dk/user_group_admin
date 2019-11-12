@@ -23,7 +23,8 @@ class OC_User_Group_Hooks {
 		self::addNotificationsForGroupAction($params, 'group', 'deleted_self');
 	}
 	
-	public static function dbGroupShare($group, $uid, $owner, $memberRequest=false) {
+	public static function dbGroupShare($group, $uid, $owner, $memberRequest=false,
+			$accept='', $decline='') {
 		if(empty($group) || empty($uid) || empty($owner) ||
 				$uid==\OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER){
 			return;
@@ -37,18 +38,23 @@ class OC_User_Group_Hooks {
 			self::addNotificationsForGroupAction($params, 'group', 'requested_user_self');
 			self::addNotificationsForGroupAction($params, 'group', 'requested_with_by');
 		}
+		if(!empty($uid) && !empty($accept) && !empty($decline)){
+			OC_User_Group_Admin_Util::sendVerification($uid, $accept, $decline, $group, $memberRequest);
+		}
 	}
 	
-	public static function groupShare($group, $uid, $owner, $memberRequest=false) {
+	public static function groupShare($group, $uid, $owner, $memberRequest=false,
+			$accept='', $decline='') {
 		if(!\OCP\App::isEnabled('files_sharding')  || \OCA\FilesSharding\Lib::isMaster()){
-			$result = self::dbGroupShare($group, $uid, $owner, $memberRequest);
+			self::dbGroupShare($group, $uid, $owner, $memberRequest, $accept, $decline);
 		}
 		else{
-			$result = \OCA\FilesSharding\Lib::ws('groupShare', array('group'=>urlencode($group),
-					'userid'=>$uid, 'owner'=>$owner, 'memberRequest'=>($memberRequest?'yes':'no')),
+			\OCA\FilesSharding\Lib::ws('groupShare', array('group'=>urlencode($group),
+					'userid'=>$uid, 'owner'=>$owner, 'memberRequest'=>($memberRequest?'yes':'no'),
+					'accept'=>$accept, 'decline'=>$decline
+			),
 					false, true, null, 'user_group_admin');
 		}
-		return $result;
 	}
 	
 	public static function dbGroupJoin($group, $uid, $owner, $externalUser = false) {
