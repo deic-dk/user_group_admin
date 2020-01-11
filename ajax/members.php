@@ -34,8 +34,9 @@ if (isset($_GET['search'])) {
 	$users = array();
 	$limit = 0;
 	$offset = 0;
-	while ($count < 4 && count($users) == $limit) {
-		$limit = 4 - $count;
+	$max = 12;
+	while ($count < $max && count($users) == $limit) {
+		$limit = $max - $count;
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
 			$users = OC_User::getDisplayNames($_GET['search'], $limit, $offset);
 		}
