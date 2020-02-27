@@ -288,7 +288,7 @@ function sendInvite(group){
 		buttons: [ 
 	{ id:'send_emails', text: 'Send', click: function() {
 		$.each(myEmailList, function(key, value){
-			OC.UserGroup.sendInvitationEmail(value, group);
+			OC.UserGroup.sendInvitationEmail(value.trim(), group.trim());
 		});
 		$(this).dialog( 'close' );
 	}},
