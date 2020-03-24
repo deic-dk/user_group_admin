@@ -564,5 +564,14 @@ $(document).ready(function() {
 	
 	OC.UserGroup.initGroupDropDown() ;
 	
+	$('#external_signup .fadeout').delay(3000).hide(3000);
+	$('#external_signup input.password').val('');
+	$('#external_signup input.password').on('mouseout', function(ev) {
+		$(this).css('font-family', 'password-mask');
+	});
+	$('#external_signup input.password').on('mouseenter', function(ev) {
+		$(this).css('font-family', 'unset');
+	});
+	
 });
 

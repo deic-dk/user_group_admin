@@ -14,14 +14,24 @@
 	<form method="post" id="external_signup">
 		<input type="hidden" name="code" value="<?php echo $_GET['code'];?>"/>
 		<br />
-		<input type="password" name="password" 
+		<?php
+		if(!empty($_['password_error'])){
+			echo "<div class='msg error fadeout'>".$_['password_error']."</div>";
+		}
+		?>
+		<!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
+		<input style="display:none" type="text" name="fakeusernameremembered"/>
+		<input style="display:none" type="password" name="fakepasswordremembered"/>
+		<input class="password numeric-password"
+		autocomplete="off" type="text" name="password" 
 			<?php
 		\OCP\Util::writeLog('User_Group_Admin', 'Missing: '.serialize($_['missingfields']), \OCP\Util::WARN);
 			if(in_array('password', $_['missingfields'])){
 				echo "class='highlight'";
 			}
 			if(!empty($_['password_error'])){
-				echo "placeholder='".$_['password_error']."'";
+				//echo "placeholder='".$_['password_error']."'";
+				echo "placeholder='Password not accepted'";
 			}
 			else{
 				echo 'placeholder="Password"';
