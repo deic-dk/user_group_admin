@@ -219,7 +219,7 @@ function showMembers(group, role, info){
 				!$('.group textarea.description').is('[readonly]')){
 			saveDescription();
 		}
-		ev.target.closest(".oc-dialog").remove();
+		ev.target.closest(".oc-dialog") && ev.target.closest(".oc-dialog").remove();
 		$('.modalOverlay').remove();
 	});
 
@@ -441,25 +441,29 @@ $(document).ready(function() {
 
 	$("#invite").live('click', function(event) {
 		OC.UserGroup.groupSelected = $('.grouptitle').attr('group');
-		$(".userselect").css("display", "block");
+		$(".userselect").toggle();
 		OC.UserGroup.initDropDown() ;
-		$('.userselect .ui-autocomplete-input').focus();
+		//$('.userselect .ui-autocomplete-input').focus();
 		event.stopPropagation();
-		$('html').click(function(event) {
-			if ( !$(event.target).closest("div[class='userselect']").length )  {
-					$("div[class='userselect']").hide();
+		$('.ui-dialog').click(function(event) {
+			if ( !$(event.target).closest(".userselect").length &&  !$(event.target).closest("#invite").length)  {
+				if($(".userselect:visible").length){
+					$(".userselect").hide();
+				}	
 			}
 		});
 	});
 	
 	$("#invite-guests").live('click', function(event) {
 		OC.UserGroup.groupSelected = $('.grouptitle').attr('group');
-		$(".emailaddresses").css("display", "block");
+		$(".emailaddresses").toggle();
 		event.stopPropagation();
-		$('html').click(function(event) {
+		$('.ui-dialog').click(function(event) {
 			if($(event.target).closest(".oc-dialog").find('.group').length &&
-					!$(event.target).closest("div[class='emailaddresses']").length)  {
-					$("div[class='emailaddresses']").hide();
+					!$(event.target).closest(".emailaddresses").length &&  !$(event.target).closest("#invite-guests").length)  {
+				if($(".emailaddresses:visible").length){
+					$(".emailaddresses").hide();
+				}
 			}
 		});
 	});
@@ -471,6 +475,8 @@ $(document).ready(function() {
   });
 
 	$(document).click(function(e){
+		e.stopPropagation();
+		e.preventDefault();
 		if ($(".oc-dialog").length &&
 				!$(e.target).parents().filter('.oc-dialog').length && !$(e.target).parents().filter('.ui-dialog').length &&
 				!$(e.target).parents().filter('.name').length ) {
@@ -491,6 +497,7 @@ $(document).ready(function() {
 		else if($(e.target).prop('id') && $(e.target).prop('id')=='send-invite'){
 			sendInvite($(e.target).attr('group'));
 		}
+		return false;
 	});
 
 	$("#groupstable .nametext").live('click', function() {
