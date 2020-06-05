@@ -571,6 +571,8 @@ $(document).ready(function() {
 	
 	OC.UserGroup.initGroupDropDown() ;
 	
+	$('#external_signup input[type=submit]').on('click', function(ev){$(ev.target).parent().submit();});
+	
 	$('#external_signup .fadeout').delay(3000).hide(3000);
 	$('#external_signup input.password').val('');
 	$('#external_signup input.password').on('mouseout', function(ev) {

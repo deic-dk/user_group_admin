@@ -26,36 +26,36 @@ function checkGroup(&$group, $groupUser){
 			}
 			$tmpl = new OCP\Template('user_group_admin', 'signup', 'base');
 			$missingFields = array();
-			if(empty($_POST['password'])){
+			if(empty($_REQUEST['password'])){
 				$missingFields[] = 'password';
 			}
 			elseif(file_exists('/usr/local/sbin/cracklib-check')){ // TODO: generalize this
-				$password = trim($_POST['password']);
+				$password = trim($_REQUEST['password']);
 				$cracklibCheck = shell_exec("echo $password | /usr/local/sbin/cracklib-check 2>&1 | xargs echo -n");
 				OC_Log::write('ChangePassword','Checked password :'.$cracklibCheck, \OC_Log::WARN);
 				if(substr($cracklibCheck, -4)!=": OK"){
 					$missingFields[] = 'password';
 					$tmpl->assign('password_error', $cracklibCheck);
 				}
-				$tmpl->assign('password', $_POST['password']);
+				$tmpl->assign('password', $_REQUEST['password']);
 			}
 			else{
-				$tmpl->assign('password', $_POST['password']);
+				$tmpl->assign('password', $_REQUEST['password']);
 			}
-			if(empty($_POST['fullname'])){
+			if(empty($_REQUEST['fullname'])){
 				$missingFields[] = 'fullname';
 			}
 			else{
-				$tmpl->assign('fullname', $_POST['fullname']);
+				$tmpl->assign('fullname', $_REQUEST['fullname']);
 			}
-			if(empty($_POST['address'])){
+			if(empty($_REQUEST['address'])){
 				$missingFields[] = 'address';
 			}
 			else{
-				$tmpl->assign('address', $_POST['address']);
+				$tmpl->assign('address', $_REQUEST['address']);
 			}
-			if(!empty($_POST['affiliation'])){
-				$tmpl->assign('affiliation', $_POST['affiliation']);
+			if(!empty($_REQUEST['affiliation'])){
+				$tmpl->assign('affiliation', $_REQUEST['affiliation']);
 			}
 			// Form not completed, direct to form, highlighting missing fields
 			$tmpl->assign('email', $group["invitation_email"]);
@@ -68,7 +68,7 @@ function checkGroup(&$group, $groupUser){
 				// Create user
 				$newuser = $group["invitation_email"];
 				$owner = $group["owner"];
-				OC_User::createUser($newuser, $_POST['password']);
+				OC_User::createUser($newuser, $_REQUEST['password']);
 				if(\OCP\App::isEnabled('files_sharding') && \OCA\FilesSharding\Lib::isMaster()){
 					// Set home server to that of the group owner
 					$homeServerID = \OCA\FilesSharding\Lib::lookupServerIdForUser($owner);
@@ -77,10 +77,10 @@ function checkGroup(&$group, $groupUser){
 						\OCA\FilesSharding\Lib::$USER_ACCESS_ALL);
 				}
 				OC_Preferences::setValue($newuser, 'settings', 'email', $newuser);
-				OC_User::setDisplayName($newuser, $_POST['fullname']);
-				OCP\Config::setUserValue($newuser, 'user_group_admin', 'address', $_POST['address']);
-				if(!empty($_POST['affiliation'])){
-					OCP\Config::setUserValue($newuser, 'user_group_admin', 'affiliation', $_POST['affiliation']);
+				OC_User::setDisplayName($newuser, $_REQUEST['fullname']);
+				OCP\Config::setUserValue($newuser, 'user_group_admin', 'address', $_REQUEST['address']);
+				if(!empty($_REQUEST['affiliation'])){
+					OCP\Config::setUserValue($newuser, 'user_group_admin', 'affiliation', $_REQUEST['affiliation']);
 				}
 				if(OCP\App::isEnabled('files_accounting')){
 					// External users can default to lower freequota than regular users.
@@ -112,7 +112,7 @@ function checkGroup(&$group, $groupUser){
 			return true;
 		}
 		if($_GET['code']===$group["decline"]){
-			if($_POST['declined']=='yes'){
+			if($_REQUEST['declined']=='yes'){
 				// Membership declined
 				$result = OC_User_Group_Admin_Util::updateStatus($group["gid"], $user,
 						OC_User_Group_Admin_Util::$GROUP_INVITATION_DECLINED, true);

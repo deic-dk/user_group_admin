@@ -11,7 +11,7 @@
 	Your username will be the email address to which the invitation was sent:
 	<b><?php echo $_['email'];?></b></div>
 	
-	<form method="post" id="external_signup">
+	<form method="post" id="external_signup" action="external_collaborator_signup.php" >
 		<input type="hidden" name="code" value="<?php echo $_GET['code'];?>"/>
 		<br />
 		<?php
@@ -27,16 +27,16 @@
 			<?php
 		\OCP\Util::writeLog('User_Group_Admin', 'Missing: '.serialize($_['missingfields']), \OCP\Util::WARN);
 			if(in_array('password', $_['missingfields'])){
-				echo "class='highlight'";
+				echo 'class="highlight"';
 			}
 			if(!empty($_['password_error'])){
 				//echo "placeholder='".$_['password_error']."'";
-				echo "placeholder='Password not accepted'";
+				echo 'placeholder="Password not accepted"';
 			}
 			else{
 				echo 'placeholder="Password"';
 				if(!empty($_['password'])){
-					echo "value='".$_['password']."'";
+					echo 'value="'.$_['password'].'"';
 				}
 			}
 			?>
