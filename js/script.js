@@ -475,11 +475,11 @@ $(document).ready(function() {
   });
 
 	$(document).click(function(e){
-		e.stopPropagation();
-		e.preventDefault();
 		if ($(".oc-dialog").length &&
 				!$(e.target).parents().filter('.oc-dialog').length && !$(e.target).parents().filter('.ui-dialog').length &&
 				!$(e.target).parents().filter('.name').length ) {
+			e.stopPropagation();
+			e.preventDefault();
 			if($('.ui-dialog .group .invitemembers').length && $('.group textarea.description').length &&
 					!$('.group textarea.description').is('[readonly]')){
 				saveDescription();
@@ -487,17 +487,23 @@ $(document).ready(function() {
 			$(".oc-dialog").remove();
 			$('.modalOverlay').remove();
 			$('#dialogalert').closest('.ui-dialog').remove();
+			return false;
 		}
 		else if($(e.target).attr('group') && $(e.target).hasClass('group-info')){
+			e.stopPropagation();
+			e.preventDefault();
 			showMembers($(e.target).attr('group'), '',
 					'<div class="info">'+t('user_group_admin', 'Description')+': '+($(e.target).attr('description')||'')+'</div>'+
 					'<div class="info">'+t('user_group_admin', 'Owner')+': '+$(e.target).attr('ownerDisplayName')+'</div>'+
 					'<div class="info">'+t('user_group_admin', 'Members')+': '+$(e.target).attr('members')+'</div>');
+			return false;
 		}
 		else if($(e.target).prop('id') && $(e.target).prop('id')=='send-invite'){
+			e.stopPropagation();
+			e.preventDefault();
 			sendInvite($(e.target).attr('group'));
+			return false;
 		}
-		return false;
 	});
 
 	$("#groupstable .nametext").live('click', function() {
