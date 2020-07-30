@@ -468,16 +468,25 @@ $(document).ready(function() {
 		});
 	});
 
-  $('#show_owned_group_folders').live('click', function(ev){
-  	ev.preventDefault();
-  	ev.stopPropagation();
-  	toggleShowOwned();
-  });
+	$('#show_owned_group_folders').live('click', function(ev){
+		ev.preventDefault();
+		ev.stopPropagation();
+		toggleShowOwned();
+	});
+
+	// Deal with strange jquery perhaps-bug: clicking in dialog causes scroll up. So we scroll to bottom if the click is on one of the buttons there.
+	$(document).mousedown(function(e){
+		if(($(e.target).parents().filter('.oc-dialog').length || $(e.target).parents().filter('.ui-dialog').length ||
+				$(e.target).parents().filter('.name').length) && $('.ui-dialog-content').length &&
+				(e.target.id=='invite' || e.target.id=='invite-guests' || e.target.id=='export-group' || e.target.id=='setfreequota')){
+			$('.ui-dialog-content').scrollTop($('.ui-dialog-content')[0].scrollHeight);
+		}
+	});
 
 	$(document).click(function(e){
-		if ($(".oc-dialog").length &&
+		if($(".oc-dialog").length &&
 				!$(e.target).parents().filter('.oc-dialog').length && !$(e.target).parents().filter('.ui-dialog').length &&
-				!$(e.target).parents().filter('.name').length ) {
+				!$(e.target).parents().filter('.name').length) {
 			e.stopPropagation();
 			e.preventDefault();
 			if($('.ui-dialog .group .invitemembers').length && $('.group textarea.description').length &&
