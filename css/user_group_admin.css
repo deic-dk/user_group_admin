@@ -348,4 +348,8 @@ https://stackoverflow.com/questions/36935576/how-to-make-input-type-tel-work-as-
 	width: 240px;
 }
 
+input#privategroup[type="checkbox"], input#opengroup[type="checkbox"] {
+	margin: 2px 10px 4px 4px;
+}
+
 

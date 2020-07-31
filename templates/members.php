@@ -4,11 +4,25 @@ $group = $_['group'];
 $owner = $_['owner'];
 $members = $_['members'];
 $numMembers = count($members);
+$privategroup = $_['privategroup'];
+$opengroup = $_['opengroup'];
 
 echo "<div>".$l->t("Description")."</div>";
 
 echo "<li><span class='left'>".
 		"<textarea class='description' readonly='readonly' rows='3' cols='92'>".$_['description']."</textarea>".
+		"</span></li>";
+
+echo "<div>".$l->t("Privacy")."</div>";
+
+echo "<li><span class='left'>".
+		$l->t("Private").
+		"<input id='privategroup' type='checkbox' title='".$l->t("Is group hidden from non-members?").
+		"'".($privategroup?" checked='checked'":"")." />".
+		"&nbsp;".
+		$l->t("Open").
+		"<input id='opengroup' type='checkbox' title='".$l->t("Is group open to all users without approval?").
+		"'".($opengroup?" checked='checked'":"")." />".
 		"</span></li>";
 
 echo "<div class='owner'>".$l->t("Owner")."</div>";
@@ -33,7 +47,6 @@ else{
 		}
 	}
 }
-
 
 if($showMembers){
 	foreach($members as $member){

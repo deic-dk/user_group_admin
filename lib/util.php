@@ -302,6 +302,44 @@ class OC_User_Group_Admin_Util {
 		return $result;
 	}
 	
+	public static function dbSetPrivate($private, $gid) {
+		$sql = "UPDATE `*PREFIX*user_group_admin_groups` SET `private` = ? WHERE `gid` = ?";
+		$query = OC_DB::prepare($sql);
+		$result = $query->execute(array($private?'yes':'no', $gid));
+		return $result;
+	}
+	
+	public static function setPrivate($private, $gid) {
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			$result = self::dbSetPrivate($private, $gid);
+		}
+		else{
+			$result = \OCA\FilesSharding\Lib::ws('groupActions', array(
+					'privateGroup'=>($private?'yes':'no'), 'name'=>urlencode($gid), 'action'=>'setPrivate'),
+					false, true, null, 'user_group_admin');
+		}
+		return $result;
+	}
+	
+	public static function dbSetOpen($open, $gid) {
+		$sql = "UPDATE `*PREFIX*user_group_admin_groups` SET `open` = ? WHERE `gid` = ?";
+		$query = OC_DB::prepare($sql);
+		$result = $query->execute(array($open?'yes':'no', $gid));
+		return $result;
+	}
+	
+	public static function setOpen($open, $gid) {
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			$result = self::dbSetOpen($open, $gid);
+		}
+		else{
+			$result = \OCA\FilesSharding\Lib::ws('groupActions', array(
+					'openGroup'=>($open?'yes':'no'), 'name'=>urlencode($gid), 'action'=>'setOpen'),
+					false, true, null, 'user_group_admin');
+		}
+		return $result;
+	}
+	
 	public static function dbGetShowOwned($gid) {
 		$stmt = OC_DB::prepare ( 'SELECT `show_owned` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?');
 		$result = $stmt->execute(array($gid));

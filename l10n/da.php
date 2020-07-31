@@ -78,5 +78,10 @@ $TRANSLATIONS = array(
 		"Decline confirmation" => "Bekræftelse",
 		"Show owned group folders" => "Vis ejede grupper",
 		"Allow group owner to see group folders members" => "Tillad gruppe-ejer at se medlemmers gruppe-mapper",
+		"Privacy" = "Fortrolighed",
+		"Private" => "Private",
+		"Open" => "Åben",
+		"Is group hidden from non-members?" => "Er gruppen skjult for ikke-medlemmer?",
+		"Is group open to all users without approval?" => "Er gruppen åben for alle, uden godkendelse?"
 );
 $PLURAL_FORMS = "nplurals=2; plural=(n != 1);";

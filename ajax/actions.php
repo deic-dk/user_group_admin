@@ -131,6 +131,19 @@ function doAction($group, $owner, $user){
 				$result = OC_User_Group_Admin_Util::setDescription($_POST['description'], $group);
 			}
 			break;
+		case "setprivate":
+			\OCP\Util::writeLog('User_Group_Admin', 'Setting '.$group.' private: '.$_POST['privategroup'].
+			' : '.$user.' : '.$owner, \OCP\Util::WARN);
+			if(checkOwner($user, $owner)){
+				$result = OC_User_Group_Admin_Util::setPrivate($_POST['privategroup']!='no', $group);
+			}
+			break;
+		case "setopen":
+			\OCP\Util::writeLog('User_Group_Admin', 'Setting '.$group.' open: '.$_POST['opengroup'], \OCP\Util::WARN);
+			if(checkOwner($user, $owner)){
+				$result = OC_User_Group_Admin_Util::setOpen($_POST['opengroup']=='yes', $group);
+			}
+			break;
 		case "showmembers":
 			$result = (checkOwner($user, $owner) || OC_User_Group_Admin_Util::inGroup($user, $group));
 			break;
@@ -163,6 +176,8 @@ function doAction($group, $owner, $user){
 					$tmpl->assign( 'group' , $group );
 					$tmpl->assign( 'owner' , $groupInfo['owner'] );
 					$tmpl->assign( 'description' , $groupInfo['description'] );
+					$tmpl->assign( 'privategroup' , !empty($groupInfo['private'])&&$groupInfo['private']=='yes');
+					$tmpl->assign( 'opengroup' , !empty($groupInfo['open'])&&$groupInfo['open']=='yes' );
 					$tmpl->assign( 'members' , OC_User_Group_Admin_Util::usersInGroup( $group ) );
 					$page = $tmpl->fetchPage();
 					OCP\JSON::success(array('data' => array('page'=>$page)));
@@ -175,6 +190,8 @@ function doAction($group, $owner, $user){
 				$tmpl->assign( 'owner' , $groupInfo['owner'] );
 				$tmpl->assign( 'description' , $groupInfo['description'] );
 				$members = OC_User_Group_Admin_Util::usersInGroup( $group );
+				$tmpl->assign( 'privategroup' , !empty($groupInfo['private'])&&$groupInfo['private']=='yes');
+				$tmpl->assign( 'opengroup' , !empty($groupInfo['open'])&&$groupInfo['open']=='yes' );
 				$tmpl->assign( 'members' , $members );
 				$page = $tmpl->fetchPage();
 				$tmpl = new OCP\Template("user_group_admin", "freequota");

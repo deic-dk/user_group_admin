@@ -262,7 +262,29 @@ function saveDescription(){
 			{ group : $('.group .grouptitle').attr('group'), action: "setdescription", description : $('.group textarea.description').val() } ,
 			function ( jsondata ){
 		if(jsondata.status != 'success' ) {
-			OC.dialogs.alert( jsondata) ;
+			OC.dialogs.alert( jsondata.data.title, jsondata.data.message);
+		}
+	});
+}
+
+function savePrivate(){
+	$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'),
+			{ group : $('.group .grouptitle').attr('group'), action: "setprivate",
+				privategroup : ($('.group input#privategroup').prop('checked')?'yes':'no') } ,
+			function ( jsondata ){
+		if(jsondata.status != 'success' ) {
+			OC.dialogs.alert( jsondata.data.title, jsondata.data.message);
+		}
+	});
+}
+
+function saveOpen(){
+	$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'),
+			{ group : $('.group .grouptitle').attr('group'), action: "setopen",
+			opengroup : ($('.group input#opengroup').prop('checked')?'yes':'no') } ,
+			function ( jsondata ){
+		if(jsondata.status != 'success' ) {
+			OC.dialogs.alert( jsondata.data.title, jsondata.data.message);
 		}
 	});
 }
@@ -484,6 +506,7 @@ $(document).ready(function() {
 	});
 
 	$(document).click(function(e){
+		// Close group members dialog if open and clicking outside it
 		if($(".oc-dialog").length &&
 				!$(e.target).parents().filter('.oc-dialog').length && !$(e.target).parents().filter('.ui-dialog').length &&
 				!$(e.target).parents().filter('.name').length) {
@@ -498,6 +521,7 @@ $(document).ready(function() {
 			$('#dialogalert').closest('.ui-dialog').remove();
 			return false;
 		}
+		// Show group members dialog when clicking on group
 		else if($(e.target).attr('group') && $(e.target).hasClass('group-info')){
 			e.stopPropagation();
 			e.preventDefault();
@@ -507,11 +531,18 @@ $(document).ready(function() {
 					'<div class="info">'+t('user_group_admin', 'Members')+': '+$(e.target).attr('members')+'</div>');
 			return false;
 		}
+		// Send invitation when clicking on on Send button
 		else if($(e.target).prop('id') && $(e.target).prop('id')=='send-invite'){
 			e.stopPropagation();
 			e.preventDefault();
 			sendInvite($(e.target).attr('group'));
 			return false;
+		}
+		else if($(e.target).prop('id') && $(e.target).prop('id')=='privategroup'){
+			savePrivate();
+		}
+		else if($(e.target).prop('id') && $(e.target).prop('id')=='opengroup'){
+			saveOpen();
 		}
 	});
 
