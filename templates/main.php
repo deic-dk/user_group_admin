@@ -155,7 +155,7 @@ if(\OC_User::isAdminUser(\OC_User::getUser())){
 				<td>
 				<span class="info"><?php
 				$allGroups = count($ownedGroups)+$count;
-				echo $allGroups." group".($allGroups>1?"s":""); ?></span>
+				echo $allGroups." group".($allGroups>1||$allGroups==0?"s":""); ?></span>
 				</td>
 			</tr>
 		</tfoot>
