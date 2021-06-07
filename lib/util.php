@@ -675,7 +675,7 @@ class OC_User_Group_Admin_Util {
 				   Always show to admin. */
 				continue;
 			}
-			if($onlyWithFreeQuota && empty($groupInfo['user_freequota'])){
+			if($onlyWithFreeQuota && (empty($groupInfo['user_freequota']) || $groupInfo['user_freequota']=='none')){
 				continue;
 			}
 			$row['owner'] = $groupInfo['owner'];
