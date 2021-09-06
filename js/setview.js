@@ -29,9 +29,9 @@ OCA.UserGroups.App = {
 				scrollContainer: $('#app-content'),
 				fileActions: fileActions,
 				allowLegacyActions: true,
-				gid: gid/*,
+				gid: gid,
 				dragOptions: OCA.Files.dragOptions,
-				folderDropOptions: OCA.Files.folderDropOptions*/
+				folderDropOptions: OCA.Files.folderDropOptions
 			}
 		);
 		this._FileList[gid].$el.find('#emptycontent').text(t('UserGroups', 'No files here'));
