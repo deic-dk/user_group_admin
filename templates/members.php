@@ -18,11 +18,11 @@ echo "<div>".$l->t("Privacy")."</div>";
 echo "<li><span class='left'>".
 		$l->t("Private").
 		"<input id='privategroup' type='checkbox' title='".$l->t("Is group hidden from non-members?").
-		"'".($privategroup?" checked='checked'":"")." />".
+		"'".($privategroup?" checked='checked'":"").($owner===\OC_User::getUser()?"":" readonly")." />".
 		"&nbsp;".
 		$l->t("Open").
 		"<input id='opengroup' type='checkbox' title='".$l->t("Is group open to all users without approval?").
-		"'".($opengroup?" checked='checked'":"")." />".
+		"'".($opengroup?" checked='checked'":"").($owner===\OC_User::getUser()?"":" readonly")." />".
 		"</span></li>";
 
 echo "<div class='owner'>".$l->t("Owner")."</div>";
