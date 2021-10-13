@@ -12,7 +12,7 @@
 	<b><?php echo $_['email'];?></b></div>
 	
 	<form method="post" id="external_signup" action="external_collaborator_signup.php" >
-		<input type="hidden" name="code" value="<?php echo $_GET['code'];?>"/>
+		<input type="hidden" name="code" value="<?php echo $_REQUEST['code'];?>"/>
 		<br />
 		<?php
 		if(!empty($_['password_error'])){

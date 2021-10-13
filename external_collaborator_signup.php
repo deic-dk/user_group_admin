@@ -111,7 +111,7 @@ function checkGroup(&$group, $groupUser){
 			}
 			return true;
 		}
-		if($_GET['code']===$group["decline"]){
+		if($_REQUEST['code']===$group["decline"]){
 			if($_REQUEST['declined']=='yes'){
 				// Membership declined
 				$result = OC_User_Group_Admin_Util::updateStatus($group["gid"], $user,
