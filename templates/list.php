@@ -28,7 +28,7 @@
 							   value="(max <?php isset($_['uploadMaxHumanFilesize']) ? p($_['uploadMaxHumanFilesize']) : ''; ?>)" />
 						<input type="file" id="file_upload_start" name='files[]'
 							   data-url="<?php p(\OC::$WEBROOT);?>/themes/<?=OC_Util::getTheme();?>/apps/files/ajax/upload.php" />
-						<a href="#" class="btn btn-primary btn-flat"><i class="icon-upload-cloud"></i> <?php p($l->t('Upload'));?></a>
+						<a href="#" class="btn btn-primary btn-flat"><i class="icon-upload"></i> <?php p($l->t('Upload'));?></a>
 				</div>
 				<?php if(!isset($_['dirToken'])):?>
 						<div id="new" class="btn-group">
@@ -76,7 +76,7 @@
 		  <div class="col-xs-5 col-sm-5 text-right">
 			<span id="" class="selectedActions">
 			  <a href="" class="download btn btn-xs btn-default">
-				<i class="icon-download-cloud"></i>
+				<i class="icon-download"></i>
 				<?php p($l->t('Download'))?>
 			  </a>
 			  <a href="" class="delete-selected btn btn-xs btn-danger">
