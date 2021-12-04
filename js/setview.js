@@ -189,12 +189,13 @@ $(document).ready(function(){
 		ownedGroup = $(this).attr('data-id').substr(20);
 		$('ul.nav-sidebar').find('.active').removeClass('active');
 		$(this).children('a').addClass('active');
-		if(typeof OCA.Files=='undefined'){
+		//if(typeof OCA.Files=='undefined'){
 			window.location.href = "/index.php/apps/files?dir=%2F&view=sharingin&owned_group="+ownedGroup ;
-		}
+		/*}
+		 // Not sure what the point of this was..
 		else{
 			OCA.Files.App.setActiveView('sharingin', {silent: false})
-		}
+		}*/
 	});
 
   $('ul.nav-sidebar').on('click', 'li[data-id^="user-groups"]', function(e) {
