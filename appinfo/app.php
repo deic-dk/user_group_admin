@@ -41,7 +41,7 @@ if(isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI']!='/' &&
 		if(!OC_User_Group_Admin_Util::createGroupFolder($group['gid'])){
 			return false;
 		}
-		if((empty($group['hidden']) || $group['hidden']!='yes') && $group['owner']!=$user){
+		if((empty($group['hidden']) || $group['hidden']==='no') && $group['owner']!=$user){
 			OC_User_Group_Admin_Util::shareGroupFolder($user, $group['owner'], $group['gid']);
 		}
 		$order += 1./100;

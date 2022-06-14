@@ -50,8 +50,11 @@ function isReadable($group, $owner, $user) {
 
 function canLeave($group, $owner, $user) {
 	$info = OC_User_Group_Admin_Util::getGroupInfo($group);
-	return checkOwner($user, $owner) ||
-		empty($info['hidden']) || $info['hidden']!=='yes';
+	return (checkOwner($user, $owner) ||
+		empty($info['hidden']) || $info['hidden']==='no') &&
+		// External users cannot leave the group they were invited to.
+		// To delete account they have to send a request to the group owner.
+		!OC_User_Group_Admin_Util::ownerIsCurator($owner, $user);
 }
 
 function doAction($group, $owner, $user){
@@ -100,9 +103,16 @@ function doAction($group, $owner, $user){
 			}
 			break;
 		case "delmember":
+			\OCP\Util::writeLog('User_Group_Admin', 'deleting user '.$_POST['member'].' <-- '.$user.' <-- '.$owner.' <-- '.$group, \OCP\Util::WARN);
 			if(!empty($_POST['member']) && $_POST['member'] != OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER &&
 				(checkOwner($user, $owner) || $_POST['member']==$user)){
 				$result = OC_User_Group_Admin_Util::removeFromGroup($_POST['member'], $group);
+				// We only allow disabling external users here.
+				// Group owners of system groups may disable users via rmmem.php
+				if(!empty($_POST['disable']) && OC_User_Group_Admin_Util::ownerIsCurator($owner, $_POST['member'])){
+					\OCP\Util::writeLog('User_Group_Admin', 'Disabling invited user '.$_POST['member'], \OCP\Util::WARN);
+					OC_User_Group_Admin_Util::disableUser($owner, $group, $_POST['member']);
+				}
 			}
 			elseif(isset($_POST['invitation_email']) && checkOwner($user, $owner)){
 				\OCP\Util::writeLog('User_Group_Admin', 'Removing invited user '.$_POST['invitation_email'], \OCP\Util::WARN);
@@ -111,18 +121,14 @@ function doAction($group, $owner, $user){
 			break;
 		case "disableuser":
 			\OCP\Util::writeLog('User_Group_Admin', 'disabling user '.$_POST['user'].' <-- '.$user.' <-- '.$owner, \OCP\Util::WARN);
-			if(isset($_POST['user']) && $_POST['user']!=$user && checkOwner($user, $owner)){
-				$pending = OC_Preferences::getValue($owner, 'user_group_admin', 'pending_verify_'.$_POST['user'], '');
+			if(isset($_POST['user']) && $_POST['user']!=$user && checkOwner($user, $owner) &&
+					OC_User_Group_Admin_Util::ownerIsCurator($owner, $_POST['user'])){
+				$pending = OC_Preferences::getValue($owner, 'user_group_admin', \OCP\Util::$PENDING_VERIFY_PREFIX.$_POST['user'], '');
 				if(empty($pending)){
 					break;
 				}
 				$result = OC_User_Group_Admin_Util::removeFromGroup($_POST['user'], $group);
-				if(\OCP\App::isEnabled('files_sharding')){
-					\OCA\FilesSharding\Lib::disableUser($_POST['user']);
-					\OCP\Util::writeLog('User_Group_Admin', 'NOTICE: Disabled user '.$_POST['user'].
-							' as requested by '.$owner.' as owner of the group '.$group, \OCP\Util::ERROR);
-					\OC_Preferences::deleteKey($owner, 'user_group_admin', 'pending_verify_'.$user);
-				}
+				OC_User_Group_Admin_Util::disableUser($owner, $group, $_POST['user']);
 			}
 			break;
 		case "setdescription":

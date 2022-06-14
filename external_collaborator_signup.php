@@ -16,7 +16,7 @@ OC_Util::addScript( 'core', 'multiselect' );
 OC_Util::addScript( 'core', 'singleselect' );
 OC_Util::addScript('core', 'jquery.inview');
 
-function checkGroup(&$group, $groupUser){
+function checkGroup(&$group, $user) {
 	if($group["verified"]==OC_User_Group_Admin_Util::$GROUP_INVITATION_OPEN){
 		\OCP\Util::writeLog('User_Group_Admin', 'Code: '.$_REQUEST['code'].'==='.$group["accept"], \OCP\Util::WARN);
 		if($_REQUEST['code']===$group["accept"]){
@@ -97,7 +97,7 @@ function checkGroup(&$group, $groupUser){
 				if(\OCP\App::isEnabled('files_sharding') ){
 					$masterUrl = \OCA\FilesSharding\Lib::getMasterURL();
 				}
-				\OC_Preferences::setValue($owner, 'user_group_admin', 'pending_verify_'.$newuser, -1);
+				\OC_Preferences::setValue($owner, 'user_group_admin', \OCP\Util::$PENDING_VERIFY_PREFIX.$newuser, OC_User_Group_Admin_Util::$GROUP_MEMBERSHIP_PENDING);
 				//\OC_Response::redirect($masterUrl."?username=".$newuser);
 				$theme = new \OC_Defaults();
 				echo "<script type='text/javascript'>var url=window.location.href.replace('code=','nocode='); ".

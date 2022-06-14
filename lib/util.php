@@ -26,9 +26,12 @@ class OC_User_Group_Admin_Util {
 	
 	public static $HIDDEN_GROUP_OWNER = 'hidden_group_owner';
 	public static $UNKNOWN_GROUP_MEMBER = 'unknown_group_member';
+	public static $GROUP_MEMBERSHIP_PENDING = -1;
 	public static $GROUP_INVITATION_OPEN = 0;
 	public static $GROUP_INVITATION_ACCEPTED = 1;
 	public static $GROUP_INVITATION_DECLINED = 2;
+	public static $PENDING_VERIFY_PREFIX = 'pending_verify_';
+	public static $MEMBER_TYPE_EXTERNAL = 'external';
 	
 	/**
 	 * @brief Try to create a new group
@@ -223,7 +226,7 @@ class OC_User_Group_Admin_Util {
 		$owner = $groupInfo['owner'];
 		if($uid!= self::$UNKNOWN_GROUP_MEMBER && self::dbInGroup($uid, $gid, true)){
 			return self::updateStatus($gid, $uid,
-					$uid===$owner||self::dbHiddenGroupExists($gid)||$memberRequest&&$groupInfo['open']=='yes'?
+					($uid===$owner||self::dbHiddenGroupExists($gid)||$memberRequest&&$groupInfo['open']=='yes')?
 					self::$GROUP_INVITATION_ACCEPTED:self::$GROUP_INVITATION_OPEN);
 		}
 		$stmt = OC_DB::prepare("INSERT INTO `*PREFIX*user_group_admin_group_user` ( `gid`, `uid`, `verified`, `accept`, `decline`, `invitation_email`) VALUES( ?, ?, ?, ?, ?, ?)" );
@@ -439,8 +442,8 @@ class OC_User_Group_Admin_Util {
 		$senderName = $defaults->getName();
 		if(\OCP\App::isEnabled('files_sharding') ){
 			$masterUrl = \OCA\FilesSharding\Lib::getMasterURL();
-			$acceptUrl = $masterUrl.'/apps/user_group_admin/index.php?code='.$accept;
-			$declineUrl = $masterUrl.'/apps/user_group_admin/index.php?code='.$decline.'&decline=1';
+			$acceptUrl = rtrim($masterUrl, '/').'/apps/user_group_admin/index.php?code='.$accept;
+			$declineUrl = rtrim($masterUrl, '/').'/apps/user_group_admin/index.php?code='.$decline.'&decline=1';
 		}
 		else{
 			$acceptUrl = OCP\Util::linkToAbsolute('user_group_admin', 'index.php',
@@ -554,6 +557,14 @@ class OC_User_Group_Admin_Util {
 
 	/**
 	* Update user status
+	*
+	* @param unknown $gid
+	* @param unknown $uid
+	* @param unknown $status - $GROUP_INVITATION_ACCEPTED or $GROUP_INVITATION_OPEN
+	* @param boolean $checkOpen
+	* @param string $invitationEmail
+	* @param string $code
+	* @return unknown
 	*/
 	public static function updateStatus($gid, $uid, $status, $checkOpen=false, $invitationEmail='', $code='') {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
@@ -599,6 +610,18 @@ class OC_User_Group_Admin_Util {
 			return false;
 		}
 		return true;
+	}
+	
+	public static function disableUser($owner, $group, $user){
+		$ret = null;
+		if(\OCP\App::isEnabled('files_sharding')){
+			$ret = \OCA\FilesSharding\Lib::disableUser($user);
+			\OCP\Util::writeLog('User_Group_Admin', 'NOTICE: Disabled user '.$user.
+					' as requested by '.$owner.' as owner of the group '.$group, \OCP\Util::ERROR);
+			// User only disabled, not deleted. Keep track of who invited him/her.
+			//\OC_Preferences::deleteKey($owner, 'user_group_admin', \OC_User_Group_Admin_Util::$PENDING_VERIFY_PREFIX.$user);
+		}
+		return $ret;
 	}
 
 	public static function removeFromGroup($uid, $gid, $invitation_email='') {
@@ -713,9 +736,14 @@ class OC_User_Group_Admin_Util {
 		return false;
 	}
 	
-	public static function groupIsHiddenOrOpen($gid) {
+	public static function groupIsHidden($gid) {
 			$groupInfo = self::getGroupInfo($gid);
-			return $groupInfo['hidden']==='yes' || $groupInfo['open']==='yes';
+			return $groupInfo['hidden']==='yes';
+	}
+	
+	public static function groupIsHiddenOrOpen($gid) {
+		$groupInfo = self::getGroupInfo($gid);
+		return $groupInfo['hidden']==='yes' || $groupInfo['open']==='yes';
 	}
 
 	/**
@@ -738,9 +766,34 @@ class OC_User_Group_Admin_Util {
 		$owner = self::dbGetGroupOwner($gid);
 		while($row = $result->fetchRow()){
 			$row['owner'] = $owner;
+			$isExternal = self::dbOwnerIsCurator($owner, $row['uid']);
+			$row['type'] = $isExternal?self::$MEMBER_TYPE_EXTERNAL:'';
 			$users[] = $row;
 		}
 		return $users;
+	}
+	
+	/**
+	 * Check whether a user $owner is responsible for the user $user.
+	 * @param string $owner
+	 * @param string $user
+	 * @return boolean
+	 */
+	public static function ownerIsCurator($owner, $user){
+		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
+			$result = self::dbOwnerIsCurator($owner, $user);
+		}
+		else{
+			$res = \OCA\FilesSharding\Lib::ws('ownerIsCurator', array('owner'=>urlencode($owner), 'user'=>urlencode($user)),
+					false, true, null, 'user_group_admin');
+			$result = (!empty($res) && $res=="yes");
+		}
+		return $result;
+	}
+	
+	public static function dbOwnerIsCurator($owner, $user){
+		$pending = OC_Preferences::getValue($owner, 'user_group_admin', self::$PENDING_VERIFY_PREFIX.$user, '');
+		return !empty($pending);
 	}
 
 	public static function usersInGroup($gid, $search = '', $limit = null, $offset = null) {

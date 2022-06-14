@@ -267,6 +267,12 @@ table#groupstable th .columntitle.name {
 	font-size:80%;
 }
 
+.group_member_external {
+	color:#3d3d5c;
+	font-weight:bold;
+	font-size:80%;
+}
+
 .oc-dialog .icon-cancel-circled {
 	color:#006b93;
 	display:inline;
@@ -356,4 +362,6 @@ input[type="checkbox"][readonly] {
   pointer-events: none;
 }
 
-
+.ui-dialog-group-external #dialogalert{
+	white-space: normal;
+}

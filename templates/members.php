@@ -78,11 +78,14 @@ if($showMembers){
 		}
 		elseif($verified===OC_User_Group_Admin_Util::$GROUP_INVITATION_DECLINED){
 			if($showMembers){
-				$verifiedStr = '<i class="group_declined">'.$l->t("User declined the invitation");
+				$verifiedStr = '<i class="group_declined">'.$l->t("User declined the invitation").'</i>';
 			}
 			else{
 				continue;
 			}
+		}
+		elseif(!empty($member["type"]) && $member["type"]==OC_User_Group_Admin_Util::$MEMBER_TYPE_EXTERNAL){
+			$verifiedStr = '<i class="group_member_external">'.$l->t("External").'</i>';
 		}
 		print_unescaped("<li data-member=\"$uid\" data-invitation-email=\"$invitationEmail\"><span class='left'>$name</span>" .
 			$userStr .

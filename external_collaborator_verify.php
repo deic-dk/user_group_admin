@@ -39,15 +39,13 @@ $tmpl->assign('email', $email);
 
 $owner = \OC_User::getUser();
 $now = time();
-$pending = OC_Preferences::getValue($owner, 'user_group_admin', 'pending_verify_'.$user, '');
-if($pending==-1){
-	\OC_Preferences::setValue($owner, 'user_group_admin', 'pending_verify_'.$user, $now);
+$pending = OC_Preferences::getValue($owner, 'user_group_admin', \OCP\Util::$PENDING_VERIFY_PREFIX.$user, '');
+if($pending==OC_User_Group_Admin_Util::$GROUP_MEMBERSHIP_PENDING){
+	\OC_Preferences::setValue($owner, 'user_group_admin', \OCP\Util::$PENDING_VERIFY_PREFIX.$user, $now);
 	$pending = 'yes';
 }
 elseif(empty($pending) || $now>$pending+24*60*60){
 	$pending = 'no';
-	\OC_Preferences::deleteKey($owner, 'user_group_admin', 'pending_verify_'.$user);
-	\OC_Preferences::setValue($user, 'user_group_admin', 'verified_by', $owner);
 }
 $tmpl->assign('verify_pending', $pending);
 

@@ -307,8 +307,9 @@ function sendInvite(group){
 	$( '#dialogalert' ).parent().find('.ui-dialog-titlebar').show();
 	$( '#dialogalert' ).parent().find('.ui-dialog-buttonpane').show();
 	$( '#dialogalert' ).dialog({
+		dialogClass: 'ui-dialog-group-external',
 		buttons: [ 
-	{ id:'send_emails', text: 'Send', click: function() {
+	{ id:'send_emails',  text: 'Send', click: function() {
 		$.each(myEmailList, function(key, value){
 			OC.UserGroup.sendInvitationEmail(value.trim(), group.trim());
 		});
@@ -375,7 +376,8 @@ $(document).ready(function() {
 					$('#newgroup .editgroup').val("");
 					$('#user_group_admin_holder').hide();
 					location.reload();
-				}else{
+				}
+				else{
 					OC.dialogs.alert( jsondata.data.message , jsondata.data.title );
 				}
 			});
@@ -421,8 +423,8 @@ $(document).ready(function() {
 		ev.stopPropagation();
 		var role = $(this).closest('tr').attr('role') ;
 		var groupSelected = $(this).closest('tr').attr('group') ;
-		var textHtml = $( '#dialogalert' ).html().replace( role == 'owner'?t('user_group_admin', 'Leave'):t('user_group_admin', 'Delete'),
-				role == 'owner'? t('user_group_admin', 'Delete'):t('user_group_admin', 'Leave'));
+		var textHtml = $( '#dialogalert' ).html().replace(role=='owner'?t('user_group_admin', 'leave'):t('user_group_admin', 'delete'),
+				role == 'owner'? t('user_group_admin', 'delete'):t('user_group_admin', 'leave'));
 		 $('#dialogalert').html(textHtml);
 		$('#dialogalert').dialog({ buttons: [ { id:'delete_leave_group', text: role == 'owner'?t('user_group_admin', 'Delete'):t('user_group_admin', 'Leave'),
 				click: function() {
@@ -508,7 +510,9 @@ $(document).ready(function() {
 	$(document).click(function(e){
 		// Close group members dialog if open and clicking outside it
 		if($(".oc-dialog").length &&
-				!$(e.target).parents().filter('.oc-dialog').length && !$(e.target).parents().filter('.ui-dialog').length &&
+				!$(e.target).parents().filter('.oc-dialog').length &&
+				!$(e.target).parents().filter('.ui-dialog').length &&
+				!$(e.target).parents().filter('.oc-dialog-buttonrow').length && 
 				!$(e.target).parents().filter('.name').length) {
 			e.stopPropagation();
 			e.preventDefault();
@@ -574,23 +578,48 @@ $(document).ready(function() {
 		else{
 			OC.dialogs.alert( "Could not delete unidentified member!" ,"Error" ) ;
 		}
-		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), { member : member , group : group , invitation_email: invitation_email,
-				action : "delmember"} , function ( jsondata ){
+		var isExternal = $(this).parents('li').find('i.group_member_external').length;
+		OC.dialogs.confirm('Are you sure you want to remove '+(member?member:invitation_email)+' from '+group+'?', 'Confirm delete',
+			function(res){
+				if(res){
+					if(isExternal){
+						OC.dialogs.notify("Removing an external user from "+group+" will disable the user account"+".\n\n" +
+								"Do you wish to proceed?", "Confirm removal", removeMemberWrapper, true, null, null, OCdialogs.YES_NO_BUTTONS, member, group, invitation_email, true);
+					}
+					else{
+						removeMember(member, group, invitation_email, false);
+					}
+				}
+			},
+			false
+		);
+
+		$('.tipsy').remove();
+	});
+	
+	function removeMemberWrapper(deleteOk, inputVal, member, group, invitation_email, disable){
+		if(deleteOk){
+			removeMember(member, group, invitation_email, disable);
+		}
+	}
+
+	function removeMember(member, group, invitation_email, disable){
+		$.post(OC.filePath('user_group_admin', 'ajax', 'actions.php'), {member: member, group: group , invitation_email: invitation_email, disable: disable,
+		action : "delmember"} , function ( jsondata ){
 			if(jsondata.status == 'success' ) {
-				container.remove();
 				var theint = getMembersCount(group);
 				theint--;
 				setMembersCount(group, theint);
 				var int2 = parseInt($("tr[group='"+group+"']").find("span#nomembers").html(),10)
 				int2--;
 				$("tr[group='"+group+"']").find("span#nomembers").text(int2);
+				$('.dropmembers li[data-member="'+member+'"]').remove();
 			}
 			else{
 				OC.dialogs.alert( jsondata.data.message , jsondata.data.title ) ;
 			}
 		});
-		$('.tipsy').remove();
-	});
+	}
 
 	$('#importnew #import_group_file').change(function() {
 		$('#import_group_form').submit();
