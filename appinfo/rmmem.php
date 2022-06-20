@@ -9,20 +9,20 @@ OCP\App::checkAppEnabled('files_sharding');
 	\OC_Response::redirect($master);
 }*/
 
-$group = $_POST['group'];
+$group = $_GET['group'];
 $owner = OC_User_Group_Admin_Util::getGroupOwner($group);
 $user = OCP\User::getUser();
-$member = $_POST['member']
+$member = $_GET['member'];
 
 $result = false;
 
-if(!empty($_POST['member']) && $_POST['member'] != OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER &&
-		(checkOwner($user, $owner) || $_POST['member']==$user)){
-	$result = OC_User_Group_Admin_Util::removeFromGroup($_POST['member'], $group);
-	if(!empty($_POST['disable']) &&
-			OC_User_Group_Admin_Util:: groupIsHidden($group) &&
-			OC_User_Group_Admin_Util::ownerIsCurator($owner, $user)){
-		$result = $result && OC_User_Group_Admin_Util::disableUser($owner, $group, $user);
+if(!empty($member) && $member != OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER &&
+		(OC_User::isAdminUser($user) || !empty($owner) && $user===$owner || $member==$user)){
+			$result = OC_User_Group_Admin_Util::removeFromGroup($member, $group);
+			if(!empty($_GET['disable']) &&
+				//OC_User_Group_Admin_Util:: groupIsHidden($group) &&
+					OC_User_Group_Admin_Util::ownerIsCurator($owner, $member)){
+				$result = $result && OC_User_Group_Admin_Util::disableUser($owner, $group, $member);
 	}
 }
 

@@ -793,6 +793,7 @@ class OC_User_Group_Admin_Util {
 	
 	public static function dbOwnerIsCurator($owner, $user){
 		$pending = OC_Preferences::getValue($owner, 'user_group_admin', self::$PENDING_VERIFY_PREFIX.$user, '');
+		\OCP\Util::writeLog('User_Group_Admin', 'Curator: '.$owner.' '.$user.' '.$pending.' '.empty($pending), \OCP\Util::WARN);
 		return !empty($pending);
 	}
 
