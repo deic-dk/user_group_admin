@@ -111,7 +111,7 @@ function doAction($group, $owner, $user){
 				// Group owners of system groups may disable users via rmmem.php
 				if(!empty($_POST['disable']) && OC_User_Group_Admin_Util::ownerIsCurator($owner, $_POST['member'])){
 					\OCP\Util::writeLog('User_Group_Admin', 'Disabling invited user '.$_POST['member'], \OCP\Util::WARN);
-					OC_User_Group_Admin_Util::disableUser($owner, $group, $_POST['member']);
+					OC_User_Group_Admin_Util::disableUser($owner, $_POST['member']);
 				}
 			}
 			elseif(isset($_POST['invitation_email']) && checkOwner($user, $owner)){
@@ -128,7 +128,7 @@ function doAction($group, $owner, $user){
 					break;
 				}
 				$result = OC_User_Group_Admin_Util::removeFromGroup($_POST['user'], $group);
-				OC_User_Group_Admin_Util::disableUser($owner, $group, $_POST['user']);
+				OC_User_Group_Admin_Util::disableUser($owner, $_POST['user']);
 			}
 			break;
 		case "setdescription":

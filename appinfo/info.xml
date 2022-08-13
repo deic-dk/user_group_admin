@@ -9,6 +9,5 @@
 	<require>4.93</require>
 	<remote>
 		<group>appinfo/remote.php</group>
-		<disableuser>appinfo/rmmem.php</disableuser>
 	</remote>
 	</info>

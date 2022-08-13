@@ -218,10 +218,12 @@ class OC_User_Group_Admin_Util {
 	 * @param boolean $memberRequest
 	 * 					Whether this was initiated by a user requesting group membership
 	 * 					or a group owner adding a user.
+	 * @param boolean $verified
+	 * 					True to skip verfication.
 	 * @return bool Adds a user to a group.
 	 */
 	public static function dbAddToGroup($uid, $gid, $accept, $decline, $memberRequest=false,
-			$email='') {
+			$email='', $verified=false) {
 		$groupInfo = self::getGroupInfo($gid);
 		$owner = $groupInfo['owner'];
 		if($uid!= self::$UNKNOWN_GROUP_MEMBER && self::dbInGroup($uid, $gid, true)){
@@ -261,7 +263,7 @@ class OC_User_Group_Admin_Util {
 			$stmt->execute ( array (
 					$gid,
 					$uid,
-					self::$GROUP_INVITATION_OPEN,
+					$verified?self::$GROUP_INVITATION_ACCEPTED:self::$GROUP_INVITATION_OPEN,
 					$accept,
 					$decline,
 					$email
@@ -271,15 +273,16 @@ class OC_User_Group_Admin_Util {
 	}
 
 	public static function addToGroup($uid, $gid, $accept, $decline, $memberRequest=false,
-			$email='') {
+			$email='', $verified=false) {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-			$result = self::dbAddToGroup($uid, $gid, $accept, $decline, $memberRequest, $email);
+			$result = self::dbAddToGroup($uid, $gid, $accept, $decline, $memberRequest, $email, $verified);
 		}
 		else{
 			$result = \OCA\FilesSharding\Lib::ws('groupActions', array(
 					'name'=>urlencode($gid), 'userid'=>$uid, 'action'=>'newMember',
 					'accept'=>$accept, 'decline'=>$decline,
 					'memberRequest'=>$memberRequest?'yes':'no',
+					'verified'=>$verified?'yes':'no',
 					'email'=>empty($email)?'':$email),
 					false, true, null, 'user_group_admin');
 		}
@@ -612,18 +615,30 @@ class OC_User_Group_Admin_Util {
 		return true;
 	}
 	
-	public static function disableUser($owner, $group, $user){
+	public static function disableUser($owner, $user){
 		$ret = null;
 		if(\OCP\App::isEnabled('files_sharding')){
 			$ret = \OCA\FilesSharding\Lib::disableUser($user);
 			\OCP\Util::writeLog('User_Group_Admin', 'NOTICE: Disabled user '.$user.
-					' as requested by '.$owner.' as owner of the group '.$group, \OCP\Util::ERROR);
+					' as requested by '.$owner, \OCP\Util::WARN);
 			// User only disabled, not deleted. Keep track of who invited him/her.
 			//\OC_Preferences::deleteKey($owner, 'user_group_admin', \OC_User_Group_Admin_Util::$PENDING_VERIFY_PREFIX.$user);
 		}
 		return $ret;
 	}
 
+	public static function enableUser($owner, $user){
+		$ret = null;
+		if(\OCP\App::isEnabled('files_sharding')){
+			$ret = \OCA\FilesSharding\Lib::enableUser($user);
+			\OCP\Util::writeLog('User_Group_Admin', 'NOTICE: Enabled user '.$user.
+					' as requested by '.$owner, \OCP\Util::WARN);
+			// User only disabled, not deleted. Keep track of who invited him/her.
+			//\OC_Preferences::deleteKey($owner, 'user_group_admin', \OC_User_Group_Admin_Util::$PENDING_VERIFY_PREFIX.$user);
+		}
+		return $ret;
+	}
+	
 	public static function removeFromGroup($uid, $gid, $invitation_email='') {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
 			$result = self::dbRemoveFromGroup($uid, $gid, $invitation_email);

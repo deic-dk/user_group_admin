@@ -18,6 +18,7 @@ $accept = isset($_GET['accept'])?$_GET['accept']:'';
 $decline = isset($_GET['decline'])?$_GET['decline']:'';
 $code = isset($_GET['code'])?$_GET['code']:'';
 $description = isset($_GET['description'])?$_GET['description']:'';
+$verified = empty($_GET['verified'])?false:$_GET['verified']=='yes';
 $private = empty($_GET['privateGroup'])?true:$_GET['privateGroup']!='no';
 $open = isset($_GET['openGroup'])?$_GET['openGroup']=='yes':false;
 $invitation_email = isset($_GET['invitation_email'])?$_GET['invitation_email']:'';
@@ -28,7 +29,7 @@ switch ($action) {
 		break;
 	case "newMember":
 		$result = OC_User_Group_Admin_Util::dbAddToGroup($userid, $name, $accept, $decline, $memberRequest,
-			$invitationEmail);
+		$invitationEmail, $verified);
 		break;
 	case "deleteGroup":
 		$result = OC_User_Group_Admin_Util::dbDeleteGroup($name);
