@@ -168,9 +168,11 @@ function checkGroup($group, $groupUser){
 	$acceptCode = $group["accept"];
 	$declineCode = $group["decline"];
 	$verified = $group["verified"];
-	if($verified==OC_User_Group_Admin_Util::$GROUP_INVITATION_OPEN &&
+	\OCP\Util::writeLog('User_Group_Admin', 'Checking group: '.$group["gid"]." ".$_GET['code'].
+			" ".$acceptCode." ".$verified, \OCP\Util::DEBUG);
+	if(((int)$verified)===OC_User_Group_Admin_Util::$GROUP_INVITATION_OPEN &&
 			($_GET['code']===$acceptCode || $_GET['code']===$declineCode)){
-		\OCP\Util::writeLog('User_Group_Admin', 'GROUP: '.$group["gid"], \OCP\Util::WARN);
+		\OCP\Util::writeLog('User_Group_Admin', 'group: '.$group["gid"], \OCP\Util::WARN);
 		if(OC_User_Group_Admin_Util::updateStatus($groupname, $groupUser,
 				$_GET['code']===$acceptCode?OC_User_Group_Admin_Util::$GROUP_INVITATION_ACCEPTED:
 				OC_User_Group_Admin_Util::$GROUP_INVITATION_DECLINED, true, $group["invitation_email"],

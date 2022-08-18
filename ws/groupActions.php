@@ -9,6 +9,7 @@ if(!OCA\FilesSharding\Lib::checkIP()){
 }
 $action = isset($_GET['action'])?$_GET['action']:null;
 $userid = isset($_GET['userid'])?$_GET['userid']:'';
+$user = isset($_GET['user'])?$_GET['user']:''; // When set, ID of logged-in user. Then $userid is uid in user_group_admin_group_user
 $name = isset($_GET['name'])?$_GET['name']:null;
 $quota = isset($_GET['quota'])?$_GET['quota']:'';
 $usage = isset($_GET['usage'])?$_GET['usage']:0;
@@ -40,7 +41,7 @@ switch ($action) {
 	case "updateStatus":
 		$status = isset($_GET['status'])?$_GET['status']:null;
 		$checkOpen = isset($_GET['checkOpen'])?$_GET['checkOpen']==='yes':false;
-		$result = OC_User_Group_Admin_Util::dbUpdateStatus($name, $userid, $status, $checkOpen, $invitationEmail, $code);
+		$result = OC_User_Group_Admin_Util::dbUpdateStatus($name, $userid, $status, $checkOpen, $invitationEmail, $code, $user);
 		break;
 	case "setUserFreeQuota":
 		$result = OC_User_Group_Admin_Util::dbSetUserFreeQuota($name, $quota);

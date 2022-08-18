@@ -492,15 +492,55 @@ class OC_User_Group_Admin_Util {
 				\OCP\Util::WARN);
 		return !empty($res);
 	}
+	
+	public static function dbGetUserFromEmail($email){
+		$stmt = \OCP\DB::prepare( "SELECT `userid`  FROM `*PREFIX*preferences` WHERE `configkey` = ? AND `configvalue` = ?" );
+		$res = $stmt->execute(array('email', $email));
+		if($res){
+			$results = $res->fetchAll();
+			if(count($results)>1){
+				\OCP\Util::writeLog('User_Group_Admin', 'ERROR: Multiple users have the same email '.serialize($results), \OCP\Util::ERROR);
+				return '';
+			}
+		}
+		return empty($results)?'':$results[0]['userid'];
+	}
 
-	public static function dbUpdateStatus($gid, $uid, $status, $checkOpen=false, $invitationEmail='', $code='') {
-		$user = \OCP\User::getUser();
-		if(empty($user) && !empty($invitationEmail)){
+	/**
+	 * Update user status
+	 *
+	 * @param string $gid
+	 * @param string $uid uid of row in user_group_admin_group_user
+	 * @param int $status - $GROUP_INVITATION_ACCEPTED or $GROUP_INVITATION_OPEN
+	 * @param boolean $checkOpen
+	 * @param string $invitationEmail
+	 * @param string $code
+	 * @param string $user ID user logged in on silo from where the ws call to this method originates
+	 * @return unknown
+	 */
+	public static function dbUpdateStatus($gid, $uid, $status, $checkOpen=false, $invitationEmail='', $code='', $user='') {
+		$currentUser = \OCP\User::getUser();
+		if(empty($currentUser) && (!empty($user)||!empty($invitationEmail))){
+			// The user may have been logged in, but somehow lost the login session,
+			// either from timeout or a server restart.
+			// To try and cover this, we check if the invitation email matches an existing email
+			$existingUser = '';
+			if(!empty($user)){
+				$existingUser = $user;
+			}
+			if(empty($existingUser) && !empty($invitationEmail)){
+				$existingUser = self::dbGetUserFromEmail($invitationEmail);
+			}
 			// When signing up external users, the invitation email is used as uid.
-			$actualUser = $invitationEmail;
+			if(!empty($existingUser)){
+				$actualUser = $existingUser;
+			}
+			else{
+				$actualUser = $invitationEmail;
+			}
 		}
 		else{
-			$actualUser = $user;
+			$actualUser = $currentUser;
 		}
 		if(!empty($actualUser)){
 			// First clean up potential existing group membership
@@ -561,9 +601,9 @@ class OC_User_Group_Admin_Util {
 	/**
 	* Update user status
 	*
-	* @param unknown $gid
-	* @param unknown $uid
-	* @param unknown $status - $GROUP_INVITATION_ACCEPTED or $GROUP_INVITATION_OPEN
+	* @param string $gid
+	* @param string $uid uid of row in user_group_admin_group_user
+	* @param int $status - $GROUP_INVITATION_ACCEPTED or $GROUP_INVITATION_OPEN
 	* @param boolean $checkOpen
 	* @param string $invitationEmail
 	* @param string $code
@@ -574,9 +614,10 @@ class OC_User_Group_Admin_Util {
 			$result = self::dbUpdateStatus($gid, $uid, $status, $checkOpen, $invitationEmail, $code);
 		}
 		else{
+			$user = \OCP\User::getUser();
 			$result = \OCA\FilesSharding\Lib::ws('groupActions', array(
 					'name'=>urlencode($gid), 'userid'=>$uid, 'status' => $status, 'action'=>'updateStatus',
-					'checkOpen'=>($checkOpen?'yes':'no'), 'email' => $invitationEmail, 'code' => $code),
+					'checkOpen'=>($checkOpen?'yes':'no'), 'email' => $invitationEmail, 'code' => $code, 'user'=>$user),
 					false, true, null, 'user_group_admin');
 		}
 		return $result;
