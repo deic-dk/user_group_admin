@@ -97,7 +97,7 @@ function checkGroup(&$group, $user) {
 				if(\OCP\App::isEnabled('files_sharding') ){
 					$masterUrl = \OCA\FilesSharding\Lib::getMasterURL();
 				}
-				\OC_Preferences::setValue($owner, 'user_group_admin', \OCP\Util::$PENDING_VERIFY_PREFIX.$newuser, OC_User_Group_Admin_Util::$GROUP_MEMBERSHIP_PENDING);
+				\OC_Preferences::setValue($owner, 'user_group_admin', OC_User_Group_Admin_Util::$PENDING_VERIFY_PREFIX.$newuser, OC_User_Group_Admin_Util::$GROUP_MEMBERSHIP_PENDING);
 				//\OC_Response::redirect($masterUrl."?username=".$newuser);
 				$theme = new \OC_Defaults();
 				echo "<script type='text/javascript'>var url=window.location.href.replace('code=','nocode='); ".
