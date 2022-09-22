@@ -48,42 +48,7 @@ OCA.UserGroups.App = {
 			);
 		}
 	},
-	// TODO: delete this function
-  reinitView: function(view, path){
-		// The stuff below works, but keeps the hover bars with only default file actions
-		OCA.Files.App.setActiveView('files'/*$(this).attr('data-id')*/, {silent: true});
-		OCA.Files.App.files.initialize();
-		$('#controls #breadcrumb-container .breadcrumb').remove();
-		if($('tfoot .summary').length>1){
-			$('tfoot .summary').first().remove();
-		}
 
-		var fileActions = new OCA.Files.FileActions();
-		// default actions
-		fileActions.registerDefaultActions();
-		// legacy actions
-		fileActions.merge(window.FileActions);
-		// regular actions
-		fileActions.merge(OCA.Files.fileActions);
-		
-		OCA.Files.App.fileList._onActionsUpdated = _.bind(this._onActionsUpdated, this);
-		OCA.Files.fileActions.on('setDefault.app-files', this._onActionsUpdated);
-		OCA.Files.fileActions.on('registerAction.app-files', this._onActionsUpdated);
-		window.FileActions.on('setDefault.app-files', this._onActionsUpdated);
-		window.FileActions.on('registerAction.app-files', this._onActionsUpdated);
-
-		OCA.Files.App.fileList.initialize(view,
-				{scrollContainer: $('#app-content'), dragOptions: OCA.Files.dragOptions, folderDropOptions: OCA.Files.folderDropOptions,
-				fileActions: fileActions, allowLegacyActions: true});
-		OCA.Files.App.fileList.changeDirectory(path, true, true);
-		
-		//if(typeof OCA.Meta_data.App.tag_semaphore == 'undefined' && typeof OCA.Meta_data.App.modifyFilelist != 'undefined'){
-		//	OCA.Meta_data.App.modifyFilelist();
-		//}		
-		//$('#app-navigation ul li[data-id="'+$(this).attr('data-id')+'"] a').click();
-		//window.location.href = "/index.php/apps/files?view=" + $(this).attr('data-id')+"&dir="+$(this).attr('data-path');
-		
-  },
 	fixGroupLinks:function(group){
 		if(typeof group === 'undefined'){
 			return false;
@@ -120,7 +85,7 @@ OCA.UserGroups.App = {
 		OC.Upload.init(group);
 		//if(!OCA.Files.App.fileList.modified){
 		if(!OCA.UserGroups.FileList.modified){
-			OCA.Meta_data.App.modifyFilelist(OCA.UserGroups.FileList);
+			OCA.Meta_data.App.modifyNextPage(OCA.UserGroups.FileList);
 		}
 		OCA.Files.App.fileList.modified = true;
 		OCA.UserGroups.FileList.modified = true;
@@ -189,18 +154,29 @@ $(document).ready(function(){
 		ownedGroup = $(this).attr('data-id').substr(20);
 		$('ul.nav-sidebar').find('.active').removeClass('active');
 		$(this).children('a').addClass('active');
-		//if(typeof OCA.Files=='undefined'){
+		if(typeof OCA.Files=='undefined'){
 			window.location.href = "/index.php/apps/files?dir=%2F&view=sharingin&owned_group="+ownedGroup ;
-		/*}
-		 // Not sure what the point of this was..
+		}
 		else{
-			OCA.Files.App.setActiveView('sharingin', {silent: false})
-		}*/
+			e.preventDefault();
+			e.stopPropagation();
+			OCA.Files.App.setActiveView('sharingin', {silent: false, owned_group: ownedGroup});
+			$('ul.nav-sidebar').find('.active').removeClass('active');
+			$(this).children('a').addClass('active');
+			//OCA.Files.App._changeUrl('sharingin', '/');
+			//OCA.Files.App.navigation.getActiveContainer().trigger(new $.Event('urlChanged', {view: 'sharingin', dir: '/'}));
+		}
 	});
 
   $('ul.nav-sidebar').on('click', 'li[data-id^="user-groups"]', function(e) {
 		$('ul.nav-sidebar').find('.active').removeClass('active');
 		$(this).children('a').addClass('active');
+		// Clear remaining crumb entries
+		if(typeof OCA.Files.App.fileList.breadcrumb!='undefined' && OCA.Files.App.fileList.breadcrumb!=null){
+			OCA.Files.App.fileList.breadcrumb.$el.children().not(':first').remove();
+			OCA.Files.App.fileList.breadcrumb.$el.children().first().addClass('last').find('i').removeClass('invert-image') ;
+		}
+		//
 		if($("div[id='app-content-"+$(this).attr('data-id').replace(/(:|\.|\[|\]|,|=|\')/g, "\\$1" )+"']").length !== 0){
 			$('#app-navigation ul li[data-id="'+$(this).attr('data-id').replace(/(:|\.|\[|\]|,|=|\')/g, "\\$1")+'"] a').click();
 		}
@@ -223,6 +199,9 @@ $(document).ready(function(){
 			if(typeof OCA.UserGroups.App.oldFileList!='undefined'){
 				OCA.Files.App.fileList = OCA.UserGroups.App.oldFileList;
 			}
+			// Leaving spy mode
+			console.log("Leaving spy mode");
+			delete(OCA.Files.App.fileList.ownedGroup);
 		}
 	});
 
