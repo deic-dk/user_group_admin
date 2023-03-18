@@ -31,7 +31,7 @@
 			</div>
 			<div id="joingroup" class="apanel">
 				<span class="spanpanel" >
-					<input class="editgroup ui-autocomplete-group" type="text" placeholder="<?php p($l->t("Search groups"));?>" />
+					<input id="choose-group" class="editgroup ui-autocomplete-group" type="text" placeholder="<?php p($l->t("Search groups"));?>" />
 					<span class="newgroup-span">
 						<div id="join_group" class="btn-group" original-title="">
 							<a class="btn btn-default btn-flat" href="#"><?php p($l->t("Join"));?></a>

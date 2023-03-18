@@ -61,9 +61,10 @@ OC.UserGroup = {
 	},
 	
 	initGroupDropDown : function() {
-		$('.ui-autocomplete-group').autocomplete({
+		$('#choose-group').autocomplete({
 			minLength : 1,
 			source : function(search, response) {
+				$('#choose-group').addClass('loading-small');
 				$.get(OC.filePath('user_group_admin', 'ajax', 'searchgroups.php'), {
 					search : search.term},
 					function(result) {
@@ -71,8 +72,13 @@ OC.UserGroup = {
 						$.each(result, function(key, value){
 							data.push({'label': value.gid, 'value': value});
 						});
+						$('#choose-group').removeClass('loading-small');
 						if(data.length > 0) {
-							response(data);
+							$( "#choose-group" ).autocomplete( "option", "autoFocus", true );
+							$.when(response(data)).then($(".ui-autocomplete").show());
+						}
+						else{
+							response();
 						}
 					});
 			},
@@ -397,6 +403,7 @@ $(document).ready(function() {
 		// This gets hidden when showing alerts...
 		$('.ui-dialog-titlebar').show();
 		$('.ui-dialog-buttonpane').show();
+		$('#dialogalert').addClass('wrap');
 		$('#dialogalert').dialog({ buttons: [ { id:'join_group', text: 'Join', click: function() {
 			OC.UserGroup.joinGroup($('#joingroup .editgroup').val());
 			$(this).dialog( 'close' );
