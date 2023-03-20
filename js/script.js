@@ -220,7 +220,8 @@ function showMembers(group, role, info){
 
 	$('body').append('<div class="modalOverlay">');
 
-	$('.oc-dialog-close').live('click', function(ev) {
+	$('.oc-dialog-close').click(function(ev) {
+		alert();
 		if($('.ui-dialog .group .invitemembers').length && $('.group textarea.description').length &&
 				!$('.group textarea.description').is('[readonly]')){
 			saveDescription();
