@@ -430,9 +430,11 @@ class OC_User_Group_Admin_Util {
 		}
 		catch(\Exception $e){
 			\OCP\Util::writeLog('User_Group_Admin',
-				'A problem occurred while sending the e-mail. Please revisit your settings.',
+				'A problem occurred while sending the e-mail. Please revisit your mail settings. '.$e->getMessage(),
 				\OCP\Util::ERROR);
+			return false;
 		}
+		return true;
 	}
 	
 	public static function sendVerificationToExternal($email, $accept, $decline, $gid) {
@@ -467,9 +469,11 @@ class OC_User_Group_Admin_Util {
 		}
 		catch(\Exception $e){
 			\OCP\Util::writeLog('User_Group_Admin',
-					'A problem occurred while sending the e-mail to '.$email.'. Please revisit your settings.',
+					'A problem occurred while sending the e-mail to '.$email.'. Please revisit your email settings. '.$e->getTraceAsString(),
 					\OCP\Util::ERROR);
+			return false;
 		}
+		return true;
 	}
 	
 	/**

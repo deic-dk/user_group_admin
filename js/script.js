@@ -221,7 +221,6 @@ function showMembers(group, role, info){
 	$('body').append('<div class="modalOverlay">');
 
 	$('.oc-dialog-close').click(function(ev) {
-		alert();
 		if($('.ui-dialog .group .invitemembers').length && $('.group textarea.description').length &&
 				!$('.group textarea.description').is('[readonly]')){
 			saveDescription();
@@ -427,6 +426,7 @@ $(document).ready(function() {
 		$('#joingroup').slideToggle();
 	});
 
+	$("#groupstable td .delete-group").off();
 	$("#groupstable td .delete-group").live('click', function(ev) {
 		ev.stopPropagation();
 		var role = $(this).closest('tr').attr('role') ;
@@ -465,12 +465,14 @@ $(document).ready(function() {
 		}]});
 	});	
 
+	$("#export-group").off();
 	$("#export-group").live('click', function(e) {
 		e.preventDefault();
 		var groupSelected = $('.grouptitle').attr('group');
 		OC.redirect(OC.linkTo('user_group_admin', 'ajax/export.php') + '?group=' + groupSelected);
 	});
 
+	$("#invite").off();
 	$("#invite").live('click', function(event) {
 		OC.UserGroup.groupSelected = $('.grouptitle').attr('group');
 		$(".userselect").toggle();
@@ -486,6 +488,7 @@ $(document).ready(function() {
 		});
 	});
 	
+	$("#invite-guests").off();
 	$("#invite-guests").live('click', function(event) {
 		OC.UserGroup.groupSelected = $('.grouptitle').attr('group');
 		$(".emailaddresses").toggle();
@@ -500,6 +503,7 @@ $(document).ready(function() {
 		});
 	});
 
+	$('#show_owned_group_folders').off();
 	$('#show_owned_group_folders').live('click', function(ev){
 		ev.preventDefault();
 		ev.stopPropagation();
@@ -507,13 +511,13 @@ $(document).ready(function() {
 	});
 
 	// Deal with strange jquery perhaps-bug: clicking in dialog causes scroll up. So we scroll to bottom if the click is on one of the buttons there.
-	$(document).mousedown(function(e){
+	/*$(document).mousedown(function(e){
 		if(($(e.target).parents().filter('.oc-dialog').length || $(e.target).parents().filter('.ui-dialog').length ||
 				$(e.target).parents().filter('.name').length) && $('.ui-dialog-content').length &&
 				(e.target.id=='invite' || e.target.id=='invite-guests' || e.target.id=='export-group' || e.target.id=='setfreequota')){
 			$('.ui-dialog-content').scrollTop($('.ui-dialog-content')[0].scrollHeight);
 		}
-	});
+	});*/
 
 	$(document).click(function(e){
 		// Close group members dialog if open and clicking outside it

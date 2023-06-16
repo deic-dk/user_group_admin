@@ -172,8 +172,12 @@ function doAction($group, $owner, $user){
 				if(!empty($_POST['email']) && empty($_POST['member'])){
 					OC_User_Group_Hooks::groupShare($group,
 						OC_User_Group_Admin_Util::$UNKNOWN_GROUP_MEMBER, $owner);
-					OC_User_Group_Admin_Util::sendVerificationToExternal($_POST['email'], $accept, $decline, $group);
-					OCP\JSON::success();
+					if(OC_User_Group_Admin_Util::sendVerificationToExternal($_POST['email'], $accept, $decline, $group)){
+						OCP\JSON::success();
+					}
+					else{
+						OCP\JSON::error(array('data' => array('title'=> 'Mail error', 'message' => 'Mail could not be sent...')));
+					}
 				}
 				else{
 					OC_User_Group_Hooks::groupShare($group, $_POST['member'], $owner, $memberRequest, $accept, $decline);
