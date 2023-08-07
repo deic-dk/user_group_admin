@@ -3,9 +3,18 @@
 OCP\JSON::checkAppEnabled('user_group_admin');
 OCP\JSON::checkAppEnabled('files_sharding');
 
-if(!OCA\FilesSharding\Lib::checkIP()){
-	http_response_code(401);
-	exit;
+$user = OCP\USER::getUser();
+$allowedQueryUser = trim(\OCP\Config::getSystemValue('vlantrusteduser', ''));
+
+// This is to allow ScienceRepository/Zenodo to query for user matching orcid
+if(empty($user)){
+	$user = \OC_Chooser::checkIP();
+}
+if(empty($user) || $user!=$allowedQueryUser){
+	if(!OCA\FilesSharding\Lib::checkIP()){
+		http_response_code(401);
+		exit;
+	}
 }
 
 $onlyVerified = isset($_GET['only_verified'])&&$_GET['only_verified']==='yes';
