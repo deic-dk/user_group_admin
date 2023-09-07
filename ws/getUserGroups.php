@@ -6,7 +6,7 @@ OCP\JSON::checkAppEnabled('files_sharding');
 $user = OCP\USER::getUser();
 $allowedQueryUser = trim(\OCP\Config::getSystemValue('vlantrusteduser', ''));
 
-// This is to allow ScienceRepository/Zenodo to query for user matching orcid
+// This is to allow file selection of ScienceRepository/Zenodo to support group folders
 if(empty($user)){
 	$user = \OC_Chooser::checkIP();
 }
