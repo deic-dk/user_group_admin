@@ -23,6 +23,7 @@ $verified = empty($_GET['verified'])?false:$_GET['verified']=='yes';
 $private = empty($_GET['privateGroup'])?true:$_GET['privateGroup']!='no';
 $open = isset($_GET['openGroup'])?$_GET['openGroup']=='yes':false;
 $invitation_email = isset($_GET['invitation_email'])?$_GET['invitation_email']:'';
+$non_billed_bytes = isset($_GET['non_billed_bytes'])?$_GET['non_billed_bytes']:0;
 
 switch ($action) {
 	case "newGroup":
@@ -53,7 +54,7 @@ switch ($action) {
 		$result = OC_User_Group_Admin_Util::dbUpdateGroupUsage($userid, $name, $usage);
 		break;
 	case "getGroupUsageCharge":
-		$result = OC_User_Group_Admin_Util::dbGetGroupUsageCharge($name);
+		$result = OC_User_Group_Admin_Util::dbGetGroupUsageCharge($name, $non_billed_bytes);
 		break;
 	case "setDescription":
 		$result = OC_User_Group_Admin_Util::setDescription($description, $name);

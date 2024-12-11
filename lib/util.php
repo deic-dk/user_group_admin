@@ -963,31 +963,41 @@ class OC_User_Group_Admin_Util {
 		return !empty($info)&&isset($info['owner'])?$info['owner']:null;
 	}
 	
-	public static function getGroupUsageCharge($group) {
+	public static function getGroupUsageCharge($group, $nonBilledBytes=0) {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-			$result = self::dbGetGroupUsageCharge($group);
+			$result = self::dbGetGroupUsageCharge($group, $nonBilledBytes);
 		}
 		else{
 			$result = \OCA\FilesSharding\Lib::ws('groupActions',
-					array('action'=>'getGroupUsageCharge', 'name'=>urlencode($group)), false, true, null, 'user_group_admin');
+					array('action'=>'getGroupUsageCharge', 'name'=>urlencode($group), 'non_billed_bytes'=>,
+							$nonBilledBytes),
+					false, true, null, 'user_group_admin');
 		}
 		return $result;
 	}
 	
-	public static function dbGetGroupUsageCharge($group) {
+	public static function dbGetGroupUsageCharge($group, $freeBytes=0) {
 		if(!\OCP\App::isEnabled('files_sharding') || !\OCP\App::isEnabled('files_accounting')){
 			return 0;
 		}
 		$sql = 'SELECT * FROM `*PREFIX*user_group_admin_group_user` WHERE `gid` = ?';
 		$stmt = OC_DB::prepare($sql);
 		$result = $stmt->execute(array($group));
-		$charge = 0;
+		$charge = 0.0;
+		$billedBytesForGroup = 0;
 		while($row = $result->fetchRow()){
 			$row = $result->fetchRow();
 			$charges = \OCA\Files_Accounting\Storage_Lib::getChargeForUserServers($row['uid']);
-			$charge += round(((int)$row['files_usage']) * $charges['charge_home'] / pow(1024, 3), 3);
+			if($row['files_usage'] <= $freeBytes){
+				$freeBytes = $freeBytes - $row['files_usage'];
+			}
+			else{
+				$billedBytesForGroup = ((int)$row['files_usage']) -((int) $freeBytes);
+				$freeBytes = 0;
+				$charge += round($billedBytesForGroup * $charges['charge_home'] / pow(1024, 3), 3);
+			}
 		}
-		return $charge;
+		return array('charge'=>$charge, 'remaining_free_bytes'=>$freeBytes);
 	}
 	
 	public static function getGroupUsage($group, $user=null) {
