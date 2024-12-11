@@ -969,8 +969,8 @@ class OC_User_Group_Admin_Util {
 		}
 		else{
 			$result = \OCA\FilesSharding\Lib::ws('groupActions',
-					array('action'=>'getGroupUsageCharge', 'name'=>urlencode($group), 'non_billed_bytes'=>,
-							$nonBilledBytes),
+					array('action'=>'getGroupUsageCharge', 'name'=>urlencode($group),
+							'non_billed_bytes'=>$nonBilledBytes),
 					false, true, null, 'user_group_admin');
 		}
 		return $result;
