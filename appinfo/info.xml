@@ -8,6 +8,9 @@
 	<author>Jorge Rafael Garcia Ramos </author>
 	<require>4.93</require>
 	<remote>
-		<group>appinfo/remote.php</group>
+		<groupfolders>appinfo/remote.php</groupfolders>
 	</remote>
-	</info>
+  <remote>
+    <groupadmin>appinfo/api.php</groupadmin>
+  </remote>
+ 	</info>

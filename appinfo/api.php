@@ -9,16 +9,21 @@ OCP\App::checkAppEnabled('files_sharding');
 	\OC_Response::redirect($master);
 }*/
 
+global $action, $group, $owner, $user, $member, $msg;
+
 $group = empty($_GET['group'])?'':$_GET['group'];
 $owner = empty($group)?'':OC_User_Group_Admin_Util::getGroupOwner($group);
 $user = OCP\User::getUser();
 $member = empty($_GET['member'])?'':$_GET['member'];
 $action = isset($_GET['action'])?$_GET['action']:null;
+$format = empty($_GET['format'])?'':$_GET['format'];
 
 $msg = empty($owner)&&!in_array($action, ["disableUser", "enableUser", "createGroup"])?"No such group":"";
 
+\OC_Log::write('saml', 'Managing group: '.$user. ' --> '.$group. ' --> '.$action, \OC_Log::WARN);
+
 $result = false;
-if(checkPermissions($user, $owner)){
+if(checkPermissions()){
 	switch ($action) {
 		case "disableUser":
 			$result = disableUser();
@@ -51,7 +56,14 @@ else{
 
 if($result){
 	if($action=="listMembers"){
-		OCP\JSON::encodedPrint($result);
+		if(!empty($format) && $format=="text"){
+			foreach($result['members'] as $member){
+				print($member['uid']."\n");
+			}
+		}
+		else{
+			OCP\JSON::encodedPrint($result);
+		}
 	}
 	else{
 		OCP\JSON::success(empty($msg)?[]:['message'=>$msg]);
@@ -64,6 +76,7 @@ else{
 // Basic permission checks
 function checkPermissions() {
 	global $action, $group, $owner, $user, $member;
+	\OC_Log::write('saml', 'Checking permissions: '.$user. ' --> '.$group. ' --> '.$action, \OC_Log::WARN);
 	return !empty($user) && (!empty($group)||in_array($action, ["disableUser", "enableUser", "createGroup"])) &&
 	
 	($action=="listMembers" && OC_User_Group_Admin_Util::inGroup($user, $group) &&
