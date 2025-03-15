@@ -61,6 +61,12 @@ if($result){
 				print($member['uid']."\n");
 			}
 		}
+		elseif(!empty($format) && $format=="x509"){
+			$masterfq = \OCP\Config::getSystemValue('masterfq', $_SERVER['HTTP_HOST']);
+			foreach($result['members'] as $member){
+				print("O=".$masterfq.",CN=".$member['uid']."\n");
+			}
+		}
 		else{
 			OCP\JSON::encodedPrint($result);
 		}
