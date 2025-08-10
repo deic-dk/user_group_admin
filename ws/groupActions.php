@@ -21,13 +21,14 @@ $code = isset($_GET['code'])?$_GET['code']:'';
 $description = isset($_GET['description'])?$_GET['description']:'';
 $verified = empty($_GET['verified'])?false:$_GET['verified']=='yes';
 $private = empty($_GET['privateGroup'])?true:$_GET['privateGroup']!='no';
+$hidden = empty($_GET['hidden'])?null:$_GET['hidden'];
 $open = isset($_GET['openGroup'])?$_GET['openGroup']=='yes':false;
 $invitation_email = isset($_GET['invitation_email'])?$_GET['invitation_email']:'';
 $non_billed_bytes = isset($_GET['non_billed_bytes'])?$_GET['non_billed_bytes']:0;
 
 switch ($action) {
 	case "newGroup":
-		$result = OC_User_Group_Admin_Util::dbCreateGroup($name, $userid);
+		$result = OC_User_Group_Admin_Util::dbCreateGroup($name, $userid, $hidden);
 		break;
 	case "newMember":
 		$result = OC_User_Group_Admin_Util::dbAddToGroup($userid, $name, $accept, $decline, $memberRequest,

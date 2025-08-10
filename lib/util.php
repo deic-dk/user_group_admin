@@ -41,7 +41,7 @@ class OC_User_Group_Admin_Util {
 	 * @return bool Tries to create a new group. If the group name already exists, false will
 	 *         be returned.
 	 */
-	public static function dbCreateGroup($gid, $uid) {
+	public static function dbCreateGroup($gid, $uid, $hidden=null) {
 		// Check for existence
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?" );
 		$result = $stmt->execute(array($gid));
@@ -53,22 +53,40 @@ class OC_User_Group_Admin_Util {
 		if($result->fetchRow()){
 			return false;
 		}
-		$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` ) VALUES( ? , ? )" );
-		$result = $stmt->execute(array(
-				$gid,
-				$uid
-		));
+		if(empty($hidden)){
+			$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` ) VALUES( ? , ? )" );
+			$result = $stmt->execute(array(
+					$gid,
+					$uid
+			));
+		}
+		else{
+			$stmt = OC_DB::prepare ( "INSERT INTO `*PREFIX*user_group_admin_groups` ( `gid` , `owner` , `hidden` ) VALUES( ? , ? , ? )" );
+			$result = $stmt->execute(array(
+					$gid,
+					$uid,
+					$hidden
+			));
+		}
+
 		return $result;
 	}
 
-	public static function createGroup($gid, $uid) {
+	public static function createGroup($gid, $uid, $hidden=null) {
 		if(!\OCP\App::isEnabled('files_sharding') || \OCA\FilesSharding\Lib::isMaster()){
-			$result = self::dbCreateGroup($gid, $uid );
+			$result = self::dbCreateGroup($gid, $uid, $hidden);
 		}
 		else{
-			$result = \OCA\FilesSharding\Lib::ws('groupActions', array('userid'=>$uid,
-					'name'=>urlencode($gid), 'action'=>'newGroup'), false, true,
-					null, 'user_group_admin');
+			if(empty($hidden)){
+				$result = \OCA\FilesSharding\Lib::ws('groupActions', array('userid'=>$uid,
+						'name'=>urlencode($gid), 'action'=>'newGroup'), false, true,
+						null, 'user_group_admin');
+			}
+			else{
+				$result = \OCA\FilesSharding\Lib::ws('groupActions', array('userid'=>$uid,
+						'name'=>urlencode($gid), 'hidden'=>$hidden, 'action'=>'newGroup'), false, true,
+						null, 'user_group_admin');
+			}
 		}
 		return $result ? true : false;
 	}
@@ -125,7 +143,7 @@ class OC_User_Group_Admin_Util {
 		return true;
 	}
 
-	public static function createHiddenGroup($gid) {
+	public static function dbCreateHiddenGroup($gid) {
 
 		// Check for existence
 		$stmt = OC_DB::prepare ( "SELECT `gid` FROM `*PREFIX*user_group_admin_groups` WHERE `gid` = ?" );
