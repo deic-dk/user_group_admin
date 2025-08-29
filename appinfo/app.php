@@ -57,8 +57,18 @@ if(isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI']!='/' &&
 		);
 }
 
-OCP\Util::addScript('user_group_admin','setview');
-OCP\Util::addScript('user_group_admin','user_group_notification');
+if(!isset($_SERVER['REQUEST_URI']) ||
+		strpos($_SERVER['REQUEST_URI'], OC::$WEBROOT ."/shared/")!==0 &&
+		strpos($_SERVER['REQUEST_URI'], OC::$WEBROOT ."/public/")!==0 &&
+		strpos($_SERVER['REQUEST_URI'], OC::$WEBROOT ."/files/")!==0 &&
+		strpos($_SERVER['REQUEST_URI'], OC::$WEBROOT ."/remote.php/")!==0 &&
+		strpos($_SERVER['REQUEST_URI'], OC::$WEBROOT ."/sharingin/")!==0 &&
+		strpos($_SERVER['REQUEST_URI'], OC::$WEBROOT ."/sharingout/")!==0 &&
+		strpos($_SERVER['REQUEST_URI'], OC::$WEBROOT ."/groupfolders/")!==0
+		){
+	OCP\Util::addScript('user_group_admin','setview');
+	OCP\Util::addScript('user_group_admin','user_group_notification');
+}
 
 }
 
